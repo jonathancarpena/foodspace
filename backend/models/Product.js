@@ -1,6 +1,8 @@
-const mongoose = require("mongoose")
+import pkg from "mongoose"
 
-const productSchema = new mongoose.Schema({
+const { Schema, model, ObjectId } = pkg
+
+const productSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -9,29 +11,25 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    purchasedDate: {
-        type: Date,
-        required: true
-    },
-    expirationDate: {
-        type: Date,
-        required: true
-    },
-    expired: {
-        type: Boolean,
-        default: false
-    },
-    owner: {
+    measurement: {
         type: String,
-        default: "everyone",
+        default: "count"
     },
     imageUrl: {
         type: String,
         required: true
     },
-
+    expirationLifeSpan: {
+        type: Number,
+        required: false,
+        default: 7
+    },
+    author: {
+        type: ObjectId,
+        required: true
+    }
 })
 
-const Product = mongoose.model('product', productSchema)
+const Product = model('product', productSchema)
 
-module.exports = Product
+export default Product

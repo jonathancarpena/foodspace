@@ -1,11 +1,15 @@
+import { Routes, Route } from 'react-router-dom';
+import Landing from './pages/landing';
 
 function App() {
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
-        Hello World
-      </h1>
-    </div>
+    <Routes>
+
+      {/* Landing Page */}
+      <Route exact path='/' element={<Landing />} />
+
+    </Routes>
   );
 }
 
