@@ -24,10 +24,15 @@ const productSchema = new Schema({
         required: false,
         default: 7
     },
+    barcode: {
+        type: Number,
+        required: false,
+    },
     author: {
         type: ObjectId,
         required: true
-    }
+    },
+
 })
 
 const Product = model('product', productSchema)

@@ -1,15 +1,18 @@
 import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
 import Landing from './pages/landing';
 
 function App() {
 
   return (
-    <Routes>
+    <Layout>
+      <Routes>
 
-      {/* Landing Page */}
-      <Route exact path='/' element={<Landing />} />
+        {/* Landing Page */}
+        <Route exact path='/' element={<Landing />} />
 
-    </Routes>
+      </Routes>
+    </Layout>
   );
 }
 
