@@ -11,7 +11,7 @@ import { CgClipboard, CgComment, CgTrash, CgInsights } from 'react-icons/cg'
 // Constants
 const contentSections = [
     {
-        icon: <CgClipboard className='inline-block' />,
+        icon: <CgClipboard />,
         heading: 'Keep track without the chaos',
         message: 'Connect your teams, projects, and docs in Notion — so you can bust silos and move as one.',
         image: image1
@@ -39,7 +39,7 @@ const contentSections = [
 const Section = ({ content }) => {
     const { icon, heading, message, image } = content
     return (
-        <section className='flex flex-col md:flex-row space-y-5 tracking-tight'>
+        <section className='flex flex-col md:flex-row space-y-6 tracking-tight'>
 
             <div>
                 {/* Icon */}
@@ -47,7 +47,7 @@ const Section = ({ content }) => {
                     {icon}
                 </span>
                 {/* Heading */}
-                <h3 className='text-xl  text-main font-semibold'>
+                <h3 className='text-xl  text-main font-semibold mt-3'>
                     {heading}
                 </h3>
                 {/* Subheading */}

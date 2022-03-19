@@ -43,14 +43,6 @@ const userSchema = new Schema({
         lowercase: true,
         trim: true
     },
-    username: {
-        type: String,
-        required: true,
-        lowercase: true,
-        trim: true,
-        minLength: 6,
-        maxlength: 15,
-    },
     password: {
         type: String,
         required: true,

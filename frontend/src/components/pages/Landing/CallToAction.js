@@ -1,5 +1,8 @@
 import React from 'react'
 
+// Router
+import { Link } from 'react-router-dom'
+
 // Icons
 import { BiFridge } from 'react-icons/bi'
 
@@ -25,9 +28,11 @@ function CallToAction() {
             </div>
 
             {/* Call to Action */}
-            <Button sx='w-[250px] mb-3'>
-                Try FoodSpace free
-            </Button>
+            <Link to='/account/signup'>
+                <Button sx='w-[250px] mb-3'>
+                    Try FoodSpace free
+                </Button>
+            </Link>
 
             {/* Link to Contact */}
             <span className='block text-secondary'>

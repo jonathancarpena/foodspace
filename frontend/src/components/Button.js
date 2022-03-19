@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-const defaultButtonStyles = 'inline-block w-max font-semibold rounded-sm m-1 ring-[1px]'
+const defaultButtonStyles = 'inline-block w-max font-semibold rounded-sm m-1 ring-[1px] drop-shadow-sm'
 
 const sizeOptions = {
     sm: 'text-sm px-2 py-2',
@@ -23,7 +23,8 @@ function Button({ children, onClick, variant = 'contained', disabled = false, si
     return (
         <button
             onClick={onClick}
-            className={`${disabled ? disabledStyles[variant] : variantOptions[variant]} ${sizeOptions[size]} ${sx} `}>
+            className={`${disabled ? disabledStyles[variant] : variantOptions[variant]} 
+            ${sizeOptions[size]} ${sx} `}>
             {children}
         </button>
     )

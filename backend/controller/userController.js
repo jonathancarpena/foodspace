@@ -10,10 +10,10 @@ export const register = async (req, res) => {
     console.log('REGISTER')
     try {
         // Get user input
-        const { email, username, password, first_name, last_name } = req.body
+        const { email, password, first_name, last_name } = req.body
 
         // Validate user input
-        if (!username || !email || !password || !first_name || !last_name) {
+        if (!email || !password || !first_name || !last_name) {
             res.status(400).send("All input is required");
         } else {
             const salt = await genSalt()
@@ -22,7 +22,6 @@ export const register = async (req, res) => {
             const data = {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
-                username: req.body.username,
                 password: hashPassword,
                 email: req.body.email.toLowerCase(),
             }
@@ -41,19 +40,17 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         // Get user input
-        const { email, username, password } = req.body
+        const { email, password } = req.body
 
         // Validate user input
-        if (!((email || username) && password)) {
-            res.status(400).send("All input is required");
+        if (!(email && password)) {
+            res.status(400).json({
+                message: "All input is required"
+            })
         }
 
         let user;
-        if (email) {
-            user = await User.findOne({ email: email })
-        } else {
-            user = await User.findOne({ username: username })
-        }
+        user = await User.findOne({ email: email })
 
         if (!user) {
             return res.status(401).send("Invalid Credentials")
@@ -62,18 +59,23 @@ export const login = async (req, res) => {
 
         let isMatch = await compare(password, user.password)
         if (!isMatch) {
-            return res.status(401).send("Invalid Credentials")
+            res.status(401).send({
+                message: "Incorrect Password"
+            })
         }
 
 
-        const token = jwt.sign({
-            _id: user._id,
-            email: user.email
-        }, process.env.TOKEN_KEY, {
-            expiresIn: 360000
-        })
+        if (isMatch && user) {
+            const token = jwt.sign({
+                _id: user._id,
+                email: user.email
+            }, process.env.TOKEN_KEY, {
+                expiresIn: 360000
+            })
 
-        res.json({ token })
+            res.status(200).json({ token })
+        }
+
     } catch (err) {
         console.error(err);
     }
@@ -104,6 +106,24 @@ export const logout = async (req, res) => {
 
     return res.send({ success: true })
 }
+
+
+export const emailCheck = async (req, res) => {
+    const { email } = req.body
+    try {
+        const user = await User.findOne({ email: email })
+        res.json({
+            user
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            message: "Server Error"
+        })
+    }
+}
+
+
 
 
 

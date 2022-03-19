@@ -4,6 +4,7 @@
 	"proxy": "http://127.0.0.1:5000",
 	"private": true,
 	"dependencies": {
+		"@emailjs/browser": "^3.4.0",
 		"@headlessui/react": "^1.5.0",
 		"@reduxjs/toolkit": "^1.8.0",
 		"@tailwindui/react": "^0.1.1",

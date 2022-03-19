@@ -16,6 +16,11 @@ connectDB();
 // Express Server
 const app = express()
 
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:3000"
+}))
+
 // For JSON Data
 app.use(cookieParser())
 app.use(json())
@@ -23,10 +28,7 @@ app.use(urlencoded({
     extended: false
 }))
 
-app.use(cors({
-    credentials: true,
-    origin: "http://localhost:3000"
-}))
+
 
 
 // Routes: (extension, routes)

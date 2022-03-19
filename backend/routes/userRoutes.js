@@ -4,7 +4,8 @@ import {
     register,
     login,
     logout,
-    me
+    me,
+    emailCheck
 } from '../controller/userController.js';
 
 import auth from '../middleware/auth.js'
@@ -19,6 +20,11 @@ router.post("/register", register)
 //@route    POST /api/user/login
 ///@access  Public
 router.post("/login", login)
+
+//@desc     POST user login session created
+//@route    POST /api/user/email
+///@access  Public
+router.post("/email", emailCheck)
 
 //@desc     POST user login session created
 //@route    POST /api/user/me

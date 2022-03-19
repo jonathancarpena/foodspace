@@ -33,7 +33,7 @@ function Navbar() {
     }, [])
 
     return (
-        <nav className={`bg-white fixed top-0 z-[100] w-screen  `}>
+        <nav className={`bg-white fixed top-0 z-[100] w-screen `}>
 
             <div className={`flex w-[88%] items-center ${scroll > 50 && 'border-b-[1px]'} mx-5`}  >
                 {/* Branding */}
@@ -50,9 +50,11 @@ function Navbar() {
                 {/* Login & Hamburger */}
                 <div className='ml-auto py-2.5 '>
                     {/* Login */}
-                    <Button size='sm'>
-                        Try FoodSpace Free
-                    </Button>
+                    <Link to='/account/signup'>
+                        <Button size='sm'>
+                            Try FoodSpace Free
+                        </Button>
+                    </Link>
 
                     {/* Mobile Menu Hamburger */}
                     <button onClick={() => setOpenMenu(!openMenu)}>
@@ -68,7 +70,7 @@ function Navbar() {
 
             {/* Mobile Menu */}
             {openMenu && <>
-                <div className='bg-white absolute top-14 w-[88%] h-screen mx-5'>
+                <div className='bg-white absolute top-16 w-screen h-screen px-5'>
 
                     {/* Links */}
                     <ul className='flex flex-col'>
@@ -88,14 +90,18 @@ function Navbar() {
                     </ul>
 
                     {/* Login/Join Buttons */}
-                    <div className='flex flex-col items-center mt-5 space-y-4'>
-                        <Button size='md' sx='w-[90vw] '>
-                            Try FoodSpace free
-                        </Button>
+                    <div className='flex flex-col jusitfy-center items-center mt-5 space-y-4'>
+                        <Link to='/account/signup' className='w-full'>
+                            <Button size='md' sx='w-full'>
+                                Try FoodSpace free
+                            </Button>
+                        </Link>
 
-                        <Button size='md' variant='outline' sx='w-[90vw] '>
-                            Log in
-                        </Button>
+                        <Link to='/account/login' className='w-full'>
+                            <Button size='md' variant='outline' sx='w-full'>
+                                Log in
+                            </Button>
+                        </Link>
                     </div>
 
                 </div>
