@@ -74,6 +74,22 @@ export const getAdminFoodSpaceById = async (req, res) => {
     }
 }
 
+export const getAllAdminFoodSpace = async (req, res) => {
+    const { _id } = req.user
+
+    try {
+        const me = await User.findById(_id)
+        res.json({
+            foodSpace: me.admin
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            message: "Server Error"
+        })
+    }
+}
+
 
 export const createFoodSpace = async (req, res) => {
     try {

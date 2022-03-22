@@ -18,7 +18,7 @@ module.exports = {
           800: '#784400',
         },
         main: '#111111',
-        secondary: '#666665'
+        secondary: '#92938C'
       },
       fontFamily: {
         'body': ["Noto Sans"]

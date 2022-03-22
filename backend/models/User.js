@@ -2,6 +2,16 @@ import pkg from "mongoose"
 
 const { Schema, ObjectId, model } = pkg
 
+const avatarSchema = new Schema({
+    emoji: {
+        type: String,
+        default: '🥧'
+    },
+    favoriteColor: {
+        type: String,
+        default: 'bg-red-400'
+    }
+})
 const productSchema = new Schema({
     name: {
         type: String,
@@ -65,6 +75,9 @@ const userSchema = new Schema({
     myFood: {
         type: [productSchema],
         default: []
+    },
+    avatar: {
+        type: avatarSchema,
     }
 })
 

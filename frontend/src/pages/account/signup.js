@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
+// Redux
+import { userEmail, setupAuth } from '../../redux/features/auth/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
+
 // Router
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -10,20 +14,23 @@ import { FaGoogle, FaApple, FaTimesCircle } from 'react-icons/fa'
 
 // Components
 import Button from '../../components/Button'
-import TransitionOpacity from '../../components/TransitionOpacity'
+import TransitionOpacity from '../../components/Transition/TransitionOpacity'
 
 // Utils
 import { validateEmail, sendRegisterCode, generateHashCode } from '../../lib/utils'
 
 // Constants
-import { BASE_API } from '../../lib/urls'
+import { API } from '../../lib/urls'
 
 
-function SignUp() {
+function Login() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const auth = useSelector(state => state.auth)
     const [email, setEmail] = useState('')
     const [emailError, setEmailError] = useState('')
-    const [registerCode, setRegisterCode] = useState(generateHashCode())
+    // const [registerCode, setRegisterCode] = useState(generateHashCode())
+    const [registerCode, setRegisterCode] = useState('jack')
     const [newUser, setNewUser] = useState({
         status: false,
         error: '',
@@ -46,9 +53,11 @@ function SignUp() {
             setEmailError('')
             const { data } = await axios({
                 method: "POST",
-                url: `${BASE_API}/user/email`,
+                url: `${API.USER.email}`,
                 data: { email }
             })
+
+            console.log(data)
 
             if (!data.user) {
                 setNewUser({
@@ -63,7 +72,7 @@ function SignUp() {
                     register_code: registerCode,
                     email: email
                 }
-                sendRegisterCode(params)
+                // sendRegisterCode(params)
             } else {
                 setNewUser({
                     ...newUser,
@@ -81,14 +90,15 @@ function SignUp() {
 
     async function handleLoginSubmit(e) {
         e.preventDefault()
-
         try {
-            const res = await axios({
-                method: "POST",
-                url: `${BASE_API}/user/login`,
-                data: { email: email, password: currentUser.passwordInput }
-            })
-            if (res.data) {
+            const data = {
+                email: email,
+                password: currentUser.passwordInput
+            }
+
+            dispatch(setupAuth({ type: "login", payload: data }))
+
+            if (auth.ready) {
                 setSuccess(true)
                 setTimeout(() => {
                     navigate('/')
@@ -106,10 +116,13 @@ function SignUp() {
         e.preventDefault()
         if (newUser.codeInput === registerCode) {
             setNewUser({ ...newUser, error: '' })
+            dispatch(userEmail({ email }))
+            setSuccess(true)
             setTimeout(() => {
-                setSuccess(true)
-                navigate('/')
+                setSuccess(false)
+                navigate('/account/onboarding')
             }, [2000])
+
         } else {
             setNewUser({ ...newUser, error: 'Your register code was incorrect. Please try again.' })
         }
@@ -135,8 +148,17 @@ function SignUp() {
 
 
     return (
-        <section >
+        <section className='relative h-screen'>
 
+            <Link to='/account/onboarding'>
+                <p onClick={() => {
+                    dispatch(userEmail({ email }))
+                    navigate('/account/onboarding')
+                }} >
+                    OnBoarding
+                </p>
+
+            </Link>
             <div className='absolute top-4 left-4'>
                 <Link to='/'>
                     {/* Icon */}
@@ -151,161 +173,167 @@ function SignUp() {
             </div>
 
 
-            <TransitionOpacity show={success}>
-                <h1 className='text-4xl absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%]'>
-                    Success
+            {/* User Successfully Login or Register Code */}
+            <TransitionOpacity show={success} relative={false} hidden={false}>
+                <h1 className=' text-4xl absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%]'>
+                    Welcome!
                 </h1>
             </TransitionOpacity>
 
 
             {!success &&
-                <div className='mx-[5.25rem] flex flex-col justify-center items-center space-y-5'>
 
-                    <h1 className='pt-[5.7rem]   text-[50px] font-bold tracking-tight'>
-                        Sign up
-                    </h1>
+                <>
+                    <div className='mx-[5.25rem]  mt-16 flex flex-col justify-center items-center space-y-5'>
 
-                    {/* Login Providers */}
-                    <div className='flex flex-col space-y-3 w-full pb-5 border-b-[1px] '>
+                        <h1 className='pt-[4.5rem] text-[50px] font-bold tracking-tighter'>
+                            Sign up
+                        </h1>
 
-                        {/* Google Login */}
-                        <Button sx='w-full py-1.5  text-sm font-normal mx-0 '>
-                            <FaGoogle className='inline-block mb-1 mr-1' /> Continue with Google
-                        </Button>
+                        {/* Login Providers */}
+                        <div className='flex flex-col space-y-3 w-full pb-5 border-b-[1px] '>
 
-                        {/* Apple Login */}
-                        <button className='py-1.5 ring-[1px] mx-0 ring-main rounded-sm  w-full text-sm drop-shadow-sm'>
-                            <FaApple className='inline-block mb-1 mr-1 text-[1rem]' />Continue with Apple
-                        </button>
+                            {/* Google Login */}
+                            <Button sx='w-full py-1.5  text-sm font-normal mx-0 '>
+                                <FaGoogle className='inline-block mb-1 mr-1' /> Continue with Google
+                            </Button>
 
-                    </div>
-
-                    {/* Login Form */}
-                    <form className='w-full' onSubmit={handleEmailSubmit}>
-
-                        {/* Email Input */}
-                        <div className='w-full'>
-                            <label htmlFor='email' className='block text-xs text-neutral-400 mb-1.5'>
-                                Email
-                            </label>
-
-                            {/* Input */}
-                            <div className='relative mb-3.5'>
-                                <input
-                                    disabled={newUser.status || currentUser.status}
-                                    type="email"
-                                    name="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    id="email"
-                                    placeholder='Enter your email address...'
-                                    className={`block border-[1px] border-neutral-300 w-full px-2 py-1.5 
-                            rounded-sm  bg-neutral-50 focus:outline-sky-200 
-                            focus:outline-offset-2 focus:border-sky-300`}
-                                />
-
-                                {/* Erase All */}
-                                {email &&
-                                    <button onClick={clearEmailInput} className='absolute top-3 right-3'>
-                                        <FaTimesCircle className='text-neutral-400 active:text-neutral-500' />
-                                    </button>
-                                }
-                            </div>
+                            {/* Apple Login */}
+                            <button className='py-1.5 ring-[1px] mx-0 ring-main rounded-sm  w-full text-sm drop-shadow-sm'>
+                                <FaApple className='inline-block mb-1 mr-1 text-[1rem]' />Continue with Apple
+                            </button>
 
                         </div>
 
-                        {emailError &&
-                            <p className='text-red-500 text-sm mt-2'>{emailError}</p>
-                        }
+                        {/* Login Form */}
+                        <form className='w-full' onSubmit={handleEmailSubmit}>
 
-                        {/* Submit Input */}
-                        {!(newUser.status || currentUser.status) &&
-                            <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 '>
-                                Continue with email
-                            </Button>
-                        }
-
-                    </form>
-
-                    {/* New User */}
-                    {newUser.status &&
-                        <div className='block w-full'>
-                            <form onSubmit={handleRegisterCodeSubmit}>
-
-                                {/* Email Message */}
-                                <p className='text-neutral-400 text-center text-sm mt-[-1.5rem] mb-3'>
-                                    We just sent you a temporary sign up code. Please check your inbox and paste the sign up code below.
-                                </p>
-                                <label htmlFor='registerCode' className='block text-xs text-neutral-400 mb-1.5'>
-                                    Register code
+                            {/* Email Input */}
+                            <div className='w-full'>
+                                <label htmlFor='email' className='block text-xs text-neutral-400 mb-1.5'>
+                                    Email
                                 </label>
 
-                                {/* Register Code Input */}
-                                <input
-                                    value={newUser.codeInput}
-                                    onChange={(e) => setNewUser({ ...newUser, codeInput: e.target.value })}
-                                    id="registerCode"
-                                    placeholder='Paste register code.'
-                                    className={`block border-[1px] border-neutral-300 w-full px-2 py-1.5 
+                                {/* Input */}
+                                <div className='relative mb-3.5'>
+                                    <input
+                                        disabled={newUser.status || currentUser.status}
+                                        type="email"
+                                        name="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        id="email"
+                                        placeholder='Enter your email address...'
+                                        className={`block border-[1px] border-neutral-300 w-full px-2 py-1.5 
                             rounded-sm  bg-neutral-50 focus:outline-sky-200 
-                            focus:outline-offset-2 focus:border-sky-300 mb-3`}
-                                />
+                            focus:outline-offset-2 focus:border-sky-300`}
+                                    />
 
-                                <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 ' >
-                                    Create new account
-                                </Button>
-
-                                {newUser.error &&
-                                    <p className='text-red-500 text-sm text-center'>{newUser.error}</p>
-                                }
-
-                            </form>
-                        </div>
-                    }
-
-
-                    {/* Email Exist */}
-                    {currentUser.status &&
-                        <div className='block w-full'>
-                            <form onSubmit={handleLoginSubmit}>
-
-                                {/* Label Password */}
-                                <p htmlFor='password' className='flex mt-[-1.2rem] justify-between w-full text-xs text-neutral-400 mb-1.5'>
-                                    Password
-                                    {/* Error: Password Incorrect */}
-                                    {currentUser.error &&
-                                        <span className='text-red-500 '>{currentUser.error}</span>
+                                    {/* Erase All */}
+                                    {email &&
+                                        <button onClick={clearEmailInput} className='absolute top-3 right-3'>
+                                            <FaTimesCircle className='text-neutral-400 active:text-neutral-500' />
+                                        </button>
                                     }
-                                </p>
+                                </div>
 
+                            </div>
 
+                            {emailError &&
+                                <p className='text-red-500 text-sm mt-2'>{emailError}</p>
+                            }
 
-                                {/* Input: Password */}
-                                <input
-                                    type='password'
-                                    value={currentUser.passwordInput}
-                                    onChange={(e) => setCurrentUser({ ...currentUser, passwordInput: e.target.value })}
-                                    id="password"
-                                    placeholder='Enter Password...'
-                                    className={`block border-[1px] border-neutral-300 w-full px-2 py-1.5 
+                            {/* Submit Input */}
+                            {!(newUser.status || currentUser.status) &&
+                                <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 '>
+                                    Continue with email
+                                </Button>
+                            }
+
+                        </form>
+
+                        {/* New User */}
+                        {newUser.status &&
+                            <div className='block w-full'>
+                                <form onSubmit={handleRegisterCodeSubmit}>
+
+                                    {/* Email Message */}
+                                    <p className='text-neutral-400 text-center text-sm mt-[-1.5rem] mb-3'>
+                                        We just sent you a temporary sign up code. Please check your inbox and paste the sign up code below.
+                                    </p>
+                                    <label htmlFor='registerCode' className='block text-xs text-neutral-400 mb-1.5'>
+                                        Register code
+                                    </label>
+
+                                    {/* Register Code Input */}
+                                    <input
+                                        value={newUser.codeInput}
+                                        onChange={(e) => setNewUser({ ...newUser, codeInput: e.target.value })}
+                                        id="registerCode"
+                                        placeholder='Paste register code.'
+                                        className={`block border-[1px] border-neutral-300 w-full px-2 py-1.5 
                             rounded-sm  bg-neutral-50 focus:outline-sky-200 
                             focus:outline-offset-2 focus:border-sky-300 mb-3`}
-                                />
+                                    />
+
+                                    <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 ' >
+                                        Create new account
+                                    </Button>
+
+                                    {newUser.error &&
+                                        <p className='text-red-500 text-sm text-center'>{newUser.error}</p>
+                                    }
+
+                                </form>
+                            </div>
+                        }
 
 
-                                {/* Log In */}
-                                <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 ' >
-                                    Log in
-                                </Button>
-                            </form>
-                        </div>
-                    }
+                        {/* Email Exist */}
+                        {currentUser.status &&
+                            <div className='block w-full'>
+                                <form onSubmit={handleLoginSubmit}>
 
-                </div>
+                                    {/* Label Password */}
+                                    <p htmlFor='password' className='flex mt-[-1.2rem] justify-between w-full text-xs text-neutral-400 mb-1.5'>
+                                        Password
+                                        {/* Error: Password Incorrect */}
+                                        {currentUser.error &&
+                                            <span className='text-red-500 '>{currentUser.error}</span>
+                                        }
+                                    </p>
+
+
+                                    {/* Input: Password */}
+                                    <input
+                                        type='password'
+                                        value={currentUser.passwordInput}
+                                        onChange={(e) => setCurrentUser({ ...currentUser, passwordInput: e.target.value })}
+                                        id="password"
+                                        placeholder='Enter Password...'
+                                        className={`block border-[1px] border-neutral-300 w-full px-2 py-1.5 
+                            rounded-sm  bg-neutral-50 focus:outline-sky-200 
+                            focus:outline-offset-2 focus:border-sky-300 mb-3`}
+                                    />
+
+
+                                    {/* Log In */}
+                                    <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 ' >
+                                        Log in
+                                    </Button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                    <p className='text-xs text-secondary mt-24 text-center mx-1'>
+                        By clicking “Continue with Google/Email” above, you acknowledge that you have read and understood, and agree to FoodSpace's
+                        <span className='ml-1 cursor-pointer underline hover:text-primary-500 '>Terms & Conditions</span> and<span className='ml-1 cursor-pointer underline hover:text-primary-500 '>Privacy Policy</span>.
+                    </p>
+                </>
             }
 
         </section>
     )
 }
 
-export default SignUp
+export default Login

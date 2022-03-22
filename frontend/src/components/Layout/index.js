@@ -7,13 +7,16 @@ import { useLocation } from 'react-router-dom'
 import Footer from './Footer'
 import Navbar from './Navbar'
 
+// Constants
+const fullScreenPages = ['/account/login', '/account/signup', '/account/onboarding']
+
 function Layout({ children }) {
     const [showFooter, setShowFooter] = useState(true)
     const [showNavbar, setShowNavbar] = useState(true)
     const location = useLocation()
 
     useEffect(() => {
-        if (location.pathname.includes('login') || location.pathname.includes('signup')) {
+        if (fullScreenPages.includes(location.pathname)) {
             setShowFooter(false)
             setShowNavbar(false)
         } else {
@@ -25,7 +28,7 @@ function Layout({ children }) {
     return (
         <div className=' font-body'>
             {showNavbar && <Navbar />}
-            <div className='mt-16 '>
+            <div className={`${showNavbar ? 'mt-16' : ''}`}>
                 {children}
             </div>
             {showFooter && <Footer />}

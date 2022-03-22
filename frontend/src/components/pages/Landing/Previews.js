@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 // Components
-import TransitionOpacity from '../../TransitionOpacity'
+import TransitionOpacity from '../../Transition/TransitionOpacity'
 
 // Icons
 import { FiArrowRight, FiArrowLeft } from 'react-icons/fi'
@@ -25,15 +25,14 @@ const Slide = ({ img, title, slideNumber, index }) => {
     return (
 
         <TransitionOpacity show={index === slideNumber}>
-            <div >
-                {/* Image */}
-                <img src={img} className='h-[270px] mb-3 drop-shadow-md rounded-md cursor-pointer hover:brightness-[0.9] transition-[filter] ease-in-out duration-150 ' />
 
-                {/* Title */}
-                <span className=' font-semibold hover:underline  cursor-pointer'>
-                    {title}
-                </span>
-            </div>
+            {/* Image */}
+            <img src={img} className='h-[270px] mb-3 drop-shadow-md rounded-md cursor-pointer hover:brightness-[0.9] transition-[filter] ease-in-out duration-150 ' />
+
+            {/* Title */}
+            <span className=' font-semibold hover:underline  cursor-pointer'>
+                {title}
+            </span>
         </TransitionOpacity>
     )
 }

@@ -29,7 +29,7 @@ router.post("/email", emailCheck)
 //@desc     POST user login session created
 //@route    POST /api/user/me
 ///@access  Authenticated
-router.post("/me", auth, me)
+router.get("/me", auth, me)
 
 
 //@desc     DELETE user login session deleted
