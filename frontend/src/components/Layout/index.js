@@ -8,7 +8,12 @@ import Footer from './Footer'
 import Navbar from './Navbar'
 
 // Constants
-const fullScreenPages = ['/account/login', '/account/signup', '/account/onboarding']
+const fullScreenPages = [
+    '/account/login',
+    '/account/signup',
+    '/account/onboarding',
+    '/foodSpace/create'
+]
 
 function Layout({ children }) {
     const [showFooter, setShowFooter] = useState(true)
@@ -26,7 +31,7 @@ function Layout({ children }) {
     }, [location])
 
     return (
-        <div className=' font-body'>
+        <div className={`${(showNavbar && showFooter) ? 'bg-white' : 'bg-[#F7F6F3]'} font-body `}>
             {showNavbar && <Navbar />}
             <div className={`${showNavbar ? 'mt-16' : ''}`}>
                 {children}

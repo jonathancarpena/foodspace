@@ -26,7 +26,7 @@ export const getProductById = async (req, res) => {
 }
 
 
-export const addProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
     const { _id: user_id } = req.user
 
     try {
@@ -48,7 +48,7 @@ export const addProduct = async (req, res) => {
 }
 
 
-export const removeProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
     const { product_id } = req.body
     const { _id: user_id } = req.user
 

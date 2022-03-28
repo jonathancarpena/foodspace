@@ -33,17 +33,12 @@ function OnBoarding() {
     const [showModal, setShowModal] = useState(false)
 
 
-    useEffect(() => {
-        if (!auth.user) {
-            navigate('/')
-        }
-    }, [])
 
     useEffect(() => {
-        if (auth.ready) {
+        if (auth.ready || !auth.user.email) {
             navigate('/')
         }
-    }, [auth.ready])
+    }, [auth])
 
     async function handleSubmit(e) {
         e.preventDefault()

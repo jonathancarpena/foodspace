@@ -19,9 +19,15 @@ const productSchema = new Schema({
     },
     quantity: {
         type: Number,
-        required: true
+        required: false,
+        default: 1
     },
-    measurement: {
+    type: {
+        type: String,
+        required: false,
+        default: "food"
+    },
+    unit: {
         type: String,
         default: "count"
     },
@@ -36,6 +42,16 @@ const productSchema = new Schema({
     },
     author: {
         type: ObjectId,
+        required: true
+    }
+})
+const foodSpaceSchema = new Schema({
+    _id: {
+        type: ObjectId,
+        required: true
+    },
+    name: {
+        type: String,
         required: true
     }
 })
@@ -65,11 +81,11 @@ const userSchema = new Schema({
         trim: true
     },
     foodSpaces: {
-        type: [ObjectId],
+        type: [foodSpaceSchema],
         default: [],
     },
     admin: {
-        type: [ObjectId],
+        type: [foodSpaceSchema],
         default: [],
     },
     myFood: {
@@ -78,6 +94,10 @@ const userSchema = new Schema({
     },
     avatar: {
         type: avatarSchema,
+        default: {
+            emoji: "🥧",
+            favoriteColor: "bg-slate-300"
+        }
     }
 })
 

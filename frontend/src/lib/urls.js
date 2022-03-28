@@ -19,6 +19,12 @@ export const API = {
         addArea: `${BASE_API}/foodSpace/admin/add-area`,
         addUser: `${BASE_API}/foodSpace/admin/add-user`,
         removeUser: `${BASE_API}/foodSpace/admin/remove-user`,
+    },
+    PRODUCT: {
+        base: `${BASE_API}/products`,
+        add: `${BASE_API}/products/create`,
+        delete: `${BASE_API}/products/delete`,
+        update: `${BASE_API}/products/update`
     }
 }
 

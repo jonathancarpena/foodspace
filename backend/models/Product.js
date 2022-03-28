@@ -7,11 +7,12 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    quantity: {
-        type: Number,
-        required: true
+    type: {
+        type: String,
+        required: false,
+        default: "food"
     },
-    measurement: {
+    unit: {
         type: String,
         default: "count"
     },

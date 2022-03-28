@@ -99,7 +99,7 @@ function Login() {
             if (auth.ready) {
                 setSuccess(true)
                 setTimeout(() => {
-                    navigate('/')
+                    navigate('/account')
                 }, [2000])
             }
         } catch (error) {
@@ -110,7 +110,7 @@ function Login() {
 
     }
 
-    async function handleRegisterCodeSubmit(e) {
+    function handleRegisterCodeSubmit(e) {
         e.preventDefault()
         if (newUser.codeInput === registerCode) {
             setNewUser({ ...newUser, error: '' })

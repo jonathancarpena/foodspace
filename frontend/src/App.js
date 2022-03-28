@@ -14,6 +14,9 @@ import Login from './pages/account/login'
 import SignUp from './pages/account/signup';
 import OnBoarding from './pages/account/onboarding';
 import CreateFoodSpace from './pages/foodspace/create'
+import FoodSpace from './pages/foodspace/[id]'
+import AdminFoodSpace from './pages/foodspace/admin'
+import AddItem from './pages/foodspace/addItem'
 
 
 function App() {
@@ -46,6 +49,15 @@ function App() {
 
         {/* Create FoodSpace Page */}
         <Route exact path='/foodSpace/create' element={<CreateFoodSpace />} />
+
+        {/* FoodSpace Page */}
+        <Route exact path='/foodSpace/:id' element={<FoodSpace />} />
+
+        {/* Admin FoodSpace Page */}
+        <Route exact path='/foodSpace/admin/:id' element={<AdminFoodSpace />} />
+
+        {/* Add Item to FoodSpace Page */}
+        <Route exact path='/foodSpace/:foodSpaceName/add-item' element={<AddItem />} />
 
       </Routes>
     </Layout>

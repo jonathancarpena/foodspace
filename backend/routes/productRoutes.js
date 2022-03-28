@@ -2,8 +2,8 @@ import { Router } from "express";
 import {
     getAllProducts,
     getProductById,
-    addProduct,
-    removeProduct,
+    createProduct,
+    deleteProduct,
     updateProduct
 } from "../controller/productController.js";
 import auth from "../middleware/auth.js";
@@ -22,15 +22,15 @@ router.get("/:id", getProductById)
 
 
 //@desc     POST a product to the db
-//@route    POST /api/products/add
+//@route    POST /api/products/create
 ///@access  Authenticated
-router.post("/add", auth, addProduct)
+router.post("/create", auth, createProduct)
 
 
 //@desc     POST a product to the db
-//@route    POST /api/products/remove
+//@route    POST /api/products/delete
 ///@access  Authenticated
-router.delete("/remove", auth, removeProduct)
+router.delete("/delete", auth, deleteProduct)
 
 
 //@desc     PUT a product to the db

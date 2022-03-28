@@ -7,12 +7,14 @@ async function checkIfInFoodSpace(foodSpace_id, user_id) {
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
 
-        if (foodSpace.admin.toString() === user_id) {
+        if (foodSpace.admin._id.toString() === user_id) {
             found = "admin"
-        } else if (foodSpace.users.includes(user_id)) {
-            found = "user"
-        } else {
-            found = null
+        }
+
+        for (const user of foodSpace.users) {
+            if (user._id.toString() === user_id.toString()) {
+                found = "user"
+            }
         }
 
     } catch (error) {
@@ -26,10 +28,16 @@ async function checkIfInFoodSpace(foodSpace_id, user_id) {
 // Access to Admin and Users
 export const getAllFoodSpaces = async (req, res) => {
     const { _id } = req.user
+    const userExist = await checkIfInFoodSpace(foodSpace_id, _id)
+
+    if (!userExist) {
+        res.status(400).json({
+            message: "Access Denied"
+        })
+    }
     try {
         const me = await User.findById(_id)
-
-        res.json({
+        res.status(200).json({
             admin: me.admin,
             foodSpaces: me.foodSpaces
         })
@@ -43,11 +51,19 @@ export const getAllFoodSpaces = async (req, res) => {
 
 export const getFoodSpaceById = async (req, res) => {
     const { _id } = req.user
-    const num = req.params.id
+    const foodSpace_id = req.params.id
+
+    const userExist = await checkIfInFoodSpace(foodSpace_id, _id)
+    if (!userExist) {
+        res.status(400).json({
+            message: "Access Denied"
+        })
+    }
+
     try {
-        const me = await User.findById(_id)
-        res.json({
-            foodSpace: me.foodSpaces[num + 1]
+        const foodSpace = await FoodSpace.findById(foodSpace_id)
+        res.status(200).json({
+            foodSpace
         })
     } catch (error) {
         console.error(error)
@@ -60,15 +76,23 @@ export const getFoodSpaceById = async (req, res) => {
 
 export const getAdminFoodSpaceById = async (req, res) => {
     const { _id } = req.user
-    const num = req.params.id
+    const foodSpace_id = req.params.id
+    let foodSpace;
     try {
-        const me = await User.findById(_id)
-        res.json({
-            foodSpace: me.admin[num + 1]
+        const userIsAdmin = await checkIfInFoodSpace(foodSpace_id, _id)
+        if (!userIsAdmin) {
+            return res.status(400).json({
+                message: "Access Denied"
+            })
+        }
+
+        foodSpace = await FoodSpace.findById(foodSpace_id)
+        return res.status(200).json({
+            foodSpace
         })
+
     } catch (error) {
-        console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -92,9 +116,25 @@ export const getAllAdminFoodSpace = async (req, res) => {
 
 
 export const createFoodSpace = async (req, res) => {
+    const { _id } = req.user
+
     try {
+
+        // Creating a new FoodSpace
         const newFoodSpace = await FoodSpace.create(req.body)
-        res.json(newFoodSpace)
+
+        // Adding FoodSpace to User
+        const user = await User.findById(_id)
+        const foodSpaceModel = {
+            _id: newFoodSpace._id,
+            name: newFoodSpace.name
+        }
+        user.admin.push(foodSpaceModel)
+        await user.save()
+
+        res.status(200).json({
+            foodSpace: newFoodSpace
+        })
     } catch (error) {
         console.error(error)
         res.status(500).json({
@@ -131,9 +171,10 @@ export const deleteFoodSpace = async (req, res) => {
 
 // Access to Admin only
 export const addUserToFoodSpace = async (req, res) => {
+    console.log('ADDING NEW USER')
     // Validate if User is an Admin
     const { _id } = req.user
-    const { user_id, foodSpace_id } = req.body
+    const { email, foodSpace_id } = req.body
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!check || check === "user") {
         return res.status(400).json({
@@ -141,14 +182,62 @@ export const addUserToFoodSpace = async (req, res) => {
         })
     }
 
+
+
     try {
-        const foodSpace = await FoodSpace.findById(foodSpace_id)
-        foodSpace.users.push(user_id)
-        await foodSpace.save()
-        res.json({
-            message: `Added user to your FoodSpace: #${foodSpace_id}`,
-            foodSpace: foodSpace
-        })
+        const newUser = await User.findOne({ email: email })
+
+        if (newUser) {
+            const userExist = await checkIfInFoodSpace(foodSpace_id, newUser._id)
+
+            // Validation: User Exist
+            if (userExist) {
+                console.log('USER ALREADY EXIST')
+                return res.status(400).json({
+                    message: "User is already added."
+                })
+            }
+            // Validation: Cannot Add yourself
+            if (newUser._id === _id) {
+                return res.status(400).json({
+                    message: "Cannot add yourself."
+                })
+            }
+
+            // Grabbing FoodSpace
+            const foodSpace = await FoodSpace.findById(foodSpace_id)
+
+            // Creating User Schema
+            const userData = {
+                _id: newUser._id,
+                first_name: newUser.first_name,
+                last_name: newUser.last_name,
+                email: newUser.email,
+                avatar: newUser.avatar
+            }
+
+            // Adding User to FoodSpace
+            foodSpace.users.push(userData)
+            await foodSpace.save()
+
+            // Adding FoodSpace to User
+            const foodSpaceModel = {
+                _id: foodSpace._id,
+                name: foodSpace.name
+            }
+            newUser.foodSpaces.push(foodSpaceModel)
+            await newUser.save()
+
+            res.json({
+                message: `Added user to your FoodSpace: #${foodSpace_id}`,
+                foodSpace: foodSpace
+            })
+        } else {
+            return res.status(400).json({
+                message: "User does not exist."
+            })
+        }
+
     } catch (error) {
         console.error(error)
         res.status(500).json({
@@ -222,7 +311,9 @@ export const addAreaToFoodSpace = async (req, res) => {
 export const addItemToFoodSpace = async (req, res) => {
     // Validate if User is an Admin or User
     const { _id } = req.user
-    const { item, foodSpace_id } = req.body
+    const { items, foodSpace_id } = req.body
+    console.log('FOODSPACE ITEM ', items)
+    console.log('FOODSPACE ID ', foodSpace_id)
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!check) {
         return res.status(400).json({
@@ -233,7 +324,7 @@ export const addItemToFoodSpace = async (req, res) => {
 
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
-        foodSpace.stock.push(item)
+        items.forEach((item) => foodSpace.stock.push(item))
         await foodSpace.save()
         res.json({
             message: `Added item to FoodSpace: #${foodSpace_id}`,

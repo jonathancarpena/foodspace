@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 
 import axios from 'axios'
 
@@ -43,7 +43,25 @@ export const setupAuth = createAsyncThunk(
     }
 )
 
+export const refreshMe = createAsyncThunk(
+    'auth/refreshMe',
+    async (arg, thunkAPI) => {
 
+        const { data } = await axios({
+            method: "GET",
+            url: `${API.USER.me}`,
+            headers: {
+                Authorization: `Bearer ${thunkAPI.getState().auth.token}`
+            }
+        })
+
+        const response = {
+            user: data.user,
+            token: thunkAPI.getState().auth.token
+        }
+        return response
+    }
+)
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -81,28 +99,25 @@ export const authSlice = createSlice({
             state.token = null
             state.ready = false
         },
+        [refreshMe.fulfilled]: (state, action) => {
+            console.log('Refresh Fufilled')
+            state.loading = false
+            state.error = null
+            state.token = action.payload.token
+            state.user = action.payload.user
+            state.ready = true
+
+        },
+        [refreshMe.rejected]: (state, action) => {
+            console.log('Refresh Rejected')
+            state.loading = false
+            state.error = JSON.parse(action.error.message)
+            state.user = null
+            state.token = null
+            state.ready = false
+        },
+
     }
-    // extraReducers: {
-    //     [setupAuth.fulfilled]: (state, action) => {
-    //         console.log('Auth Sucessful')
-    //         state.loading = false
-    //         state.ready = true
-    //         state.token = action.payload.jwt
-    //         state.user = action.payload.user
-    //         state.error = null
-    //     },
-    //     [setupAuth.rejected]: (state, action) => {
-    //         console.log('Rejected')
-    //         state.loading = false
-    //         state.ready = false
-    //         state.error = action.error.message
-    //         state.user = null
-    //         state.token = null
-    //     },
-    //     [updateAvatar.fulfilled]: (state, action) => {
-    //         state.user.avatar = action.payload
-    //     }
-    // }
 
 })
 

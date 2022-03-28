@@ -2,10 +2,73 @@ import pkg from "mongoose"
 
 const { Schema, ObjectId, model } = pkg
 
-const foodSpaceItemSchema = new Schema({
-    product_id: {
+const productSchema = new Schema({
+    _id: {
+        type: ObjectId,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    imageUrl: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: false,
+        default: "food"
+    },
+    unit: {
+        type: String,
+        default: "count"
+    }
+})
+
+const avatarSchema = new Schema({
+    emoji: {
+        type: String,
+        default: '🥧'
+    },
+    favoriteColor: {
+        type: String,
+        default: 'bg-red-400'
+    }
+})
+
+const userSchema = new Schema({
+    _id: {
         type: ObjectId,
         required: true
+    },
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: avatarSchema,
+        required: true
+    }
+})
+
+const foodSpaceItemSchema = new Schema({
+    product: {
+        type: productSchema,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: false,
+        default: 1
     },
     area: {
         type: String,
@@ -23,18 +86,24 @@ const foodSpaceItemSchema = new Schema({
         default: Date.now()
     },
     owner: {
-        type: ObjectId,
+        type: userSchema,
         required: false,
     }
 })
 
+
 const foodSpaceSchema = new Schema({
     admin: {
-        type: ObjectId,
+        type: userSchema,
         required: true
     },
+    name: {
+        type: String,
+        required: false,
+        default: "home"
+    },
     users: {
-        type: [ObjectId],
+        type: [userSchema],
         required: false,
         default: [],
     },

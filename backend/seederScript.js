@@ -15,16 +15,39 @@ import connectDB from './config/db.js'
 
 connectDB()
 
-
 const createFoodSpace = async () => {
     const user = await User.find()
     const foodSpace_items = (await Product.find()).map((item) => {
         return {
-            product_id: item._id
+            product: {
+                _id: item._id,
+                name: item.name,
+                imageUrl: item.imageUrl,
+                measurement: item.measurement
+            },
+            owner: {
+                _id: user[0]._id,
+                first_name: user[0].first_name,
+                last_name: user[0].last_name,
+                email: user[0].email,
+                avatar: user[0].avatar,
+            }
+
         }
     })
+
+
+    const admin = {
+        _id: user[0]._id,
+        first_name: user[0].first_name,
+        last_name: user[0].last_name,
+        email: user[0].email,
+        avatar: user[0].avatar,
+    }
+
+
     const populatedFoodSpace = {
-        admin: user[0]._id,
+        admin: admin,
         stock: foodSpace_items
     }
 
@@ -56,6 +79,18 @@ const populateMyFood = async () => {
     await User.findByIdAndUpdate(user._id, user)
 }
 
+const addFoodSpaceAdmin = async () => {
+    const user = (await User.find())[0]
+    const foodSpace = (await FoodSpace.find())[0]
+    const foodSpaceModel = {
+        _id: foodSpace._id,
+        name: foodSpace.name
+    }
+
+    // Adding foodSpace to admin 
+    user.admin.push(foodSpaceModel)
+    await user.save()
+}
 // Deletes Everything in Database
 // Inputs default Data
 const importData = async () => {
@@ -78,6 +113,9 @@ const importData = async () => {
 
         // Add Products to users myFood section
         await populateMyFood()
+
+        // Add  Admin to FoodSpace
+        await addFoodSpaceAdmin()
 
         console.log('Data Import Success')
         process.exit()
