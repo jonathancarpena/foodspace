@@ -22,7 +22,7 @@ function AddArea() {
     try {
       const res = await axios({
         method: "POST",
-        url: `${API.FOODSPACE.addArea}`,
+        url: `${API.ADMIN.addArea}`,
         data: {
           areas: filterEmptyFields,
           foodSpace_id

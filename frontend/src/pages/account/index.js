@@ -47,6 +47,18 @@ function Account() {
                 </Button>
             </Link>
 
+            <Link to='/product/create'>
+                <Button>
+                    Create Product
+                </Button>
+            </Link>
+
+            <Link to='/product/me'>
+                <Button>
+                    My Products
+                </Button>
+            </Link>
+
             <div>
 
                 <div>

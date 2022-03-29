@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // Router
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux'
@@ -42,6 +42,7 @@ import { FaTimes, FaPlusCircle } from 'react-icons/fa'
 // const { item, foodSpace_id } = body
 
 function AddItem() {
+    const navigate = useNavigate()
     const { state: { foodSpace, foodSpace_id } } = useLocation()
     const { token } = useSelector(state => state.auth)
     const [products, setProducts] = useState(null)
@@ -83,10 +84,7 @@ function AddItem() {
     function handleAddItemClick(item) {
         const newItem = {
             product: {
-                _id: item._id,
-                name: item.name,
-                imageUrl: item.imageUrl,
-                type: item.type,
+                ...item,
                 unit: unitMeasure[item.type][0]
             },
             quantity: 1,
@@ -108,10 +106,7 @@ function AddItem() {
         if (searchResults.length === 1) {
             const newItem = {
                 product: {
-                    _id: searchResults[0]._id,
-                    name: searchResults[0].name,
-                    imageUrl: searchResults[0].imageUrl,
-                    type: searchResults[0].type,
+                    ...searchResults[0],
                     unit: unitMeasure[searchResults[0].type][0]
                 },
                 quantity: 1,
@@ -141,13 +136,7 @@ function AddItem() {
             }
 
             const item = {
-                product: {
-                    _id: element.product._id,
-                    name: element.product.name,
-                    imageUrl: element.product.imageUrl,
-                    type: element.product.type,
-                    unit: element.product.unit
-                },
+                product: element.product,
                 quantity: element.quantity,
                 area: element.area,
                 purchaseDate: element.purchaseDate,
@@ -170,6 +159,9 @@ function AddItem() {
                 foodSpace_id
             }
         })
+        if (res) {
+            navigate('/')
+        }
     }
 
     function handleValueChange(e, index) {

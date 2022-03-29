@@ -30,7 +30,7 @@ function Admin() {
         setLoading(true)
         axios({
             method: "GET",
-            url: `${API.FOODSPACE.admin}/${foodSpace_id}`,
+            url: `${API.ADMIN.base}/${foodSpace_id}`,
             headers: {
                 Authorization: `Bearer ${auth.token}`
             }
@@ -57,7 +57,7 @@ function Admin() {
         try {
             const res = await axios({
                 method: "DELETE",
-                url: `${API.FOODSPACE.removeItem}`,
+                url: `${API.ADMIN.removeItem}`,
                 data: {
                     item_id: item._id,
                     foodSpace_id
@@ -148,7 +148,7 @@ function Admin() {
             try {
                 const res = await axios({
                     method: "DELETE",
-                    url: `${API.FOODSPACE.delete}`,
+                    url: `${API.ADMIN.delete}`,
                     data: {
                         foodSpace_id
                     },
@@ -172,7 +172,7 @@ function Admin() {
             try {
                 const res = await axios({
                     method: "DELETE",
-                    url: `${API.FOODSPACE.removeArea}`,
+                    url: `${API.ADMIN.removeArea}`,
                     data: {
                         area,
                         foodSpace_id
@@ -201,13 +201,13 @@ function Admin() {
                 Delete FoodSpace
             </Button>
 
-            <Link to={`/foodSpace/${foodSpace.name}/add-area`} state={{ foodSpace, foodSpace_id }}>
+            <Link to={`/foodSpace/admin/${foodSpace.name}/add-area`} state={{ foodSpace, foodSpace_id }}>
                 <Button>
                     Add Area
                 </Button>
             </Link>
 
-            <Link to={`/foodSpace/${foodSpace.name}/manage/users`} state={{ foodSpace, foodSpace_id }}>
+            <Link to={`/foodSpace/admin/${foodSpace.name}/manage/users`} state={{ foodSpace, foodSpace_id }}>
                 <Button>
                     Manage Users
                 </Button>
@@ -269,6 +269,7 @@ function Admin() {
                     <div key={`${idx}-${idx}`} className="flex space-x-3">
                         {item.edit
                             ? <form onSubmit={(e) => handleEditSubmit(e, idx)} className="flex space-x-3">
+                                <span>{item.product.image}</span>
                                 <p>{item.product.name}</p>
                                 <p>Qty:
                                     <input
@@ -323,6 +324,7 @@ function Admin() {
                             : <>
                                 <button onClick={() => handleRemoveItem(item)}>Remove</button>
                                 <button onClick={() => editStatus(idx)}>Edit</button>
+                                <span>{item.product.image}</span>
                                 <p>{item.product.name}</p>
                                 <p>Qty:  {item.quantity} {item.product.unit}</p>
                                 <p>Area: {item.area}</p>

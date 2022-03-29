@@ -2,31 +2,8 @@ import pkg from "mongoose"
 
 const { Schema, ObjectId, model } = pkg
 
-const productSchema = new Schema({
-    _id: {
-        type: ObjectId,
-        required: true,
-    },
-    name: {
-        type: String,
-        required: true
-    },
-    imageUrl: {
-        type: String,
-        required: true
-    },
-    type: {
-        type: String,
-        required: false,
-        default: "food"
-    },
-    unit: {
-        type: String,
-        default: "count"
-    }
-})
-
-const avatarSchema = new Schema({
+// Should be imported from User
+const user_avatarSchema = new Schema({
     emoji: {
         type: String,
         default: '🥧'
@@ -37,7 +14,8 @@ const avatarSchema = new Schema({
     }
 })
 
-const userSchema = new Schema({
+// Should be Imported from Product
+const product_authorSchema = new Schema({
     _id: {
         type: ObjectId,
         required: true
@@ -55,14 +33,82 @@ const userSchema = new Schema({
         required: true
     },
     avatar: {
-        type: avatarSchema,
+        type: user_avatarSchema,
         required: true
     }
 })
+const product_lifeSpanSchema = new Schema({
+    value: {
+        type: Number,
+        default: '7'
+    },
+    time: {
+        type: String,
+        default: 'day'
+    }
+})
+const product_productSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: false,
+        default: "food"
+    },
+    unit: {
+        type: String,
+        default: "count"
+    },
+    image: {
+        type: String,
+        required: false,
+        default: "🍽"
+    },
+    lifeSpan: {
+        type: product_lifeSpanSchema,
+    },
+    barcode: {
+        type: Number,
+        required: false,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
+    author: {
+        type: product_authorSchema,
+        required: true
+    },
+})
 
+// FoodSpace Schemas //
+const foodSpaceUserSchema = new Schema({
+    _id: {
+        type: ObjectId,
+        required: true
+    },
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: user_avatarSchema,
+        required: true
+    }
+})
 const foodSpaceItemSchema = new Schema({
     product: {
-        type: productSchema,
+        type: product_productSchema,
         required: true
     },
     quantity: {
@@ -86,15 +132,13 @@ const foodSpaceItemSchema = new Schema({
         default: Date.now()
     },
     owner: {
-        type: userSchema,
+        type: foodSpaceUserSchema,
         required: false,
     }
 })
-
-
 const foodSpaceSchema = new Schema({
     admin: {
-        type: userSchema,
+        type: foodSpaceUserSchema,
         required: true
     },
     name: {
@@ -103,7 +147,7 @@ const foodSpaceSchema = new Schema({
         default: "home"
     },
     users: {
-        type: [userSchema],
+        type: [foodSpaceUserSchema],
         required: false,
         default: [],
     },
@@ -119,6 +163,6 @@ const foodSpaceSchema = new Schema({
     },
 })
 
-const Pantry = model('foodSpace', foodSpaceSchema)
+const FoodSpace = model('foodSpace', foodSpaceSchema)
 
-export default Pantry
+export default FoodSpace

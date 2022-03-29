@@ -25,7 +25,7 @@ function ManageUsers() {
             try {
                 const res = await axios({
                     method: "POST",
-                    url: `${API.FOODSPACE.addUser}`,
+                    url: `${API.ADMIN.addUser}`,
                     data: {
                         email,
                         foodSpace_id
@@ -68,7 +68,7 @@ function ManageUsers() {
             try {
                 const res = await axios({
                     method: "DELETE",
-                    url: `${API.FOODSPACE.removeUser}`,
+                    url: `${API.ADMIN.removeUser}`,
                     data: {
                         user_id: user._id,
                         foodSpace_id

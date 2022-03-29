@@ -107,10 +107,10 @@ function Create() {
                 })
                 setErrors(null)
                 dispatch(refreshMe())
-
-                if (res.data) {
-                    navigate(`/foodSpace/${res.data.foodSpace.name}/add-item`, { state: { foodSpace_id: res.data.foodSpace._id } })
+                if (res) {
+                    navigate('/')
                 }
+
 
             } catch (error) {
                 const { message } = error.response.data

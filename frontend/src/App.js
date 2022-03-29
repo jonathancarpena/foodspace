@@ -15,9 +15,12 @@ import OnBoarding from './pages/account/onboarding';
 
 // Regular User
 import Account from './pages/account'
+import CreateProduct from './pages/product/create'
+import MyProducts from './pages/product/me'
 import CreateFoodSpace from './pages/foodspace/create'
-import FoodSpace from './pages/foodspace/[id]'
+import FoodSpace from './pages/foodspace'
 import AddItem from './pages/foodspace/addItem'
+
 
 // Admin Pages
 import AdminFoodSpace from './pages/foodspace/admin'
@@ -53,23 +56,35 @@ function App() {
         {/* Onboarding Page */}
         <Route exact path='/account/onboarding' element={<OnBoarding />} />
 
+        {/* Create Product Page */}
+        <Route exact path='/product/create' element={<CreateProduct />} />
+
+        {/* Create Product Page */}
+        <Route exact path='/product/:id' element={<CreateProduct />} />
+
+        {/* My Food Page */}
+        <Route exact path='/product/me' element={<MyProducts />} />
+
         {/* Create FoodSpace Page */}
         <Route exact path='/foodSpace/create' element={<CreateFoodSpace />} />
 
-        {/* FoodSpace Page */}
-        <Route exact path='/foodSpace/:id' element={<FoodSpace />} />
+        {/* Admin: FoodSpace Page */}
+        <Route exact path='/foodSpace/admin/:name' element={<AdminFoodSpace />} />
 
-        {/* Admin FoodSpace Page */}
-        <Route exact path='/foodSpace/admin/:id' element={<AdminFoodSpace />} />
+        {/* Admin: Add Area */}
+        <Route exact path='/foodSpace/admin/:name/add-area' element={<AddArea />} />
+
+        {/* Admin: Manage Users*/}
+        <Route exact path='/foodSpace/admin/:name/manage/users' element={<ManageUsers />} />
+
+        {/* FoodSpace Page */}
+        <Route exact path='/foodSpace/:name' element={<FoodSpace />} />
 
         {/* Add Item to FoodSpace Page */}
-        <Route exact path='/foodSpace/:foodSpaceName/add-item' element={<AddItem />} />
+        <Route exact path='/foodSpace/:name/add-item' element={<AddItem />} />
 
-        {/* Add Area to FoodSpace Page */}
-        <Route exact path='/foodSpace/:foodSpaceName/add-area' element={<AddArea />} />
 
-        {/* Add User to FoodSpace Page */}
-        <Route exact path='/foodSpace/:foodSpaceName/manage/users' element={<ManageUsers />} />
+
 
       </Routes>
     </Layout>

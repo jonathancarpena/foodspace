@@ -1,5 +1,8 @@
-import emailjs from '@emailjs/browser';
+// Constants
+import { timeInMs } from './constants';
 
+// Emailjs
+import emailjs from '@emailjs/browser';
 
 export function randomItem(array) {
     return array[Math.floor(Math.random() * array.length)];
@@ -59,3 +62,6 @@ export function generateHashCode() {
     return code
 }
 
+export function convertToMs(lifeSpan, time) {
+    return lifeSpan * timeInMs[time]
+}

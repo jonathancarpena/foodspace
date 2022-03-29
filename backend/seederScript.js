@@ -20,10 +20,7 @@ const createFoodSpace = async () => {
     const foodSpace_items = (await Product.find()).map((item) => {
         return {
             product: {
-                _id: item._id,
-                name: item.name,
-                imageUrl: item.imageUrl,
-                measurement: item.measurement
+                ...item
             },
             owner: {
                 _id: user[0]._id,
@@ -63,19 +60,26 @@ const createUser = async () => {
 const createProducts = async () => {
     const user = await User.find()
     const addAuthor = productsData.map((item) => {
+
         return {
             ...item,
-            author: user[0]._id
+            author: {
+                _id: user[0]._id,
+                first_name: user[0].first_name,
+                last_name: user[0].last_name,
+                email: user[0].email,
+                avatar: user[0].avatar,
+            }
         }
     })
 
     return addAuthor
 }
 
-const populateMyFood = async () => {
+const populateMyProducts = async () => {
     const user = (await User.find())[0]
     const products = await Product.find()
-    user.myFood = [...user.myFood, ...products]
+    user.myProducts = [...user.myProducts, ...products]
     await User.findByIdAndUpdate(user._id, user)
 }
 
@@ -111,8 +115,8 @@ const importData = async () => {
         const newFoodSpace = await createFoodSpace()
         await FoodSpace.insertMany(newFoodSpace)
 
-        // Add Products to users myFood section
-        await populateMyFood()
+        // Add Products to users myProducts section
+        await populateMyProducts()
 
         // Add  Admin to FoodSpace
         await addFoodSpaceAdmin()

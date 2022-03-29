@@ -2,9 +2,10 @@ import Product from '../models/Product.js'
 import User from '../models/User.js'
 
 export const getAllProducts = async (req, res) => {
+    console.log('GRABBING ALL PRODUCTS')
     try {
         const products = await Product.find({})
-        res.json(products)
+        return res.status(200).json(products)
     } catch (error) {
         console.error(error)
         res.status(500).json({
@@ -14,12 +15,13 @@ export const getAllProducts = async (req, res) => {
 }
 
 export const getProductById = async (req, res) => {
+    console.log('GRABBING PRODUCT BY ID')
     try {
         const product = await Product.findById(req.params.id)
-        res.json(product)
+        return res.status(200).json(product)
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -27,21 +29,23 @@ export const getProductById = async (req, res) => {
 
 
 export const createProduct = async (req, res) => {
+    console.log('CREATING PRODUCT')
     const { _id: user_id } = req.user
+    const { product } = req.body
 
     try {
-        const newProduct = await Product.create(req.body)
+        const newProduct = await Product.create(product)
         const user = await User.findById(user_id)
-        user.myFood = [...user.myFood, newProduct]
-        await User.findByIdAndUpdate(user_id, user)
+        user.myProducts.push(newProduct)
+        await user.save()
 
-        res.json({
+        return res.status(200).json({
             product: newProduct,
             message: `Successfully removed the product`
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -49,59 +53,73 @@ export const createProduct = async (req, res) => {
 
 
 export const deleteProduct = async (req, res) => {
-    const { product_id } = req.body
+    console.log('DELETING PRODUCT')
+    const { item } = req.body
     const { _id: user_id } = req.user
 
-    const product = await Product.findById(product_id)
+    const product = await Product.findById(item._id)
 
-    if (product.author.toString() !== req.user._id) {
+    if (product.author._id.toString() !== user_id) {
         return res.status(400).json({
             message: "Access Denied"
         })
     }
 
     try {
-        const deletedProduct = await Product.findByIdAndDelete(product_id)
+        // Deleting Product from DB
+        const deletedProduct = await Product.findByIdAndDelete(product._id)
 
-        const myFood = await User.findByIdAndUpdate(user_id, {
+        // Deleting Product from Users MyProducts
+        const myProducts = await User.findByIdAndUpdate(user_id, {
             "$pull": {
-                "myFood": {
-                    "_id": product_id
+                "myProducts": {
+                    "_id": product._id
                 }
             }
         })
 
-        res.json({
+        return res.status(200).json({
             message: `Successfully removed the product`
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
 }
 
 export const updateProduct = async (req, res) => {
-    const { product_id, data } = req.body
+    console.log('UPDATING PRODUCT')
     const { _id: user_id } = req.user
+    const { data } = req.body
 
-    const product = await Product.findById(product_id)
+    const product = await Product.findById(data._id)
 
-    if (product.author.toString() !== user_id) {
+    // Validating User is Author
+    if (product.author._id.toString() !== user_id) {
         return res.status(400).json({
             message: "Access Denied"
         })
     }
+
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(product_id, data)
-        res.json({
+        // Updating Product
+        const updatedProduct = await Product.findByIdAndUpdate(data._id, data)
+
+        // Updating User's My Product
+        const user = await User.findById(user_id)
+        const indexToUpdate = user.myProducts.findIndex((item) => item._id.toString() === data._id)
+        user.myProducts[indexToUpdate] = updatedProduct
+        await user.save()
+
+        return res.status(200).json({
             product: updatedProduct,
             message: `Successfully updated the product`
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }

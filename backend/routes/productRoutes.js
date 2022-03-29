@@ -34,7 +34,7 @@ router.delete("/delete", auth, deleteProduct)
 
 
 //@desc     PUT a product to the db
-//@route    PUT /api/products/update/:id
+//@route    PUT /api/products/update
 ///@access  Authenticated
 router.put("/update", auth, updateProduct)
 

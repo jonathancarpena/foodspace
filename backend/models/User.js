@@ -1,7 +1,11 @@
 import pkg from "mongoose"
-
 const { Schema, ObjectId, model } = pkg
 
+
+
+
+
+// User Schemas //
 const avatarSchema = new Schema({
     emoji: {
         type: String,
@@ -12,15 +16,44 @@ const avatarSchema = new Schema({
         default: 'bg-red-400'
     }
 })
-const productSchema = new Schema({
-    name: {
+
+// Should be Imported from Product
+const product_authorSchema = new Schema({
+    _id: {
+        type: ObjectId,
+        required: true
+    },
+    first_name: {
         type: String,
         required: true
     },
-    quantity: {
+    last_name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: avatarSchema,
+        required: true
+    }
+})
+const product_lifeSpanSchema = new Schema({
+    value: {
         type: Number,
-        required: false,
-        default: 1
+        default: '7'
+    },
+    time: {
+        type: String,
+        default: 'day'
+    }
+})
+const product_productSchema = new Schema({
+    name: {
+        type: String,
+        required: true
     },
     type: {
         type: String,
@@ -31,21 +64,30 @@ const productSchema = new Schema({
         type: String,
         default: "count"
     },
-    imageUrl: {
+    image: {
         type: String,
-        required: true
+        required: false,
+        default: "🍽"
     },
-    expirationLifeSpan: {
+    lifeSpan: {
+        type: product_lifeSpanSchema,
+    },
+    barcode: {
         type: Number,
         required: false,
-        default: 7
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
     },
     author: {
-        type: ObjectId,
+        type: product_authorSchema,
         required: true
-    }
+    },
 })
-const foodSpaceSchema = new Schema({
+
+// User Schemas //
+const userFoodSpaceSchema = new Schema({
     _id: {
         type: ObjectId,
         required: true
@@ -55,7 +97,6 @@ const foodSpaceSchema = new Schema({
         required: true
     }
 })
-
 const userSchema = new Schema({
     first_name: {
         type: String,
@@ -81,15 +122,15 @@ const userSchema = new Schema({
         trim: true
     },
     foodSpaces: {
-        type: [foodSpaceSchema],
+        type: [userFoodSpaceSchema],
         default: [],
     },
     admin: {
-        type: [foodSpaceSchema],
+        type: [userFoodSpaceSchema],
         default: [],
     },
-    myFood: {
-        type: [productSchema],
+    myProducts: {
+        type: [product_productSchema],
         default: []
     },
     avatar: {
@@ -102,5 +143,4 @@ const userSchema = new Schema({
 })
 
 const User = model('user', userSchema)
-
 export default User

@@ -391,9 +391,15 @@ export const addItemToFoodSpace = async (req, res) => {
 
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
-        items.forEach((item) => foodSpace.stock.push(item))
+
+        items.forEach((item) => {
+            if (!foodSpace.areas.includes(item.area)) {
+                item.area = foodSpace.areas[0]
+            }
+            foodSpace.stock.push(item)
+        })
         await foodSpace.save()
-        res.json({
+        return res.status(200).json({
             message: `Added item to FoodSpace: #${foodSpace_id}`,
             foodSpace: foodSpace
         })

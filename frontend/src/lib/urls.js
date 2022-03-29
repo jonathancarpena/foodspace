@@ -8,22 +8,24 @@ export const API = {
         me: `${BASE_API}/user/me`,
         logout: `${BASE_API}/user/logout`
     },
-    FOODSPACE: {
-        base: `${BASE_API}/foodSpace`,
-        admin: `${BASE_API}/foodSpace/admin`,
-        create: `${BASE_API}/foodSpace/create`,
-        addItem: `${BASE_API}/foodSpace/add-item`,
-        removeItem: `${BASE_API}/foodSpace/remove-item`,
-        updateItem: `${BASE_API}/foodSpace/update-item`,
+    ADMIN: {
+        base: `${BASE_API}/foodSpace/admin`,
         delete: `${BASE_API}/foodSpace/admin/delete`,
         addArea: `${BASE_API}/foodSpace/admin/add-area`,
         removeArea: `${BASE_API}/foodSpace/admin/remove-area`,
         addUser: `${BASE_API}/foodSpace/admin/add-user`,
         removeUser: `${BASE_API}/foodSpace/admin/remove-user`,
     },
+    FOODSPACE: {
+        base: `${BASE_API}/foodSpace`,
+        create: `${BASE_API}/foodSpace/create`,
+        addItem: `${BASE_API}/foodSpace/add-item`,
+        removeItem: `${BASE_API}/foodSpace/remove-item`,
+        updateItem: `${BASE_API}/foodSpace/update-item`
+    },
     PRODUCT: {
         base: `${BASE_API}/products`,
-        add: `${BASE_API}/products/create`,
+        create: `${BASE_API}/products/create`,
         delete: `${BASE_API}/products/delete`,
         update: `${BASE_API}/products/update`
     }
@@ -49,13 +51,13 @@ export const API = {
 // delete ✔
 // addArea ✔
 // removeArea ✔
-// addUser
-// removeUser
+// addUser ✔
+// removeUser ✔
 
 // PRODUCT //
-// base
-// add
-// delete
-// update
+// base ✔
+// add ✔
+// delete ✔
+// update ✔
 
 
