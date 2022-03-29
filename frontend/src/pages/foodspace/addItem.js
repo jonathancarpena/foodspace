@@ -42,46 +42,22 @@ import { FaTimes, FaPlusCircle } from 'react-icons/fa'
 // const { item, foodSpace_id } = body
 
 function AddItem() {
-    const { state: { foodSpace_id } } = useLocation()
+    const { state: { foodSpace, foodSpace_id } } = useLocation()
     const { token } = useSelector(state => state.auth)
     const [products, setProducts] = useState(null)
-    const [foodSpace, setFoodSpace] = useState(null)
     const [items, setItems] = useState([])
     const [search, setSearch] = useState('')
     const [searchResults, setSearchResults] = useState('')
 
     // Gets ALl Products from Database
     useEffect(() => {
-
         async function fetchProductData() {
             const productDb = await axios.get(API.PRODUCT.base)
             if (productDb) {
                 setProducts(productDb.data)
             }
         }
-
-        async function fetchFoodSpace() {
-            try {
-                const { data } = await axios.get(`${API.FOODSPACE.base}/${foodSpace_id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-                if (data.foodSpace) {
-                    setFoodSpace(data.foodSpace)
-                }
-
-            } catch (error) {
-                const { message } = error.response.data
-                console.log(message)
-            }
-        }
-
         fetchProductData()
-        fetchFoodSpace()
-
-
-
     }, [])
 
     // Shows search Results
@@ -183,8 +159,9 @@ function AddItem() {
 
 
 
-        const res = await axios(API.FOODSPACE.addItem, {
+        const res = await axios({
             method: "POST",
+            url: `${API.FOODSPACE.addItem}`,
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -193,10 +170,6 @@ function AddItem() {
                 foodSpace_id
             }
         })
-
-        console.log(res)
-
-        // console.log("Adding ", items, ' to the foodSpace')
     }
 
     function handleValueChange(e, index) {

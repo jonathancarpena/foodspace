@@ -9,14 +9,20 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 // Pages
 import Layout from './components/Layout';
 import Landing from './pages/landing';
-import Account from './pages/account'
 import Login from './pages/account/login'
 import SignUp from './pages/account/signup';
 import OnBoarding from './pages/account/onboarding';
+
+// Regular User
+import Account from './pages/account'
 import CreateFoodSpace from './pages/foodspace/create'
 import FoodSpace from './pages/foodspace/[id]'
-import AdminFoodSpace from './pages/foodspace/admin'
 import AddItem from './pages/foodspace/addItem'
+
+// Admin Pages
+import AdminFoodSpace from './pages/foodspace/admin'
+import AddArea from './pages/foodspace/admin/addArea'
+import ManageUsers from './pages/foodspace/admin/manageUsers';
 
 
 function App() {
@@ -58,6 +64,12 @@ function App() {
 
         {/* Add Item to FoodSpace Page */}
         <Route exact path='/foodSpace/:foodSpaceName/add-item' element={<AddItem />} />
+
+        {/* Add Area to FoodSpace Page */}
+        <Route exact path='/foodSpace/:foodSpaceName/add-area' element={<AddArea />} />
+
+        {/* Add User to FoodSpace Page */}
+        <Route exact path='/foodSpace/:foodSpaceName/manage/users' element={<ManageUsers />} />
 
       </Routes>
     </Layout>

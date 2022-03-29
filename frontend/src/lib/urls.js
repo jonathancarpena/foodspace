@@ -17,6 +17,7 @@ export const API = {
         updateItem: `${BASE_API}/foodSpace/update-item`,
         delete: `${BASE_API}/foodSpace/admin/delete`,
         addArea: `${BASE_API}/foodSpace/admin/add-area`,
+        removeArea: `${BASE_API}/foodSpace/admin/remove-area`,
         addUser: `${BASE_API}/foodSpace/admin/add-user`,
         removeUser: `${BASE_API}/foodSpace/admin/remove-user`,
     },
@@ -29,5 +30,32 @@ export const API = {
 }
 
 
+// DONE
+
+// USER //
+// register ✔
+// login ✔
+// email ✔
+// me ✔
+// logout
+
+// FOOD SPACE //
+// base ✔
+// admin ✔
+// create ✔
+// addItem ✔
+// removeItem ✔
+// updateItem ✔
+// delete ✔
+// addArea ✔
+// removeArea ✔
+// addUser
+// removeUser
+
+// PRODUCT //
+// base
+// add
+// delete
+// update
 
 

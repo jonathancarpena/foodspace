@@ -7,6 +7,7 @@ import {
     createFoodSpace,
     deleteFoodSpace,
     addAreaToFoodSpace,
+    removeAreaFromFoodSpace,
     addUserToFoodSpace,
     removeUserFromFoodSpace,
     addItemToFoodSpace,
@@ -65,10 +66,15 @@ router.get("/admin/:id", auth, getAdminFoodSpaceById)
 router.delete("/admin/delete", auth, deleteFoodSpace)
 
 
-//@desc     PUT updates areas in foodSpace
-//@route    PUT /api/foodSpace/add-area
+//@desc     POST add areas in foodSpace
+//@route    POST /api/foodSpace/admin/add-area
 ///@access  Authenticated
-router.put("/admin/add-area", auth, addAreaToFoodSpace)
+router.post("/admin/add-area", auth, addAreaToFoodSpace)
+
+//@desc     DELETE add areas in foodSpace
+//@route    DELETE /api/foodSpace/admin/remove-area
+///@access  Authenticated
+router.delete("/admin/remove-area", auth, removeAreaFromFoodSpace)
 
 
 //@desc     POST adds user to foodSpace

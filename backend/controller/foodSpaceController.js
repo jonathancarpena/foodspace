@@ -31,19 +31,19 @@ export const getAllFoodSpaces = async (req, res) => {
     const userExist = await checkIfInFoodSpace(foodSpace_id, _id)
 
     if (!userExist) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Access Denied"
         })
     }
     try {
         const me = await User.findById(_id)
-        res.status(200).json({
+        return res.status(200).json({
             admin: me.admin,
             foodSpaces: me.foodSpaces
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -55,19 +55,19 @@ export const getFoodSpaceById = async (req, res) => {
 
     const userExist = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!userExist) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Access Denied"
         })
     }
 
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
-        res.status(200).json({
+        return res.status(200).json({
             foodSpace
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -103,12 +103,12 @@ export const getAllAdminFoodSpace = async (req, res) => {
 
     try {
         const me = await User.findById(_id)
-        res.json({
+        return res.status(200).json({
             foodSpace: me.admin
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -132,12 +132,12 @@ export const createFoodSpace = async (req, res) => {
         user.admin.push(foodSpaceModel)
         await user.save()
 
-        res.status(200).json({
+        return res.status(200).json({
             foodSpace: newFoodSpace
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -157,11 +157,33 @@ export const deleteFoodSpace = async (req, res) => {
     }
 
     try {
-        const deleteFoodSpace = await FoodSpace.findByIdAndDelete(foodSpace_id)
-        res.json({ message: `Removed FoodSpace: #${foodSpace_id}` })
+        // Delete FoodSpace
+        const foodSpace = await FoodSpace.findByIdAndDelete(foodSpace_id)
+
+        // Remove FoodSpace from Admin
+        const user = await User.findByIdAndUpdate(_id, {
+            "$pull": {
+                "admin": {
+                    "_id": foodSpace_id
+                }
+            }
+        })
+
+        for await (const user of foodSpace.users) {
+            await User.findByIdAndUpdate(user._id, {
+                "$pull": {
+                    "foodSpaces": {
+                        "_id": foodSpace_id
+                    }
+                }
+            })
+        }
+        return res.status(200).json({
+            message: `Removed FoodSpace: #${foodSpace_id}`
+        })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -188,7 +210,7 @@ export const addUserToFoodSpace = async (req, res) => {
         const newUser = await User.findOne({ email: email })
 
         if (newUser) {
-            const userExist = await checkIfInFoodSpace(foodSpace_id, newUser._id)
+            const userExist = await checkIfInFoodSpace(foodSpace_id, newUser._id.toString())
 
             // Validation: User Exist
             if (userExist) {
@@ -228,19 +250,19 @@ export const addUserToFoodSpace = async (req, res) => {
             newUser.foodSpaces.push(foodSpaceModel)
             await newUser.save()
 
-            res.json({
+            return res.status(200).json({
                 message: `Added user to your FoodSpace: #${foodSpace_id}`,
                 foodSpace: foodSpace
             })
         } else {
             return res.status(400).json({
-                message: "User does not exist."
+                message: `${email} does not exist.`
             })
         }
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -260,18 +282,31 @@ export const removeUserFromFoodSpace = async (req, res) => {
 
 
     try {
+        // Remove User from FoodSpace
         const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
             "$pull": {
-                "users": user_id
+                "users": {
+                    "_id": user_id
+                }
             }
         })
-        res.json({
+
+        // Remove Foodspace from User
+        const user = await User.findByIdAndUpdate(user_id, {
+            "$pull": {
+                "foodSpaces": {
+                    "_id": foodSpace_id
+                }
+            }
+        })
+
+        return res.status(200).json({
             message: `Removed user from your FoodSpace: #${foodSpace_id}`,
             foodSpace: foodSpace
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -280,6 +315,37 @@ export const removeUserFromFoodSpace = async (req, res) => {
 
 // Access to Admin only
 export const addAreaToFoodSpace = async (req, res) => {
+    console.log('ADDING AREA')
+    // Validate if User is an Admin
+    const { _id } = req.user
+    const { areas, foodSpace_id } = req.body
+    const check = await checkIfInFoodSpace(foodSpace_id, _id)
+    if (!check || check === "user") {
+        return res.status(400).json({
+            message: "Access Denied"
+        })
+    }
+
+
+    try {
+        const foodSpace = await FoodSpace.findById(foodSpace_id)
+        foodSpace.areas.push(...areas)
+        await foodSpace.save()
+        return res.status(200).json({
+            message: `Added area to your FoodSpace: #${foodSpace_id}`,
+            foodSpace: foodSpace
+        })
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({
+            message: "Server Error"
+        })
+    }
+}
+
+// Access to Admin only
+export const removeAreaFromFoodSpace = async (req, res) => {
+    console.log('REMOVE AREA')
     // Validate if User is an Admin
     const { _id } = req.user
     const { area, foodSpace_id } = req.body
@@ -292,16 +358,18 @@ export const addAreaToFoodSpace = async (req, res) => {
 
 
     try {
-        const foodSpace = await FoodSpace.findById(foodSpace_id)
-        foodSpace.areas.push(area)
-        await foodSpace.save()
-        res.json({
-            message: `Added area to your FoodSpace: #${foodSpace_id}`,
+        const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
+            "$pull": {
+                "areas": area
+            }
+        })
+        return res.status(200).json({
+            message: `Removed area from your FoodSpace: #${foodSpace_id}`,
             foodSpace: foodSpace
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -309,11 +377,10 @@ export const addAreaToFoodSpace = async (req, res) => {
 
 // Access to Admin and User 
 export const addItemToFoodSpace = async (req, res) => {
+    console.log("ADDING ITEM TO FOODSPACE")
     // Validate if User is an Admin or User
     const { _id } = req.user
     const { items, foodSpace_id } = req.body
-    console.log('FOODSPACE ITEM ', items)
-    console.log('FOODSPACE ID ', foodSpace_id)
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!check) {
         return res.status(400).json({
@@ -332,7 +399,7 @@ export const addItemToFoodSpace = async (req, res) => {
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -340,9 +407,10 @@ export const addItemToFoodSpace = async (req, res) => {
 
 // Access to Admin and User 
 export const removeItemFromFoodSpace = async (req, res) => {
+    console.log('REMOVING ITEM')
     // Validate if User is an Admin or User
     const { _id } = req.user
-    const { item_id: id, foodSpace_id } = req.body
+    const { item_id, foodSpace_id } = req.body
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!check) {
         return res.status(400).json({
@@ -351,22 +419,39 @@ export const removeItemFromFoodSpace = async (req, res) => {
     }
 
     try {
+        const item = ((await FoodSpace.findById(foodSpace_id)).stock).find((item) => item._id.toString() === item_id)
 
-        const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
-            "$pull": {
-                "stock": {
-                    "_id": id
+        // Item does not Exist
+        if (!item) {
+            return res.status(400).json({
+                message: "Item does not exist"
+            })
+        }
+
+        // Only Owner and Admin access
+        if (item.owner !== null && item.owner._id.toString() !== _id && check !== "admin") {
+            return res.status(400).json({
+                message: "Access Denied"
+            })
+        } else {
+            const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
+                "$pull": {
+                    "stock": {
+                        "_id": item_id
+                    }
                 }
-            }
-        })
+            })
 
-        res.json({
-            message: `Removed item ${id} from your FoodSpace`,
-            foodSpace: foodSpace
-        })
+            return res.status(200).json({
+                message: `Removed item ${item_id} from your FoodSpace`,
+                foodSpace
+            })
+        }
+
+
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -374,6 +459,7 @@ export const removeItemFromFoodSpace = async (req, res) => {
 
 // Access to Admin and User 
 export const updateItemFromFoodSpace = async (req, res) => {
+    console.log('UPDATING ITEM')
     // Validate if User is an Admin or User
     const { _id } = req.user
     const { item_id: id, foodSpace_id, info } = req.body
@@ -384,7 +470,8 @@ export const updateItemFromFoodSpace = async (req, res) => {
         })
     }
 
-    const { owner, expired, area } = info
+    // Change Owner, Area and Quantity
+    const { owner, area, quantity } = info
 
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
@@ -394,21 +481,46 @@ export const updateItemFromFoodSpace = async (req, res) => {
 
         // Grab Item and Update
         let itemToUpdate = foodSpace.stock.find((item) => (item._id).toString() === id)
-        owner ? itemToUpdate['owner'] = owner : null
-        expired ? itemToUpdate['expired'] = expired : null
-        area ? itemToUpdate['area'] = area : null
+
+        // Item is owned by someone
+        if (itemToUpdate.owner) {
+
+            // User must be the owner or Admin
+            if (itemToUpdate.owner._id.toString() !== _id || check !== "admin") {
+                return res.status(400).json({
+                    message: "Access Denied"
+                })
+            }
+        }
+
+        if (owner) {
+            itemToUpdate['owner'] = owner
+        } else {
+            itemToUpdate['owner'] = null
+        }
+
+        if (area) {
+            itemToUpdate['area'] = area
+        }
+
+        if (quantity) {
+            itemToUpdate['quantity'] = quantity
+        }
 
         // Update FoodSpace
         foodSpace.stock[updateIndex] = itemToUpdate
         foodSpace.save()
 
-        res.json({
+        return res.status(200).json({
             message: `Updated your item in your FoodSpace`,
             foodSpace: foodSpace
         })
+
+
+
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }

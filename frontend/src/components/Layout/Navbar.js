@@ -37,15 +37,18 @@ function Navbar() {
 
             <div className={`flex w-[88%] items-center ${scroll > 50 && 'border-b-[1px]'} mx-5`}  >
                 {/* Branding */}
-                <div className=''>
-                    {/* Icon */}
-                    <BiFridge className='inline-block text-4xl mb-1' />
+                <Link to='/'>
+                    <div className=''>
+                        {/* Icon */}
+                        <BiFridge className='inline-block text-4xl mb-1' />
 
-                    {/* Brand Name */}
-                    <h1 className='inline-block ml-1 font-extrabold text-lg mt-1 text-main'>
-                        FoodSpace
-                    </h1>
-                </div>
+                        {/* Brand Name */}
+                        <h1 className='inline-block ml-1 font-extrabold text-lg mt-1 text-main'>
+                            FoodSpace
+                        </h1>
+                    </div>
+                </Link>
+
 
                 {/* Login & Hamburger */}
                 <div className='ml-auto py-2.5 '>

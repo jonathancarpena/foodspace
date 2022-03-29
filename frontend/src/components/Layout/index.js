@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
+// Redux
+import { useSelector } from 'react-redux'
+
 // Router
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 // Components
 import Footer from './Footer'
@@ -18,9 +21,15 @@ const fullScreenPages = [
 function Layout({ children }) {
     const [showFooter, setShowFooter] = useState(true)
     const [showNavbar, setShowNavbar] = useState(true)
+    const auth = useSelector(state => state.auth)
+    const navigate = useNavigate()
     const location = useLocation()
 
     useEffect(() => {
+        if (auth.token && location.pathname === '/') {
+            navigate('/account')
+        }
+
         if (fullScreenPages.includes(location.pathname)) {
             setShowFooter(false)
             setShowNavbar(false)
