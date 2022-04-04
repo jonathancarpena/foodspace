@@ -149,6 +149,15 @@ function MyFood() {
                                     />
                                 </label>
 
+                                <label>Brand:
+                                    <input
+                                        name="brand"
+                                        value={item.brand}
+                                        onChange={(e) => handleEditChange(e, idx)}
+                                        className="w-[50px]"
+                                    />
+                                </label>
+
                                 <label>LifeSpan:
                                     <input
                                         type="number"
@@ -217,20 +226,13 @@ function MyFood() {
                                 <button onClick={() => editStatus(idx)}>Edit</button>
                                 <span>{item.image}</span>
                                 <span>{item.name}</span>
+                                <span>{item.brand}</span>
                                 <span>{item.lifeSpan.value} {item.lifeSpan.time}</span>
                                 <span>Type: {item.type}</span>
                                 <span>Unit: {item.unit}</span>
                                 <span>Barcode: {item.barcode}</span>
                             </div>
 
-                        // <div key={item._id} className='flex space-x-2 justify-evenly'>
-                        //     <span>{item.image}</span>
-                        //     <span>Name: {item.name}</span>
-                        //     <span>LifeSpan: {item.lifeSpan}</span>
-                        //     <span>Type: {item.type}</span>
-                        //     <span>Unit: {item.unit}</span>
-                        //     <span>Barcode: {item.barcode}</span>
-                        // </div>
                     ))}
                 </ul>
                 : <div>

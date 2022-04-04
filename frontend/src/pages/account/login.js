@@ -47,6 +47,7 @@ function Login() {
     // Form Submit Handler
     async function handleEmailSubmit(e) {
         e.preventDefault()
+        console.log('SUBMIT EMAIL')
         if (!validateEmail(email)) {
             setEmailError('Please enter a valid email.')
         } else {
@@ -229,7 +230,7 @@ function Login() {
 
                                     {/* Erase All */}
                                     {email &&
-                                        <button onClick={clearEmailInput} className='absolute top-3 right-3'>
+                                        <button type="button" onClick={clearEmailInput} className='absolute top-3 right-3'>
                                             <FaTimesCircle className='text-neutral-400 active:text-neutral-500' />
                                         </button>
                                     }

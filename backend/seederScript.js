@@ -88,7 +88,10 @@ const addFoodSpaceAdmin = async () => {
     const foodSpace = (await FoodSpace.find())[0]
     const foodSpaceModel = {
         _id: foodSpace._id,
-        name: foodSpace.name
+        name: foodSpace.name,
+        expiredStock: foodSpace.expiredStock,
+        admin: user.avatar,
+        users: foodSpace.users
     }
 
     // Adding foodSpace to admin 
@@ -101,24 +104,30 @@ const importData = async () => {
 
     try {
         // Deletes Everything
+        console.log('CLEARING DB')
         await Product.deleteMany({})
         await User.deleteMany({})
         await FoodSpace.deleteMany({})
 
         // Inserts default data
+        console.log("CREATING USER")
         const newUser = await createUser()
         await User.insertMany([newUser])
 
+        console.log("INPUTTING DEFAULT PRODUCTS")
         const newProducts = await createProducts()
         await Product.insertMany(newProducts)
 
+        console.log("CREATING FOODSPACE")
         const newFoodSpace = await createFoodSpace()
         await FoodSpace.insertMany(newFoodSpace)
 
         // Add Products to users myProducts section
+        console.log("POPULATING USERS MY PRODUCTS")
         await populateMyProducts()
 
-        // Add  Admin to FoodSpace
+        // Add  Admin to FoodSpace\
+        console.log("ADDING ADMIN TO FOODSPACE")
         await addFoodSpaceAdmin()
 
         console.log('Data Import Success')

@@ -24,6 +24,7 @@ function Admin() {
     const [foodSpace, setFoodSpace] = useState(null)
     const [error, setError] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [area, setArea] = useState(null)
 
     useEffect(() => {
         setError(false)
@@ -43,9 +44,11 @@ function Admin() {
                     }
                 })
                 setFoodSpace({ ...res.data.foodSpace, stock: addEditStatus })
-                setLoading(false)
+                setArea(foodSpace.areas[0])
             }
+            setLoading(false)
         }).catch((err) => {
+            console.log(err)
             const { message } = err.response.data
             setError(message)
             setLoading(false)
@@ -57,7 +60,7 @@ function Admin() {
         try {
             const res = await axios({
                 method: "DELETE",
-                url: `${API.ADMIN.removeItem}`,
+                url: `${API.FOODSPACE.removeItem}`,
                 data: {
                     item_id: item._id,
                     foodSpace_id
@@ -133,14 +136,19 @@ function Admin() {
         setFoodSpace({ ...foodSpace, stock: newStock })
     }
 
+    function areaSpecific() {
+        return foodSpace.stock.filter((item) => item.area === area)
+    }
+
     if (loading) {
         return <div>Loading...</div>
     }
 
     if (!foodSpace || error) {
-        return <div> Nothing to see here </div>
+        return <div> {error} </div>
 
     }
+
 
     async function handleDeleteFoodSpace() {
         const userConfirm = window.confirm('Are you sure you want to delete this FoodSpace?')
@@ -190,7 +198,7 @@ function Admin() {
 
     return (
         <div>
-            <Link to={`/foodSpace/${foodSpace.name}/add-item`} state={{ foodSpace, foodSpace_id }}>
+            {/* <Link to={`/foodSpace/${foodSpace.name}/add-item`} state={{ foodSpace, foodSpace_id }}>
                 <Button>
                     Add Item
                 </Button>
@@ -211,7 +219,7 @@ function Admin() {
                 <Button>
                     Manage Users
                 </Button>
-            </Link>
+            </Link> */}
 
 
 
@@ -254,22 +262,25 @@ function Admin() {
                 }
             </div>
 
-            <div>
-                <h1>Areas</h1>
+            {/* Areas */}
+            <div className='p-5 flex space-x-3'>
                 {foodSpace.areas.map((item) => (
-                    <div key={item}>
-                        <h2>{item} <span onClick={() => handleRemoveArea(item)}>Remove</span></h2>
-                    </div>
+                    <span
+                        key={item}
+                        onClick={() => setArea(item)}
+                        className={`${item === area ? 'text-main underline-offset-4 underline-primary-500 ' : 'text-secondary'} font-semibold capitalize cursor-pointer`}>
+                        {item}
+                    </span>
                 ))}
             </div>
+
             {/* Stock */}
-            <div className='bg-neutral-300'>
-                <h1>Stock</h1>
-                {foodSpace.stock.map((item, idx) => (
+            <div className='mx-5 space-y-3'>
+                {areaSpecific().map((item, idx) => (
                     <div key={`${idx}-${idx}`} className="flex space-x-3">
                         {item.edit
                             ? <form onSubmit={(e) => handleEditSubmit(e, idx)} className="flex space-x-3">
-                                <span>{item.product.image}</span>
+                                <span >{item.product.image}</span>
                                 <p>{item.product.name}</p>
                                 <p>Qty:
                                     <input
@@ -321,16 +332,38 @@ function Admin() {
 
                                 <button type="submit">✔</button>
                             </form>
-                            : <>
-                                <button onClick={() => handleRemoveItem(item)}>Remove</button>
-                                <button onClick={() => editStatus(idx)}>Edit</button>
-                                <span>{item.product.image}</span>
-                                <p>{item.product.name}</p>
-                                <p>Qty:  {item.quantity} {item.product.unit}</p>
-                                <p>Area: {item.area}</p>
+                            : <div className='p-3 bg-white drop-shadow-lg flex rounded-lg w-full justify-between'>
+                                {/* <button onClick={() => handleRemoveItem(item)}>Remove</button>
+                                <button onClick={() => editStatus(idx)}>Edit</button> */}
+
+                                <div className='flex space-x-3'>
+                                    {/* Image */}
+                                    <span className='bg-neutral-200 p-1.5 rounded-full text-4xl'>
+                                        {item.product.image}
+                                    </span>
+
+                                    {/* Name */}
+                                    <div>
+                                        <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
+                                        <p className='text-main capitalize'>{item.product.name}</p>
+                                        {/* Qty */}
+                                        <p>{item.quantity} <span className='text-secondary'>{item.product.unit} left</span></p>
+                                    </div>
+
+
+                                </div>
+
+
+
+
+
+
+                                {/* Expired */}
                                 <p>{item.expired ? "expired" : ""}</p>
+
+                                {/* Owner */}
                                 {item.owner && <p>Own: {item.owner.first_name.substring(0, 3)}</p>}
-                            </>
+                            </div>
                         }
 
                     </div>

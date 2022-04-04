@@ -52,6 +52,10 @@ const product_productSchema = new Schema({
         type: String,
         required: true
     },
+    brand: {
+        type: String,
+        default: "generic"
+    },
     type: {
         type: String,
         required: false,
@@ -136,6 +140,7 @@ const foodSpaceItemSchema = new Schema({
         required: false,
     }
 })
+
 const foodSpaceSchema = new Schema({
     admin: {
         type: foodSpaceUserSchema,
@@ -161,6 +166,11 @@ const foodSpaceSchema = new Schema({
         required: false,
         default: []
     },
+    expiredStock: {
+        type: [foodSpaceItemSchema],
+        required: false,
+        default: []
+    }
 })
 
 const FoodSpace = model('foodSpace', foodSpaceSchema)

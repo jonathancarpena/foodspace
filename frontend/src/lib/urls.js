@@ -32,32 +32,5 @@ export const API = {
 }
 
 
-// DONE
-
-// USER //
-// register ✔
-// login ✔
-// email ✔
-// me ✔
-// logout
-
-// FOOD SPACE //
-// base ✔
-// admin ✔
-// create ✔
-// addItem ✔
-// removeItem ✔
-// updateItem ✔
-// delete ✔
-// addArea ✔
-// removeArea ✔
-// addUser ✔
-// removeUser ✔
-
-// PRODUCT //
-// base ✔
-// add ✔
-// delete ✔
-// update ✔
 
 

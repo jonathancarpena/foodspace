@@ -49,6 +49,18 @@ function AddItem() {
     const [items, setItems] = useState([])
     const [search, setSearch] = useState('')
     const [searchResults, setSearchResults] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
+    const [errors, setErrors] = useState(null)
+
+
+
+    // Check if user has areas
+    useEffect(() => {
+        if (foodSpace.areas.length === 0) {
+            console.log('ERROR')
+            setErrors('Need Areas to Add Items to the FoodSpace')
+        }
+    }, [])
 
     // Gets ALl Products from Database
     useEffect(() => {
@@ -186,6 +198,11 @@ function AddItem() {
     }
 
 
+    if (errors) {
+        return (
+            <h1>{errors}</h1>
+        )
+    }
     return (
         <div>
             <Link to={'/account'}>GO Back</Link>

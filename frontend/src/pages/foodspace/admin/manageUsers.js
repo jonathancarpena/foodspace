@@ -16,6 +16,7 @@ function ManageUsers() {
     const { token } = useSelector(state => state.auth)
     const [emails, setEmails] = useState([''])
     const [users, setUsers] = useState(foodSpace.users)
+    const [errors, setErrors] = useState(null)
 
 
     async function handleSubmit(e) {
@@ -34,10 +35,10 @@ function ManageUsers() {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                console.log(res)
+
             } catch (error) {
                 const { message } = error.response.data
-                console.log(message)
+                setErrors(message)
             }
         }
 
@@ -81,7 +82,7 @@ function ManageUsers() {
                 setUsers(users.filter((item) => item !== user))
             } catch (error) {
                 const { message } = error.response.data
-                console.log(message)
+                setErrors(message)
             }
 
         }
@@ -121,6 +122,8 @@ function ManageUsers() {
 
                 <button type="submit">Submit</button>
             </form>
+
+            {errors && <h1>{errors}</h1>}
         </div>
     )
 }

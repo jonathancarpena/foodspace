@@ -16,6 +16,8 @@ import { toTitleCase, convertToMs } from '../../lib/utils'
 // Constants
 import { unitMeasure, emojiDictionary } from '../../lib/constants'
 
+// Components
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 // authorSchema //
 // _id
 // first_name
@@ -34,9 +36,22 @@ import { unitMeasure, emojiDictionary } from '../../lib/constants'
 // createdAt
 
 function Create() {
+    const [scan, setScan] = useState(false);
+    const [logs, setLog] = useState([]);
+
+    const barcodeScannerComponentHandleUpdate = (error, result) => {
+
+        if (result) {
+            setLog([...logs, result.text]);
+            window.navigator.vibrate(100);
+            setScan(false);
+        }
+    };
+
     const navigate = useNavigate()
     const { user, token } = useSelector(state => state.auth)
     const [name, setName] = useState('')
+    const [brand, setBrand] = useState('')
     const [type, setType] = useState('food')
     const [image, setImage] = useState('')
     const [imageSearch, setImageSearch] = useState([])
@@ -115,6 +130,7 @@ function Create() {
         e.preventDefault()
         const product = {
             name,
+            brand,
             type,
             unit,
             barcode,
@@ -181,6 +197,16 @@ function Create() {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        className="border-2"
+                    />
+                </label>
+
+                {/* Name */}
+                <label htmlFor='brand'>Brand
+                    <input
+                        id="brand"
+                        value={brand}
+                        onChange={(e) => setBrand(e.target.value)}
                         className="border-2"
                     />
                 </label>
@@ -262,6 +288,25 @@ function Create() {
 
                 <button>Submit</button>
             </form>
+
+            <div className="App">
+                <button onClick={() => setScan(true)}>SCAN</button>
+                <button onClick={() => setScan(false)}>CANCEL</button>
+                {scan && (
+                    <div className="w-full h-12">
+                        <BarcodeScannerComponent
+                            onUpdate={barcodeScannerComponentHandleUpdate}
+                        />
+                    </div>
+                )}
+                <div>
+                    {logs.map((log) => (
+                        <div key={log}>{log}</div>
+                    ))}
+
+                    <button onClick={() => setLog([])}>CLEAR</button>
+                </div>
+            </div>
         </div>
     )
 }

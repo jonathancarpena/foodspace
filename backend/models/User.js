@@ -60,6 +60,10 @@ const product_productSchema = new Schema({
         required: false,
         default: "food"
     },
+    brand: {
+        type: String,
+        default: "generic"
+    },
     unit: {
         type: String,
         default: "count"
@@ -86,6 +90,60 @@ const product_productSchema = new Schema({
     },
 })
 
+// Should be Imported from FoodSpace
+const foodSpace_foodSpaceUserSchema = new Schema({
+    _id: {
+        type: ObjectId,
+        required: true
+    },
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: avatarSchema,
+        required: true
+    }
+})
+const foodSpace_foodSpaceItemSchema = new Schema({
+    product: {
+        type: product_productSchema,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: false,
+        default: 1
+    },
+    area: {
+        type: String,
+        required: false,
+        default: "pantry"
+    },
+    expired: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    purchasedDate: {
+        type: Date,
+        required: false,
+        default: Date.now()
+    },
+    owner: {
+        type: foodSpace_foodSpaceUserSchema,
+        required: false,
+    }
+})
+
 // User Schemas //
 const userFoodSpaceSchema = new Schema({
     _id: {
@@ -95,8 +153,44 @@ const userFoodSpaceSchema = new Schema({
     name: {
         type: String,
         required: true
+    },
+    expiredStock: {
+        type: [foodSpace_foodSpaceItemSchema],
+        required: false,
+        default: [],
+    },
+    admin: {
+        type: avatarSchema,
+        required: true
+    },
+    users: {
+        type: [avatarSchema],
+        required: false
     }
 })
+const userTaskSchema = new Schema({
+    foodSpace_id: {
+        type: ObjectId,
+        required: true
+    },
+    foodSpace_name: {
+        type: String,
+        required: true
+    },
+    area: {
+        type: String,
+        required: true
+    },
+    product_name: {
+        type: String,
+        required: true
+    },
+    completed: {
+        type: Boolean,
+        default: false,
+    }
+})
+
 const userSchema = new Schema({
     first_name: {
         type: String,
@@ -139,6 +233,10 @@ const userSchema = new Schema({
             emoji: "🥧",
             favoriteColor: "bg-slate-300"
         }
+    },
+    tasks: {
+        type: [userTaskSchema],
+        default: []
     }
 })
 

@@ -51,6 +51,10 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
+    brand: {
+        type: String,
+        default: "generic"
+    },
     type: {
         type: String,
         required: false,

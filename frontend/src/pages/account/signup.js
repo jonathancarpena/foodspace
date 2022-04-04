@@ -28,6 +28,7 @@ function Login() {
     const dispatch = useDispatch()
     const auth = useSelector(state => state.auth)
     const [email, setEmail] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
     const [emailError, setEmailError] = useState('')
     // const [registerCode, setRegisterCode] = useState(generateHashCode())
     const [registerCode, setRegisterCode] = useState('jack')
@@ -47,6 +48,7 @@ function Login() {
     // Form Submit Handler
     async function handleEmailSubmit(e) {
         e.preventDefault()
+
         if (!validateEmail(email)) {
             setEmailError('Please enter a valid email.')
         } else {
@@ -231,7 +233,7 @@ function Login() {
 
                                     {/* Erase All */}
                                     {email &&
-                                        <button onClick={clearEmailInput} className='absolute top-3 right-3'>
+                                        <button type="button" onClick={clearEmailInput} className='absolute top-3 right-3'>
                                             <FaTimesCircle className='text-neutral-400 active:text-neutral-500' />
                                         </button>
                                     }
@@ -239,13 +241,14 @@ function Login() {
 
                             </div>
 
+                            {isLoading && <h1>Loading...</h1>}
                             {emailError &&
                                 <p className='text-red-500 text-sm mt-2'>{emailError}</p>
                             }
 
                             {/* Submit Input */}
                             {!(newUser.status || currentUser.status) &&
-                                <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 '>
+                                <Button onClick={handleEmailSubmit} type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 '>
                                     Continue with email
                                 </Button>
                             }

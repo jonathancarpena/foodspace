@@ -112,6 +112,10 @@ export function AvatarModal({ showModal, setShowModal, handleComplete }) {
 
 function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = false, sx, onClick }) {
     const sizeOptions = {
+        xs: {
+            bg: "py-0.5 text-xl w-[40px] m-0.5",
+            emoji: "p-1"
+        },
         sm: {
             bg: "py-1 text-3xl w-[55px] m-1",
             emoji: "p-1.5"

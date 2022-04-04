@@ -99,15 +99,15 @@ function Create() {
             try {
                 const res = await axios({
                     method: "POST",
-                    url: `${API.FOODSPACE.addUser}`,
+                    url: `${API.ADMIN.addUser}`,
                     data: data,
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 })
                 setErrors(null)
-                dispatch(refreshMe())
                 if (res) {
+                    dispatch(refreshMe())
                     navigate('/')
                 }
 

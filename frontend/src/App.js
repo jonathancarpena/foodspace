@@ -12,6 +12,8 @@ import Landing from './pages/landing';
 import Login from './pages/account/login'
 import SignUp from './pages/account/signup';
 import OnBoarding from './pages/account/onboarding';
+import Products from './pages/product'
+import ProductDetails from './pages/product/details'
 
 // Regular User
 import Account from './pages/account'
@@ -56,11 +58,14 @@ function App() {
         {/* Onboarding Page */}
         <Route exact path='/account/onboarding' element={<OnBoarding />} />
 
-        {/* Create Product Page */}
-        <Route exact path='/product/create' element={<CreateProduct />} />
+        {/* Products Page */}
+        <Route exact path='/product' element={<Products />} />
+
+        {/* Product Details Page */}
+        <Route exact path='/product/:id' element={<ProductDetails />} />
 
         {/* Create Product Page */}
-        <Route exact path='/product/:id' element={<CreateProduct />} />
+        <Route exact path='/product/create' element={<CreateProduct />} />
 
         {/* My Food Page */}
         <Route exact path='/product/me' element={<MyProducts />} />
