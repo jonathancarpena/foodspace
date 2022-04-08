@@ -4,21 +4,22 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 // Router
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 
 // Components
 import Footer from './Footer'
 import Navbar from './Navbar'
 
 // Icons 
-import { BsFillGridFill, BsFillPlusSquareFill } from 'react-icons/bs'
-import { FaRegUser, FaUserAlt, FaBell, FaRegBell } from 'react-icons/fa'
+import { BsFillGridFill, BsFillPlusSquareFill, BsSearch } from 'react-icons/bs'
+import { FaRegUser, FaUserAlt, FaBell, FaRegBell, FaHome } from 'react-icons/fa'
+import { AiOutlineHome, AiFillHome } from 'react-icons/ai'
+
 
 
 // Constants
 const publicPages = [
     '/',
-    '/product',
 ]
 
 
@@ -45,6 +46,13 @@ function Layout({ children }) {
         }
     }, [location])
 
+    const homePages = ["account", "foodSpace"]
+    const productPages = ["product"]
+    function highlightMobileFooter(extensions) {
+        return location.pathname.split('/').some((item) => extensions.includes(item))
+    }
+
+
     return (
         <div className={`${(showNavbar && showFooter) ? 'bg-white' : 'bg-[#F7F6F3] '}  font-body `}>
             {showNavbar && <Navbar />}
@@ -53,14 +61,26 @@ function Layout({ children }) {
             </div>
 
             {/* Mobile Footer */}
-            <footer className='sm:hidden bg-red-400 fixed bottom-0  w-full p-5 flex justify-evenly items-center'>
-                <BsFillGridFill className='inline-block text-xl text-secondary' />
+            <footer className='sm:hidden fixed bottom-0  w-full p-5 flex justify-evenly items-center bg-white'>
+                <Link to='/account'>
+                    {highlightMobileFooter(homePages)
+                        ? <AiFillHome className='inline-block text-xl text-secondary cursor-pointer' />
+                        : <AiOutlineHome className='inline-block text-xl text-secondary cursor-pointer' />
+                    }
+                </Link>
                 <FaRegBell className='inline-block text-xl text-secondary' />
                 <BsFillPlusSquareFill className='inline-block text-3xl fill-primary-500' />
-                {location.pathname === '/account'
+                {location.pathname === '/account/manage'
                     ? <FaUserAlt className='inline-block text-xl text-secondary' />
                     : <FaRegUser className='inline-block text-xl text-secondary' />
                 }
+                <Link to='/product'>
+                    {highlightMobileFooter(productPages)
+                        ? <BsSearch className='inline-block text-xl fill-primary-500 cursor-pointer' />
+                        : <BsSearch className='inline-block text-xl text-secondary cursor-pointer' />
+
+                    }
+                </Link>
 
             </footer>
 

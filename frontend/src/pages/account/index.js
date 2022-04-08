@@ -14,8 +14,6 @@ import Button from '../../components/Button'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
 
-// import required modules
-import { Pagination } from "swiper";
 
 // Import Swiper styles
 import "swiper/css";
@@ -26,10 +24,8 @@ import { FaCrown } from 'react-icons/fa'
 import { BsCircleFill } from 'react-icons/bs'
 import { BiFridge, BiTrash } from 'react-icons/bi'
 
-import { toTitleCase } from '../../lib/utils'
 
 function Account() {
-
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { ready, user } = useSelector(state => state.auth)
@@ -43,6 +39,18 @@ function Account() {
     }, [])
 
 
+    function foodSpaceLength() {
+        let total = 0;
+        if (user.admin.length) {
+            total += user.admin.length
+        }
+
+        if (user.foodSpaces.length) {
+            total += user.foodSpaces.length
+        }
+
+        return total;
+    }
     function logout() {
         dispatch(clearAuth())
         navigate('/')
@@ -50,11 +58,11 @@ function Account() {
     if (!ready) {
         return (<div>Not a User</div>)
     }
-    console.log(user)
-    return (
-        <div className='flex flex-col space-y-5 '>
 
-            <Link to='/foodSpace/create'>
+    return (
+        <div className='flex flex-col space-y-5 min-h-screen pb-20'>
+
+            {/* <Link to='/foodSpace/create'>
                 <Button>
                     Create FoodSpace
                 </Button>
@@ -80,7 +88,7 @@ function Account() {
 
             <Button onClick={logout}>
                 Logout
-            </Button>
+            </Button> */}
 
 
             {/* Loading Animation */}
@@ -102,18 +110,18 @@ function Account() {
 
             <div className='flex px-7 pt-5 pb-2.5 items-center justify-between'>
                 <div>
-                    <h1 className='font-semibold '>Hello, <span className='capitalize'>{user.first_name}</span></h1>
-                    <h2 className='text-secondary text-xs'>What are we having today?</h2>
+                    <h1 className='font-semibold text-2xl'>Hello, <span className='capitalize'>{user.first_name}</span></h1>
+                    <h2 className='text-secondary'>What are we having today?</h2>
                 </div>
 
                 <Avatar
                     emoji={user.avatar.emoji}
                     bg={user.avatar.favoriteColor}
-                    ring={false}
-                    size='xs'
-                    sx='inline-block'
+                    ring={true}
+                    size='sm'
                 />
             </div>
+
 
 
             {/* Header */}
@@ -123,38 +131,43 @@ function Account() {
                     <h2 className='text-white text-xl font-semibold mt-2'>5 items</h2>
                 </div>
 
-                <BiTrash className='text-[8rem] rotate-[25deg] text-primary-700  x absolute right-5 bottom-[-2rem]' />
+                <BiTrash className='text-[8rem] rotate-[25deg] text-primary-700 absolute right-5 bottom-[-2rem]' />
             </div>
 
 
             {/* Tasks */}
             <div className='mx-7'>
-                <h1 className='font-semibold'>To do
+                <h1 className='font-semibold text-xl'>To do
                     <span className='bg-primary-100 rounded-xl px-3 text-primary-600 ml-1'>
-                        5
+                        {user.tasks.length}
                     </span>
                 </h1>
 
-                <Swiper spaceBetween={25} >
+                <Swiper spaceBetween={20} watchSlidesProgress={true} >
                     {["a", "b", "c", "d", "e"].map((item) => (
-                        <SwiperSlide key={item}>
-                            {/* <Link
+                        <SwiperSlide key={item} className='max-w-max '>
+                            {() => (
+                                <>
+                                    {/* <Link
                                 key={item.name}
                                 to={`/foodSpace/admin/${item.name}`}
                                 state={{ foodSpace_id: item._id }}> */}
-                            <div className='cursor-pointer bg-white capitalize rounded-xl  flex flex-col space-y-3 justify-evenly h-[150px] w-[150px] drop-shadow-lg mt-4 mb-2 p-3'>
-                                <p className='text-secondary text-xs'>
-                                    <BiFridge className='inline-block mr-1 text-lg' />FoodSpace {item}
-                                </p>
-                                <p className='font-semibold'>
-                                    Tomato
-                                </p>
-                                <p className='text-secondary text-xs'>
-                                    <BsCircleFill className='inline-block mr-1.5 mb-0.5 text-blue-500' />
-                                    Exp. 3 days ago
-                                </p>
-                            </div>
-                            {/* </Link> */}
+                                    <div className={` cursor-pointer bg-primary-50 capitalize rounded-xl  flex flex-col space-y-3 justify-evenly h-[150px] w-[150px] drop-shadow-lg mt-4 mb-2 p-3`}>
+                                        <p className='text-secondary text-xs'>
+                                            <BiFridge className='inline-block mr-1 text-lg' />FoodSpace {item}
+                                        </p>
+                                        <p className='font-semibold'>
+                                            Tomato
+                                        </p>
+                                        <p className='text-secondary text-xs'>
+                                            <BsCircleFill className='inline-block mr-1.5 mb-0.5 text-blue-500' />
+                                            Exp. 3 days ago
+                                        </p>
+                                    </div>
+                                    {/* </Link> */}
+                                </>
+                            )}
+
                         </SwiperSlide>
                     ))}
                 </Swiper>
@@ -162,8 +175,13 @@ function Account() {
 
 
             {/* FoodSpaces */}
-            <div className='px-7 pb-24'>
-                <h1 className='font-semibold'>FoodSpaces</h1>
+            <div className='px-7 '>
+                <h1 className='font-semibold text-xl'>
+                    FoodSpaces
+                    <span className='bg-primary-100 rounded-xl px-3 text-primary-600 ml-1'>
+                        {foodSpaceLength()}
+                    </span>
+                </h1>
 
 
                 <ul className='flex flex-col space-y-8 mt-5 '>
@@ -173,14 +191,45 @@ function Account() {
                                 key={item.name}
                                 to={`/foodSpace/admin/${item.name}`}
                                 state={{ foodSpace_id: item._id }}>
-                                <div className='relative cursor-pointer bg-white capitalize rounded-xl h-[150px] drop-shadow-lg '>
-                                    <div>
-                                        <h1>Admin</h1>
-                                        {/* <Avatar bg={item.admin.avatar.favoriteColor} emoji={item.admin.avatar.emoji} /> */}
+                                <div className='relative flex cursor-pointer p-4 bg-white capitalize rounded-xl h-[200px] drop-shadow-lg overflow-hidden'>
+
+                                    <div className='flex flex-col justify-evenly'>
+
+                                        {/* Admin + Users */}
+                                        <div className='mb-5 flex '>
+
+                                            {/* Admin */}
+                                            <div className='border-r-2 inline-block pr-2.5 mr-7 relative'>
+                                                <FaCrown className='absolute text-yellow-500 text-xs -top-4 left-[50%] -translate-x-[50%]' />
+                                                <Avatar bg={item.admin.favoriteColor} emoji={item.admin.emoji} ring={true} size={'xs'} />
+                                            </div>
+
+
+                                            {/* Users */}
+                                            <div className='inline-block'>
+                                                {item.users.map((user, idx) => (
+                                                    <React.Fragment key={user._id}>
+                                                        <Avatar bg={user.favoriteColor} emoji={user.emoji} ring={true} size={'xs'} sx={`mx-[-15px] z-[${idx}]`} />
+                                                    </React.Fragment>
+                                                ))}
+                                            </div>
+
+                                        </div>
+
+                                        {/* Expired Stock */}
+                                        {item.expiredStock.length
+                                            ? <p className='text-sm'>{item.expiredStock.length} items to throw</p>
+                                            : <p className='text-sm'>Clean Space.</p>
+                                        }
+
+
+                                        {/* FoodSpace Name */}
+                                        <p className='font-semibold tracking-tighter text-3xl'>{item.name}</p>
                                     </div>
 
-                                    <BiFridge className='block mx-auto text-5xl ' />
-                                    <p className=''>{item.name}</p>
+                                    {/* FoodSpace Image */}
+                                    <BiFridge className='text-[12rem]  text-main absolute right-8 bottom-[-3rem]' />
+
                                 </div>
                             </Link>
 
@@ -192,9 +241,46 @@ function Account() {
                                 key={item.name}
                                 to={`/foodSpace/admin/${item.name}`}
                                 state={{ foodSpace_id: item._id }}>
-                                <div className='relative cursor-pointer bg-white capitalize rounded-xl flex flex-col items-center justify-center h-[150px] w-[150px] drop-shadow-lg '>
-                                    <BiFridge className='block mx-auto text-5xl ' />
-                                    <p className=''>{item.name}</p>
+                                <div className='relative flex cursor-pointer p-4 bg-white capitalize rounded-xl h-[200px] drop-shadow-lg overflow-hidden'>
+
+                                    <div className='flex flex-col justify-evenly'>
+
+                                        {/* Admin + Users */}
+                                        <div className='mb-5 flex '>
+
+                                            {/* Admin */}
+                                            <div className='border-r-2 inline-block pr-2.5 mr-7 relative'>
+                                                <FaCrown className='absolute text-yellow-500 text-xs -top-4 left-[50%] -translate-x-[50%]' />
+                                                <Avatar bg={item.admin.favoriteColor} emoji={item.admin.emoji} ring={true} size={'xxs'} />
+                                            </div>
+
+
+                                            {/* Users */}
+                                            <div className='inline-block'>
+                                                {item.users.map((user, idx) => (
+                                                    <React.Fragment key={`${user._id}-user`}>
+                                                        <Avatar bg={user.favoriteColor} emoji={user.emoji} ring={true} size={'xxs'} sx={`mx-[-15px] z-[${idx}]`} />
+                                                    </React.Fragment>
+
+                                                ))}
+                                            </div>
+
+                                        </div>
+
+                                        {/* Expired Stock */}
+                                        {item.expiredStock.length
+                                            ? <p className='text-sm'>{item.expiredStock.length} items to throw</p>
+                                            : <p className='text-sm'>Clean Space.</p>
+                                        }
+
+
+                                        {/* FoodSpace Name */}
+                                        <p className='font-semibold tracking-tighter text-3xl'>{item.name}</p>
+                                    </div>
+
+                                    {/* FoodSpace Image */}
+                                    <BiFridge className='text-[12rem]  text-main absolute right-8 bottom-[-3rem]' />
+
                                 </div>
                             </Link>
                         ))
@@ -202,7 +288,6 @@ function Account() {
                 </ul>
 
             </div >
-
 
         </div >
     )

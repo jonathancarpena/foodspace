@@ -513,6 +513,7 @@ export const updateItemFromFoodSpace = async (req, res) => {
         })
     }
 
+
     // Change Owner, Area and Quantity
     const { owner, area, quantity } = info
 
@@ -526,12 +527,11 @@ export const updateItemFromFoodSpace = async (req, res) => {
         let itemToUpdate = foodSpace.stock.find((item) => (item._id).toString() === id)
 
         // Item is owned by someone
-        if (itemToUpdate.owner) {
-
+        if (itemToUpdate.owner && check === "user") {
             // User must be the owner or Admin
-            if (itemToUpdate.owner._id.toString() !== _id || check !== "admin") {
+            if (itemToUpdate.owner._id.toString() !== _id) {
                 return res.status(400).json({
-                    message: "Access Denied"
+                    message: "Change Not Allowed."
                 })
             }
         }

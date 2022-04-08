@@ -7246,11 +7246,6 @@ react-scripts@5.0.0:
   optionalDependencies:
     fsevents "^2.3.2"
 
-react-swipeable-list@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/react-swipeable-list/-/react-swipeable-list-1.5.1.tgz#170efdfca7c757fdd8db0b8278fb1710aba87571"
-  integrity sha512-iBqFkVaNgRJtTW7hMXkQktgnyqEJYpiuFNgZqeGE8aSCnbQPFNpXjHwshfuf2Jb0lMuvweMf9kUrj8lhhsno1g==
-
 react-webcam@^5.0.1:
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/react-webcam/-/react-webcam-5.2.4.tgz#714b4460ea43ac7ed081824299cd2a580f764478"

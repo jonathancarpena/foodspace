@@ -11,20 +11,39 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { API } from '../../../lib/urls'
 
 // Components
+import Tooltip from '../../../components/Tooltip'
 import Button from '../../../components/Button'
 import Avatar from '../../../components/pages/Account/Avatar'
 
+
+// Import Swiper React components
+import { Swiper, SwiperSlide, useSwiperSlide, useSwiper } from "swiper/react";
+
+// Import Swiper styles
+import "swiper/css";
+
 // Icons
+import { FaTrashAlt, FaEdit, FaCheck, FaCrown } from 'react-icons/fa'
 import { BiFridge } from 'react-icons/bi'
+import { ImCross } from 'react-icons/im'
+import { AiOutlineMinusCircle, AiOutlinePlusCircle } from 'react-icons/ai'
+import { MdPeopleAlt } from 'react-icons/md'
+
+import { toTitleCase } from '../../../lib/utils'
+
+
+
 
 function Admin() {
     const { state: { foodSpace_id } } = useLocation()
     const navigate = useNavigate()
+    const [my_swiper, set_my_swiper] = useState({});
     const auth = useSelector(state => state.auth)
     const [foodSpace, setFoodSpace] = useState(null)
     const [error, setError] = useState(false)
     const [loading, setLoading] = useState(true)
-    const [area, setArea] = useState(null)
+    const [area, setArea] = useState("all")
+
 
     useEffect(() => {
         setError(false)
@@ -44,7 +63,6 @@ function Admin() {
                     }
                 })
                 setFoodSpace({ ...res.data.foodSpace, stock: addEditStatus })
-                setArea(foodSpace.areas[0])
             }
             setLoading(false)
         }).catch((err) => {
@@ -56,36 +74,45 @@ function Admin() {
         console.log('FETCH')
     }, [])
 
+
+
     async function handleRemoveItem(item) {
-        try {
-            const res = await axios({
-                method: "DELETE",
-                url: `${API.FOODSPACE.removeItem}`,
-                data: {
-                    item_id: item._id,
-                    foodSpace_id
-                },
-                headers: {
-                    Authorization: `Bearer ${auth.token}`
-                }
-            })
-            const filteredStock = foodSpace.stock.filter((stock) => stock !== item)
-            setFoodSpace({ ...foodSpace, stock: filteredStock })
-        } catch (error) {
-            const { message } = error.response.data
-            setError(message)
+        const userConfirm = window.confirm(`Would you like to remove ${toTitleCase(item.product.brand)} ${toTitleCase(item.product.name)}?`)
+
+        if (userConfirm) {
+            try {
+                const res = await axios({
+                    method: "DELETE",
+                    url: `${API.FOODSPACE.removeItem}`,
+                    data: {
+                        item_id: item._id,
+                        foodSpace_id
+                    },
+                    headers: {
+                        Authorization: `Bearer ${auth.token}`
+                    }
+                })
+                const filteredStock = foodSpace.stock.filter((stock) => stock !== item)
+                setFoodSpace({ ...foodSpace, stock: filteredStock })
+            } catch (error) {
+                const { message } = error.response.data
+                setError(message)
+            }
         }
+
     }
 
-    function editStatus(index) {
+    function editStatus(item) {
+        const index = foodSpace.stock.findIndex((element) => element._id === item._id)
         let copy = foodSpace.stock
-        copy[index].edit = true
+        copy[index].edit = !copy[index].edit
         setFoodSpace({ ...foodSpace, stock: copy })
     }
 
-    async function handleEditSubmit(e, index) {
+    async function handleEditSubmit(e, item) {
         e.preventDefault()
         let owner = null
+        const index = foodSpace.stock.findIndex((element) => element._id === item._id)
         if (foodSpace.stock[index].owner !== "everyone") {
             owner = foodSpace.users.find((item) => item.first_name === foodSpace.stock[index].owner)
             if (!owner) {
@@ -125,30 +152,41 @@ function Admin() {
         } catch (error) {
             console.log(error)
             const { message } = error.response.data
-            console.log(message)
+            alert(message)
+            let updatedStock = foodSpace.stock
+            updatedStock[index].edit = false
+            setFoodSpace({ ...foodSpace, stock: updatedStock })
+
         }
 
     }
 
-    function handleEditChange(e, index) {
+    function handleEditChange(e, item, qty) {
+        const index = foodSpace.stock.findIndex((element) => element._id === item._id)
+        const key = e.target.getAttribute('name')
         let newStock = foodSpace.stock
-        newStock[index][e.target.name] = e.target.value
+        if (key === "quantity") {
+            if (qty === "increase") {
+                newStock[index][key] += 1
+            } else {
+                if (newStock[index][key] !== 0) {
+                    newStock[index][key] -= 1
+                }
+            }
+
+        } else {
+            newStock[index][key] = e.target.value
+        }
         setFoodSpace({ ...foodSpace, stock: newStock })
     }
 
     function areaSpecific() {
-        return foodSpace.stock.filter((item) => item.area === area)
+        if (area === "all") {
+            return foodSpace.stock
+        } else {
+            return foodSpace.stock.filter((item) => item.area === area)
+        }
     }
-
-    if (loading) {
-        return <div>Loading...</div>
-    }
-
-    if (!foodSpace || error) {
-        return <div> {error} </div>
-
-    }
-
 
     async function handleDeleteFoodSpace() {
         const userConfirm = window.confirm('Are you sure you want to delete this FoodSpace?')
@@ -196,8 +234,21 @@ function Admin() {
         }
     }
 
+    async function handleDeleteItem(item) {
+        const userResponse = window.confirm(`Would you like to remove ${toTitleCase(item.product.brand)} ${toTitleCase(item.product.name)}?`)
+    }
+
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
+    if (!foodSpace || error) {
+        return <div> {error} </div>
+
+    }
     return (
-        <div>
+        <div className='min-h-screen'>
             {/* <Link to={`/foodSpace/${foodSpace.name}/add-item`} state={{ foodSpace, foodSpace_id }}>
                 <Button>
                     Add Item
@@ -222,154 +273,267 @@ function Admin() {
             </Link> */}
 
 
+            {/* Header */}
+            <div className='border-b-2 p-7'>
 
-            <div>
-                <BiFridge className='inline-block text-5xl' />
-                <h1 className='inline-block capitalize'>{foodSpace.name}</h1>
-            </div>
+                <div className='pb-5 '>
+                    <BiFridge className='inline-block text-5xl mb-1 mr-2' />
+                    <h1 className='inline-block capitalize font-semibold text-3xl tracking-tight border-r-2 pr-3'>{foodSpace.name}</h1>
+                    <span className='ml-3 text-secondary'>{foodSpace.users.length + 1} <MdPeopleAlt className='inline-block mb-1 text-lg' /></span>
+                </div>
 
 
-            {/* Admin Display */}
-            <div>
-                <h2 className='capitalize'>
-                    Admin:
-                    <Avatar
-                        sx='inline-block'
-                        emoji={foodSpace.admin.avatar.emoji}
-                        bg={foodSpace.admin.avatar.favoriteColor}
-                    />
-                    {foodSpace.admin.first_name}
-                </h2>
-            </div>
+                {/* Admin Display */}
+                <div className=' flex space-x-2 '>
 
-            {/* Users Display */}
-            <div>
-                {foodSpace.users
-                    ? <h2 className='capitalize'>
-                        Users:
-                        {foodSpace.users.map((user, idx) => (
-                            <div key={`user-${idx}`}>
+                    {/* Admin */}
+                    <div className='relative '>
+                        <FaCrown className='absolute -top-4 left-[50%] -translate-x-[50%] text-yellow-500' />
+                        <h2 className='capitalize '>
+                            <Tooltip message={`${foodSpace.admin.first_name} ${foodSpace.admin.last_name[0]}.`} direction={`bottom`}>
                                 <Avatar
                                     sx='inline-block'
-                                    emoji={user.avatar.emoji}
-                                    bg={user.avatar.favoriteColor}
+                                    emoji={foodSpace.admin.avatar.emoji}
+                                    bg={foodSpace.admin.avatar.favoriteColor}
+                                    size="sm"
+                                    ring
                                 />
-                                <span>{user.first_name}</span>
-                            </div>
+                            </Tooltip>
+                        </h2>
+                    </div>
+
+                    {/* Users */}
+                    <div className='pl-[27px] border-l-2'>
+                        {foodSpace.users.map((user) => (
+                            <Tooltip message={`${user.first_name} ${user.last_name[0]}.`} direction={`bottom`}>
+                                <Avatar
+                                    bg={user.avatar.favoriteColor}
+                                    emoji={user.avatar.emoji}
+                                    size="sm"
+                                    ring
+                                    sx="mx-[-15px]"
+                                />
+                            </Tooltip>
                         ))}
-                    </h2>
-                    : <h2>No other users</h2>
-                }
+                    </div>
+
+                </div>
             </div>
+
 
             {/* Areas */}
-            <div className='p-5 flex space-x-3'>
-                {foodSpace.areas.map((item) => (
+            <Swiper
+                onInit={(ev) => {
+                    set_my_swiper(ev)
+                }}
+                spaceBetween={5}
+                className="w-[100vw] "
+                slidesPerView={3}
+                // centeredSlides={true}
+                onSlideChange={(swiper) => setArea(foodSpace.areas[swiper.activeIndex])}
+            >
+                {/* DEFAULT: ALL */}
+                <SwiperSlide className='text-center my-5'>
                     <span
-                        key={item}
-                        onClick={() => setArea(item)}
-                        className={`${item === area ? 'text-main underline-offset-4 underline-primary-500 ' : 'text-secondary'} font-semibold capitalize cursor-pointer`}>
-                        {item}
+                        onClick={() => {
+                            my_swiper.slideTo(0);
+                            setArea("all")
+                        }}
+                        className={`${"all" === area ? 'text-main border-b-2 border-b-primary-500 ' : 'text-secondary'}   font-semibold capitalize cursor-pointer `}>
+                        All
                     </span>
+                </SwiperSlide>
+
+                {/* AREA */}
+                {foodSpace.areas.map((item, idx) => (
+                    <SwiperSlide className='text-center my-5'>
+                        <span
+                            key={item}
+                            onClick={() => {
+                                my_swiper.slideTo(idx);
+                                setArea(item)
+                            }}
+                            className={`${item === area ? 'text-main border-b-2 border-b-primary-500 ' : 'text-secondary'}   font-semibold capitalize cursor-pointer `}>
+                            {item}
+                        </span>
+                    </SwiperSlide>
                 ))}
-            </div>
+            </Swiper>
+
 
             {/* Stock */}
-            <div className='mx-5 space-y-3'>
+            <div className='mx-5 '>
                 {areaSpecific().map((item, idx) => (
                     <div key={`${idx}-${idx}`} className="flex space-x-3">
                         {item.edit
-                            ? <form onSubmit={(e) => handleEditSubmit(e, idx)} className="flex space-x-3">
-                                <span >{item.product.image}</span>
-                                <p>{item.product.name}</p>
-                                <p>Qty:
-                                    <input
-                                        name="quantity"
-                                        type="number"
-                                        step={1}
-                                        value={item.quantity}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="w-[20px]"
-                                    />
-                                    {item.product.unit}
-                                </p>
-                                <p>Area:
-                                    <select
-                                        name="area"
-                                        value={item.area}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                    >
-                                        {foodSpace.areas.map((item) => (
-                                            <option>{item}</option>
-                                        ))}
-                                    </select>
-                                </p>
-                                <p>{item.expired ? "expired" : ""}</p>
-                                <p>Owner
-                                    <select
-                                        name="owner"
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        value={item.owner ? item.owner : "everyone"}
-                                    >
-                                        {/* Admin */}
-                                        <option value={foodSpace.admin.first_name}>
-                                            {foodSpace.admin.first_name}
-                                        </option>
+                            ?
+                            <Swiper
+                                initialSlide={1}
+                                slidesPerView={"auto"}
+                                className="w-full  "
+                            >
+                                <form onSubmit={(e) => handleEditSubmit(e, item)} >
+                                    <SwiperSlide className='text-left max-w-max  pb-5 px-1.5 flex '>
+                                        <div onClick={() => editStatus(item)} className={`bg-red-600 cursor-pointer rounded-xl drop-shadow-lg flex flex-col justify-center items-center space-y-1 h-full w-[15vw] `}>
+                                            <ImCross className='text-white inline-block text-[2rem] ' />
+                                            <span className='text-white text-sm'>Cancel</span>
+                                        </div>
+                                    </SwiperSlide>
 
-                                        {/* Users */}
-                                        {foodSpace.users.map((user) => (
-                                            <option value={user.first_name}>
-                                                {user.first_name}
-                                            </option>
-                                        ))}
+                                    <SwiperSlide className='w-[80vw] pb-5 px-1.5 '>
+                                        <div className='p-5 flex rounded-xl drop-shadow-lg w-full justify-between bg-white'>
+                                            {/* NAME, IMAGE, QTY */}
+                                            <div className='flex space-x-3 '>
+                                                {/* Image */}
+                                                <Avatar
+                                                    emoji={item.product.image}
+                                                    size="sm"
+                                                />
 
-                                        {/* Everyone */}
-                                        <option value={"everyone"}>
-                                            everyone
-                                        </option>
-                                    </select>
-                                </p>
+                                                {/* Name */}
+                                                <div>
+                                                    <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
+                                                    <p className='text-main capitalize'>{item.product.name}</p>
 
-                                <button type="submit">✔</button>
-                            </form>
-                            : <div className='p-3 bg-white drop-shadow-lg flex rounded-lg w-full justify-between'>
-                                {/* <button onClick={() => handleRemoveItem(item)}>Remove</button>
-                                <button onClick={() => editStatus(idx)}>Edit</button> */}
+                                                    {/* Quantity */}
+                                                    <div className='mr-2 inline-block'>
+                                                        <AiOutlineMinusCircle name="quantity" onClick={(e) => handleEditChange(e, item, 'decrease')} className='cursor-pointer inline-block' />
+                                                        <span className='mx-2'>{item.quantity}</span>
+                                                        <AiOutlinePlusCircle name="quantity" onClick={(e) => handleEditChange(e, item, 'increase')} className='cursor-pointer inline-block' />
+                                                    </div>
+                                                    <span className='text-secondary'>{item.product.unit}</span>
+                                                </div>
+                                            </div>
 
-                                <div className='flex space-x-3'>
-                                    {/* Image */}
-                                    <span className='bg-neutral-200 p-1.5 rounded-full text-4xl'>
-                                        {item.product.image}
-                                    </span>
+                                            {/* AREA */}
+                                            <div className='flex flex-col'>
+                                                <span className=''>Area </span>
+                                                <select
+                                                    name="area"
+                                                    value={item.area}
+                                                    onChange={(e) => handleEditChange(e, item)}
+                                                >
+                                                    {foodSpace.areas.map((item) => (
+                                                        <option value={item} >{toTitleCase(item)}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
 
-                                    {/* Name */}
-                                    <div>
-                                        <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
-                                        <p className='text-main capitalize'>{item.product.name}</p>
-                                        {/* Qty */}
-                                        <p>{item.quantity} <span className='text-secondary'>{item.product.unit} left</span></p>
+                                            {/* OWNER */}
+                                            <div className=''>
+                                                <span className='block'>Owner </span>
+                                                <select
+                                                    name="owner"
+                                                    onChange={(e) => handleEditChange(e, item)}
+                                                    value={item.owner ? item.owner : "everyone"}
+                                                    className=""
+                                                >
+                                                    {/* Admin */}
+                                                    <option value={foodSpace.admin.first_name}>
+                                                        {toTitleCase(foodSpace.admin.first_name)}
+                                                    </option>
+
+                                                    {/* Users */}
+                                                    {foodSpace.users.map((user) => (
+                                                        <option value={user.first_name}>
+                                                            {toTitleCase(user.first_name)}
+                                                        </option>
+                                                    ))}
+
+                                                    {/* Everyone */}
+                                                    <option value={"everyone"}>
+                                                        Everyone
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </SwiperSlide>
+
+                                    <SwiperSlide className='text-left max-w-max  pb-5 px-1.5 flex '>
+                                        <div onClick={(e) => handleEditSubmit(e, item)} className={`bg-green-600 cursor-pointer rounded-xl drop-shadow-lg flex flex-col justify-center items-center space-y-1 h-full w-[15vw] `}>
+                                            <FaCheck className='text-white inline-block text-[2rem] ' />
+                                            <span className='text-white text-sm'>Save</span>
+                                        </div>
+
+                                    </SwiperSlide>
+
+                                </form>
+                            </Swiper>
+
+
+                            : <Swiper
+                                initialSlide={1}
+                                slidesPerView={"auto"}
+                                className="w-full "
+                            >
+
+                                <SwiperSlide className='text-left max-w-max  pb-5 px-1.5 flex '>
+                                    <div onClick={() => editStatus(item)} className={`bg-neutral-600 cursor-pointer rounded-xl drop-shadow-lg flex flex-col justify-center items-center space-y-1 h-full w-[15vw] `}>
+                                        <FaEdit className='text-white inline-block text-[2rem] ' />
+                                        <span className='text-white text-sm'>Edit</span>
+                                    </div>
+                                </SwiperSlide>
+
+                                <SwiperSlide className='w-[80vw] pb-5 px-1.5 '>
+                                    <div className='p-5 bg-white  rounded-xl drop-shadow-lg flex w-full justify-between items-center'>
+                                        <div className='flex items-center space-x-3'>
+
+                                            {/* Image */}
+                                            <Avatar
+                                                emoji={item.product.image}
+                                                size="sm"
+                                            />
+
+
+                                            {/* Name */}
+                                            <div className={`${item.owner ? 'border-r-2 pr-4' : ''}`}>
+                                                <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
+                                                <p className='text-main capitalize'>{item.product.name}</p>
+                                                {/* Qty */}
+                                                <p>{item.quantity} <span className='text-secondary'>{item.product.unit}</span></p>
+                                            </div>
+
+                                            {/* Owner */}
+                                            {item.owner &&
+                                                <div className='text-center ml-4'>
+                                                    <span className='text-xs text-secondary mb-1 block'>Owner </span>
+                                                    <Avatar
+                                                        bg={item.owner.avatar.favoriteColor}
+                                                        emoji={item.owner.avatar.emoji}
+                                                        size="xs"
+                                                    />
+                                                    {/* First and Last Initial */}
+                                                    <span className='text-xs text-secondary mb-1 block'>
+                                                        {toTitleCase(item.owner.first_name)} {toTitleCase(item.owner.last_name[0])}.
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        {/* Expired */}
+                                        <p>{item.expired ? "expired" : "Expires in 2 days"}</p>
+
+
+                                    </div>
+                                </SwiperSlide>
+
+                                <SwiperSlide className='text-left max-w-max  pb-5 px-1.5 flex '>
+                                    <div onClick={() => handleRemoveItem(item)} className={`bg-red-600 cursor-pointer rounded-xl drop-shadow-lg flex flex-col justify-center items-center space-y-1 h-full w-[15vw] `}>
+                                        <FaTrashAlt className='text-white inline-block text-[2rem] ' />
+                                        <span className='text-white text-sm'>Delete</span>
                                     </div>
 
-
-                                </div>
-
+                                </SwiperSlide>
 
 
-
-
-
-                                {/* Expired */}
-                                <p>{item.expired ? "expired" : ""}</p>
-
-                                {/* Owner */}
-                                {item.owner && <p>Own: {item.owner.first_name.substring(0, 3)}</p>}
-                            </div>
+                            </Swiper>
                         }
 
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     )
 }
 

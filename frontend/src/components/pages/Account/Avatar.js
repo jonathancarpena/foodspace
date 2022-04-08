@@ -110,28 +110,32 @@ export function AvatarModal({ showModal, setShowModal, handleComplete }) {
     )
 }
 
-function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = false, sx, onClick }) {
+function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = false, sx, onClick, key = '' }) {
     const sizeOptions = {
         xs: {
-            bg: "py-0.5 text-xl w-[40px] m-0.5",
-            emoji: "p-1"
+            bg: "h-[50px]",
+            emoji: "text-[25px]"
         },
         sm: {
-            bg: "py-1 text-3xl w-[55px] m-1",
-            emoji: "p-1.5"
+            bg: "h-[65px]",
+            emoji: "text-[35px]"
         },
         md: {
-            bg: "py-2 text-5xl w-[80px] m-2",
-            emoji: "p-2"
+            bg: "h-[80px]",
+            emoji: "text-[45px]"
         },
         lg: {
-            bg: "py-3 text-6xl w-[110px] m-3",
-            emoji: "p-3"
+            bg: "h-[95px]",
+            emoji: "text-[55px]"
+        },
+        xl: {
+            bg: "h-[105px]",
+            emoji: "text-[65px] "
         },
     }
     return (
-        <div onClick={onClick} className={`${sizeOptions[size].bg} ${bg} ${ring ? 'ring-4 ring-white drop-shadow-lg' : ''} rounded-full inline-block text-center ${sx}`}>
-            <span className={`${sizeOptions[size].emoji} inline-block  `}>
+        <div key={key} onClick={onClick} className={`w-max ${sizeOptions[size].bg} rounded-[100%] ${bg} ${ring ? 'ring-4 ring-white drop-shadow-lg' : ''} flex justify-center items-center cursor-default rounded-full  text-center ${sx}`}>
+            <span className={`${sizeOptions[size].emoji} p-2`}>
                 {emoji}
             </span>
         </div>
