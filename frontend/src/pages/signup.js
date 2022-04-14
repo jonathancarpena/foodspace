@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 
 // Redux
-import { userEmail, setupAuth } from '../../redux/features/auth/authSlice'
+import { userEmail, setupAuth } from '../redux/features/auth/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
 // Router
@@ -13,14 +13,14 @@ import { BiFridge } from 'react-icons/bi'
 import { FaGoogle, FaApple, FaTimesCircle } from 'react-icons/fa'
 
 // Components
-import Button from '../../components/Button'
-import TransitionOpacity from '../../components/Transition/TransitionOpacity'
+import Button from '../components/Button'
+import TransitionOpacity from '../components/Transition/TransitionOpacity'
 
 // Utils
-import { validateEmail, sendRegisterCode, generateHashCode } from '../../lib/utils'
+import { validateEmail, sendRegisterCode, generateHashCode } from '../lib/utils'
 
 // Constants
-import { API } from '../../lib/urls'
+import { API } from '../lib/urls'
 
 
 function Login() {
@@ -59,9 +59,8 @@ function Login() {
                 data: { email }
             })
 
-            console.log(data)
 
-            if (!data.user) {
+            if (!data.ok) {
                 setNewUser({
                     ...newUser,
                     status: true
@@ -122,7 +121,7 @@ function Login() {
             setSuccess(true)
             setTimeout(() => {
                 setSuccess(false)
-                navigate('/account/onboarding')
+                navigate('/onboarding')
             }, [2000])
 
         } else {
@@ -150,17 +149,8 @@ function Login() {
 
 
     return (
-        <section className='relative h-screen'>
+        <section className='relative min-h-screen'>
 
-            <Link to='/account/onboarding'>
-                <p onClick={() => {
-                    dispatch(userEmail({ email }))
-                    navigate('/account/onboarding')
-                }} >
-                    OnBoarding
-                </p>
-
-            </Link>
             <div className='absolute top-4 left-4'>
                 <Link to='/'>
                     {/* Icon */}
@@ -241,7 +231,7 @@ function Login() {
 
                             </div>
 
-                            {isLoading && <h1>Loading...</h1>}
+
                             {emailError &&
                                 <p className='text-red-500 text-sm mt-2'>{emailError}</p>
                             }

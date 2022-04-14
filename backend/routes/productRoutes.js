@@ -4,7 +4,8 @@ import {
     getProductById,
     createProduct,
     deleteProduct,
-    updateProduct
+    updateProduct,
+    myProducts
 } from "../controller/productController.js";
 import auth from "../middleware/auth.js";
 
@@ -19,7 +20,6 @@ router.get("/", getAllProducts)
 //@route    GET /api/products/:id
 ///@access  Public
 router.get("/:id", getProductById)
-
 
 //@desc     POST a product to the db
 //@route    POST /api/products/create
@@ -37,6 +37,8 @@ router.delete("/delete", auth, deleteProduct)
 //@route    PUT /api/products/update
 ///@access  Authenticated
 router.put("/update", auth, updateProduct)
+
+
 
 
 export default router;

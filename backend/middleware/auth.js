@@ -20,7 +20,7 @@ const auth = async (req, res, next) => {
         next()
     } catch (error) {
         return res.status(400).json({
-            message: "Token invalid"
+            message: error.message
         })
     }
 

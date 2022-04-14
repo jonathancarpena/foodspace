@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // Redux
-import { userEmail, setupAuth } from '../../redux/features/auth/authSlice'
+import { userEmail, setupAuth } from '../redux/features/auth/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
 // Router
@@ -13,14 +13,14 @@ import { BiFridge } from 'react-icons/bi'
 import { FaGoogle, FaApple, FaTimesCircle } from 'react-icons/fa'
 
 // Components
-import Button from '../../components/Button'
-import TransitionOpacity from '../../components/Transition/TransitionOpacity'
+import Button from '../components/Button'
+import TransitionOpacity from '../components/Transition/TransitionOpacity'
 
 // Utils
-import { validateEmail, sendRegisterCode, generateHashCode } from '../../lib/utils'
+import { validateEmail, sendRegisterCode, generateHashCode } from '../lib/utils'
 
 // Constants
-import { API } from '../../lib/urls'
+import { API } from '../lib/urls'
 
 
 function Login() {
@@ -58,7 +58,9 @@ function Login() {
                 data: { email }
             })
 
-            if (!data.user) {
+            console.log(data)
+
+            if (!data.ok) {
                 setNewUser({
                     ...newUser,
                     status: true
@@ -98,6 +100,7 @@ function Login() {
             dispatch(setupAuth({ type: "login", payload: data }))
 
             if (auth.ready) {
+                console.log(auth)
                 setSuccess(true)
                 setTimeout(() => {
                     navigate('/account')
@@ -119,7 +122,7 @@ function Login() {
             setSuccess(true)
             setTimeout(() => {
                 setSuccess(false)
-                navigate('/account/onboarding')
+                navigate('/onboarding')
             }, [2000])
 
         } else {
@@ -144,19 +147,10 @@ function Login() {
         })
     }
 
-
+    useEffect(() => { console.log(auth.error) }, [auth])
 
     return (
-        <section className='relative h-screen'>
-
-            <Link to='/account/onboarding'>
-                <p onClick={() => {
-                    dispatch(userEmail({ email }))
-                    navigate('/account/onboarding')
-                }} >
-                    OnBoarding
-                </p>
-            </Link>
+        <section className='relative min-h-screen'>
 
             <div className='absolute top-4 left-4'>
                 <Link to='/'>
@@ -315,7 +309,7 @@ function Login() {
                             focus:outline-offset-2 focus:border-sky-300 mb-3`}
                                     />
 
-
+                                    {auth.error && <span className='text-red-600'>{auth.error}</span>}
                                     {/* Log In */}
                                     <Button type='submit' variant='outline' sx='w-full py-1.5 text-sm font-normal mx-0 ' >
                                         Log in

@@ -6,7 +6,8 @@ export const API = {
         login: `${BASE_API}/user/login`,
         email: `${BASE_API}/user/email`,
         me: `${BASE_API}/user/me`,
-        logout: `${BASE_API}/user/logout`
+        logout: `${BASE_API}/user/logout`,
+        myProducts: `${BASE_API}/products/me`
     },
     ADMIN: {
         base: `${BASE_API}/foodSpace/admin`,
@@ -27,7 +28,7 @@ export const API = {
         base: `${BASE_API}/products`,
         create: `${BASE_API}/products/create`,
         delete: `${BASE_API}/products/delete`,
-        update: `${BASE_API}/products/update`
+        update: `${BASE_API}/products/update`,
     }
 }
 

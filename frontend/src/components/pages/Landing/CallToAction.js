@@ -28,7 +28,7 @@ function CallToAction() {
             </div>
 
             {/* Call to Action */}
-            <Link to='/account/signup'>
+            <Link to='/signup'>
                 <Button sx='w-[250px] mb-3'>
                     Try FoodSpace free
                 </Button>

@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux'
-import { setupAuth } from '../../redux/features/auth/authSlice'
+import { setupAuth } from '../redux/features/auth/authSlice'
 
 // Router
 import { Link, useNavigate } from 'react-router-dom'
@@ -12,13 +12,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FaUser, FaEye } from 'react-icons/fa'
 
 // Components
-import Button from '../../components/Button'
-import Avatar, { AvatarModal } from '../../components/pages/Account/Avatar'
+import Button from '../components/Button'
+import Avatar, { AvatarModal } from '../components/pages/Account/Avatar'
 
 // Images
-import img from '../../images/account/onboard.png'
-
-
+import img from '../images/account/onboard.png'
 
 
 function OnBoarding() {
@@ -57,7 +55,6 @@ function OnBoarding() {
     }
 
 
-
     return (
         <section className='bg-[#F7F6F3]  h-screen relative flex flex-col justify-center items-center'>
 
@@ -75,7 +72,7 @@ function OnBoarding() {
                 </div>
 
                 {/* Choose Avatar */}
-                <div className='text-center'>
+                <div className='text-center mx-auto'>
                     {!avatar
                         ? <>
                             <FaUser onClick={() => setShowModal(true)} className='mb-3.5 block mx-auto fill-[#D8D8D8] bg-[#F7F7F7] text-7xl pt-4 rounded-full drop-shadow-md cursor-pointer' />

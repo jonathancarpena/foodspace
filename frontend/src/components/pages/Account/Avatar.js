@@ -126,7 +126,7 @@ function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = fal
         },
         lg: {
             bg: "h-[95px]",
-            emoji: "text-[55px]"
+            emoji: "text-[55px] "
         },
         xl: {
             bg: "h-[105px]",

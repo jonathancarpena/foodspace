@@ -37,7 +37,7 @@ function Hero() {
             </h2>
 
             {/* Call To Action */}
-            <Link to='/account/signup'>
+            <Link to='/signup'>
                 <Button variant='contained' sx='w-[200px]'>
                     Try FoodSpace Free
                 </Button>

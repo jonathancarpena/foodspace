@@ -15,14 +15,14 @@ export const register = async (req, res) => {
 
         // Validate user input
         if (!email || !password || !first_name || !last_name || !avatar) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "All input is required"
             });
         } else {
             // Validate User exist already
             const userExist = await User.findOne({ email: email })
             if (userExist) {
-                res.status(400).json({
+                return res.status(400).json({
                     message: "Access Denied"
                 });
             }
@@ -48,41 +48,44 @@ export const register = async (req, res) => {
                     expiresIn: 360000
                 })
             }
-            res.status(200).json({
-                token
+            return res.status(200).json({
+                token,
+                user
             })
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
 }
 
 export const login = async (req, res) => {
+    console.log('LOGIN EVENT')
     try {
         // Get user input
         const { email, password } = req.body
 
+
         // Validate user input
         if (!(email && password)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "All input is required"
             })
         }
 
-        let user;
-        user = await User.findOne({ email: email })
-
+        const user = await User.findOne({ email: email })
         if (!user) {
-            return res.status(401).send("Invalid Credentials")
+            return res.status(401).json({
+                message: "Invalid Credentials"
+            })
         }
 
 
-        let isMatch = await compare(password, user.password)
+        const isMatch = await compare(password, user.password)
         if (!isMatch) {
-            res.status(401).send({
+            return res.status(401).json({
                 message: "Incorrect Password"
             })
         }
@@ -96,7 +99,7 @@ export const login = async (req, res) => {
                 expiresIn: 360000
             })
 
-            res.status(200).json({ token })
+            return res.status(200).json({ token, user })
         }
 
     } catch (err) {
@@ -107,14 +110,15 @@ export const login = async (req, res) => {
 
 
 export const me = async (req, res) => {
+    console.log('FETCHING ME')
     try {
         const user = await User.findById(req.user._id)
-        res.json({
+        return res.status(200).json({
             user
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         })
     }
@@ -127,22 +131,28 @@ export const logout = async (req, res) => {
         httpOnly: true
     })
 
-    return res.send({ success: true })
+    return res.json({ message: "success" })
 }
 
 
 export const emailCheck = async (req, res) => {
+    console.log('CHECKING EMAIL')
     const { email } = req.body
-    try {
-        const user = await User.findOne({ email: email })
-        res.status(200).json({
-            user
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: "Server Error"
+
+    const userExist = await User.findOne({ email: email })
+    if (userExist) {
+        console.log("USER EXISTS")
+        return res.status(200).json({
+            ok: userExist ? true : false,
+            user: userExist ? userExist : null
         })
     }
+
+
+    return res.status(500).json({
+        message: "Server Error"
+    })
+
 }
 
 

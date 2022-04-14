@@ -14,6 +14,7 @@ import { API } from '../../../lib/urls'
 import Tooltip from '../../../components/Tooltip'
 import Button from '../../../components/Button'
 import Avatar from '../../../components/pages/Account/Avatar'
+import Dropdown, { DropdownItem } from '../../../components/Dropdown'
 
 
 // Import Swiper React components
@@ -23,12 +24,13 @@ import { Swiper, SwiperSlide, useSwiperSlide, useSwiper } from "swiper/react";
 import "swiper/css";
 
 // Icons
-import { FaTrashAlt, FaEdit, FaCheck, FaCrown } from 'react-icons/fa'
+import { FaTrashAlt, FaEdit, FaCheck, FaCrown, FaCog } from 'react-icons/fa'
 import { BiFridge } from 'react-icons/bi'
 import { ImCross } from 'react-icons/im'
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from 'react-icons/ai'
 import { MdPeopleAlt } from 'react-icons/md'
 
+// Utils
 import { toTitleCase } from '../../../lib/utils'
 
 
@@ -37,6 +39,7 @@ import { toTitleCase } from '../../../lib/utils'
 function Admin() {
     const { state: { foodSpace_id } } = useLocation()
     const navigate = useNavigate()
+    const location = useLocation()
     const [my_swiper, set_my_swiper] = useState({});
     const auth = useSelector(state => state.auth)
     const [foodSpace, setFoodSpace] = useState(null)
@@ -276,10 +279,24 @@ function Admin() {
             {/* Header */}
             <div className='border-b-2 p-7'>
 
-                <div className='pb-5 '>
-                    <BiFridge className='inline-block text-5xl mb-1 mr-2' />
-                    <h1 className='inline-block capitalize font-semibold text-3xl tracking-tight border-r-2 pr-3'>{foodSpace.name}</h1>
-                    <span className='ml-3 text-secondary'>{foodSpace.users.length + 1} <MdPeopleAlt className='inline-block mb-1 text-lg' /></span>
+                <div className='pb-5 flex justify-between items-center'>
+                    <div>
+                        <BiFridge className='inline-block text-5xl mb-1 mr-2' />
+                        <h1 className='inline-block capitalize font-semibold text-3xl tracking-tight border-r-2 pr-3'>{foodSpace.name}</h1>
+                        <span className='ml-3 text-secondary'>{foodSpace.users.length + 1} <MdPeopleAlt className='inline-block mb-1 text-lg' /></span>
+                    </div>
+
+                    {/* Admin View */}
+                    <Dropdown button={<FaCog className='text-secondary text-2xl hover:text-neutral-600 cursor-pointer' />}>
+                        <DropdownItem>
+                            <Link to={`/foodSpace/admin/${foodSpace.name}/add-user`} state={{ prevPath: location.pathname }}>
+                                Add User
+                            </Link>
+                        </DropdownItem>
+                        <DropdownItem>Another action</DropdownItem>
+                        <DropdownItem>Something Else Here</DropdownItem>
+                        <DropdownItem>Hey</DropdownItem>
+                    </Dropdown>
                 </div>
 
 

@@ -10,7 +10,8 @@ import { API } from '../../lib/urls'
 // Icons
 import { BsSearch } from 'react-icons/bs'
 import { MdCancel } from 'react-icons/md'
-import { FaAngleRight, FaRegClock, FaPlusCircle } from 'react-icons/fa'
+import { FaAngleRight, FaRegClock, FaPlusCircle, FaPlusSquare } from 'react-icons/fa'
+import Tooltip from '../../components/Tooltip'
 
 // Components
 const ProductDisplay = ({ data }) => {
@@ -85,7 +86,6 @@ function Products() {
                 setErrors(true)
             })
     }, [])
-
 
 
 
@@ -172,7 +172,7 @@ function Products() {
     }
 
     return (
-        <div className='min-h-screen'>
+        <div className='min-h-screen pb-20'>
 
             {/* Search */}
             <div className='p-7 flex flex-col space-y-1 '>
@@ -191,6 +191,15 @@ function Products() {
                             onClick={() => setSearch('')}
                             className='absolute fill-neutral-400 top-[50%] -translate-y-[50%] right-2 cursor-pointer hover:fill-neutral-500' />
                     }
+                    <Link
+                        to={`/product/create`}
+                        state={{ name: search, prevPath: location.pathname }}
+                    >
+                        <Tooltip message={"Create an Item"}>
+                            <FaPlusSquare className='inline-block ml-1 text-lg text-primary-500 cursor-pointer' />
+                        </Tooltip>
+
+                    </Link>
                 </div>
             </div>
 
@@ -222,27 +231,57 @@ function Products() {
 
 
             {/* Products Display */}
-
             {!isLoading &&
                 <>
                     <div className='mx-7'>
-                        {searchResults &&
-                            <span>{searchResults.length} result{searchResults.length === 1 ? '' : 's'}</span>
-                        }
-                        <ProductDisplay data={searchResults ? searchResults : products} />
 
-                        {(searchResults && searchResults.length === 0) &&
-                            <Link
-                                to={`/product/create`}
-                                state={{ name: search, prevPath: location.pathname }}
+                        {searchResults
+                            ? <>
+                                {/* Search Results Length */}
+                                <span>{searchResults.length} result{searchResults.length === 1 ? '' : 's'}</span>
+                                <ProductDisplay data={searchResults} />
+                                {(searchResults.length === 0)
+                                    ? <Link
+                                        to={`/product/create`}
+                                        state={{ name: search, prevPath: location.pathname }}
+                                    >
+                                        <div className='text-secondary flex flex-col  space-y-2 justify-center items-center h-[20vh] '>
+                                            <h1 className='text-3xl'>Create Item</h1>
+                                            <FaPlusCircle className='block mx-auto text-2xl' />
+                                        </div>
+                                    </Link>
 
-                            >
-                                <div className='text-secondary flex flex-col  space-y-2 justify-center items-center h-[20vh] '>
-                                    <h1 className='text-3xl'>Create Item</h1>
-                                    <FaPlusCircle className='block mx-auto text-2xl' />
-                                </div>
-                            </Link>
+                                    : <Link
+                                        to={`/product/create`}
+                                        state={{ name: search, prevPath: location.pathname }}
+                                    >
+                                        <div className='text-secondary flex flex-col  space-y-2 justify-center items-center h-[20vh] '>
+                                            <h1 className='text-2xl'>Not what you're looking for?</h1>
+                                            <h1 className='text-2xl'>Create a new Item</h1>
+                                            <FaPlusCircle className='block mx-auto text-2xl' />
+                                        </div>
+                                    </Link>}
+
+
+                            </>
+
+                            : <>
+                                {/* Products Length */}
+                                <span>{products.length} result{products.length === 1 ? '' : 's'}</span>
+                                <ProductDisplay data={products} />
+                            </>
+
                         }
+
+
+
+
+
+
+
+
+
+
                     </div>
                 </>
             }

@@ -53,7 +53,7 @@ function Navbar() {
                 {/* Login & Hamburger */}
                 <div className='ml-auto py-2.5 '>
                     {/* Login */}
-                    <Link to='/account/signup'>
+                    <Link to='/signup'>
                         <Button size='sm'>
                             Try FoodSpace Free
                         </Button>
@@ -94,13 +94,13 @@ function Navbar() {
 
                     {/* Login/Join Buttons */}
                     <div className='flex flex-col jusitfy-center items-center mt-5 space-y-4'>
-                        <Link to='/account/signup' className='w-full'>
+                        <Link to='/signup' className='w-full'>
                             <Button size='md' sx='w-full'>
                                 Try FoodSpace free
                             </Button>
                         </Link>
 
-                        <Link to='/account/login' className='w-full'>
+                        <Link to='/login' className='w-full'>
                             <Button size='md' variant='outline' sx='w-full'>
                                 Log in
                             </Button>

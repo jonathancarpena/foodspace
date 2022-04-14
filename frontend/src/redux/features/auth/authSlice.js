@@ -20,45 +20,59 @@ export const setupAuth = createAsyncThunk(
     async (arg, thunkAPI) => {
         const { type, payload } = arg
 
-        const res = await axios({
-            method: "POST",
-            url: `${API.USER[type]}`,
-            data: payload
-        })
+        try {
+            const res = await fetch(`${API.USER[type]}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            if (!res.ok) {
+                const data = await res.json()
+                let err = new Error()
+                err.status = res.status
+                err.message = data.message
+                throw err
 
-        const { data } = await axios({
-            method: "GET",
-            url: `${API.USER.me}`,
-            headers: {
-                Authorization: `Bearer ${res.data.token}`
             }
-        })
+            const data = await res.json()
+            return {
+                user: data.user,
+                token: data.token
+            }
 
-
-        const response = {
-            user: data.user,
-            token: res.data.token
+        } catch (error) {
+            return thunkAPI.rejectWithValue({
+                message: error.message,
+                status: error.status
+            })
         }
-        return response
+
     }
 )
 
 export const refreshMe = createAsyncThunk(
     'auth/refreshMe',
     async (arg, thunkAPI) => {
-
-        const { data } = await axios({
-            method: "GET",
-            url: `${API.USER.me}`,
-            headers: {
-                Authorization: `Bearer ${thunkAPI.getState().auth.token}`
+        let response;
+        try {
+            const { data } = await axios({
+                method: "GET",
+                url: `${API.USER.me}`,
+                headers: {
+                    Authorization: `Bearer ${thunkAPI.getState().auth.token}`
+                }
+            })
+            response = {
+                user: data.user,
+                token: thunkAPI.getState().auth.token
             }
-        })
 
-        const response = {
-            user: data.user,
-            token: thunkAPI.getState().auth.token
+        } catch (error) {
+            response = error.message
         }
+
         return response
     }
 )
@@ -74,11 +88,14 @@ export const authSlice = createSlice({
             state.user = null
             state.ready = false
         },
-
         userEmail: (state, action) => {
             state.user = {
                 email: action.payload.email
             }
+            state.loading = false
+            state.ready = false
+            state.error = null
+            state.token = null
         }
     },
     extraReducers: {
@@ -94,7 +111,7 @@ export const authSlice = createSlice({
         [setupAuth.rejected]: (state, action) => {
             console.log('Auth Rejected')
             state.loading = false
-            state.error = JSON.parse(action.error.message)
+            state.error = action.payload.message
             state.user = null
             state.token = null
             state.ready = false
@@ -111,6 +128,7 @@ export const authSlice = createSlice({
         [refreshMe.rejected]: (state, action) => {
             console.log('Refresh Rejected')
             state.loading = false
+            console.log(action.error)
             state.error = JSON.parse(action.error.message)
             state.user = null
             state.token = null

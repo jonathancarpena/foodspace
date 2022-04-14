@@ -41,9 +41,11 @@ import { FaTimes, FaPlusCircle } from 'react-icons/fa'
 
 // const { item, foodSpace_id } = body
 
+
 function AddItem() {
     const navigate = useNavigate()
-    const { state: { foodSpace, foodSpace_id } } = useLocation()
+    const { state: { foodSpace: currentFoodSpace, foodSpace_id } } = useLocation()
+    const [foodSpace, setFoodSpace] = useState(null)
     const { token } = useSelector(state => state.auth)
     const [products, setProducts] = useState(null)
     const [items, setItems] = useState([])
@@ -203,6 +205,8 @@ function AddItem() {
             <h1>{errors}</h1>
         )
     }
+
+
     return (
         <div>
             <Link to={'/account'}>GO Back</Link>

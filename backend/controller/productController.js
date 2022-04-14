@@ -124,3 +124,28 @@ export const updateProduct = async (req, res) => {
         })
     }
 }
+
+
+export const myProducts = async (req, res) => {
+    console.log('MY PRODUCTS')
+    const { _id: user_id } = req.user
+
+    const user = await User.findById(user_id)
+
+    if (!user) {
+        return res.status(400).json({
+            message: "Invalid Credentials"
+        })
+    }
+
+    try {
+        return res.status(200).json({
+            products: user.myProducts
+        })
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({
+            message: "Server Error"
+        })
+    }
+}

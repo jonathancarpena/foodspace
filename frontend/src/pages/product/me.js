@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // Router
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 // Redux
 import { useSelector } from 'react-redux'
@@ -16,85 +16,120 @@ import { toTitleCase, convertToMs } from '../../lib/utils'
 // Constants
 import { unitMeasure, emojiDictionary } from '../../lib/constants'
 
+// Icons
+import { BsSearch } from 'react-icons/bs'
+import { MdCancel } from 'react-icons/md'
+import { FaAngleRight, FaRegClock, FaPlusCircle, FaTrashAlt } from 'react-icons/fa'
+
+// Swiper Components
+import { Swiper, SwiperSlide, useSwiperSlide, useSwiper } from "swiper/react";
+
+// Import Swiper styles
+import "swiper/css";
+
+// Components
+const ProductDisplay = ({ handleRemoveItem, data }) => {
+    const location = useLocation()
+    return (
+        <ul className='flex flex-col'>
+            {data.map((item) => (
+                <li key={item._id}>
+
+                    <Swiper
+                        initialSlide={1}
+                        slidesPerView="auto"
+                        className="w-full h-full"
+                    >
+                        <SwiperSlide className=' max-w-max p-2 flex  '>
+                            <div onClick={() => handleRemoveItem(item)} className={`bg-red-600 cursor-pointer rounded-xl drop-shadow-lg flex flex-col justify-center items-center space-y-1  py-4 w-[15vw] `}>
+                                <FaTrashAlt className='text-white inline-block text-[2rem] ' />
+                                <span className='text-white text-sm'>Delete</span>
+                            </div>
+                        </SwiperSlide>
+
+                        <SwiperSlide className='w-[80vw] p-2 '>
+
+                            <Link to={`/product/${item._id}`} state={{ prevPath: location.pathname }}>
+                                <div className='p-4 bg-white rounded-xl flex justify-between drop-shadow-md items-center w-full active:bg-primary-200 '>
+
+                                    <div className='flex items-center space-x-3'>
+                                        <span className='inline-block text-[2rem]'>{item.image}</span>
+                                        <div className='flex flex-col space-y-0.5'>
+                                            <p className='font-semibold text-inherit capitalize '>{item.name}</p>
+                                            <p className=' text-secondary text-xs capitalize'>{item.brand}</p>
+                                            <p className=' text-secondary text-xs capitalize'><FaRegClock className='inline-block' /> Date Added: {new Date(item.createdAt).toDateString().substring(3)}</p>
+                                        </div>
+                                    </div>
+
+                                    <FaAngleRight className='text-xl text-secondary' />
+
+                                </div>
+                            </Link>
+                        </SwiperSlide>
+                    </Swiper>
+
+
+                </li>
+
+            ))}
+        </ul>
+    )
+}
 function MyFood() {
-    const navigate = useNavigate()
+    const location = useLocation()
     const { user, token } = useSelector(state => state.auth)
-    const [myProducts, setMyProducts] = useState(user.myProducts)
-    const [time, setTime] = useState('day')
+    const [myProducts, setMyProducts] = useState([])
+    const [search, setSearch] = useState('')
+    const [searchResults, setSearchResults] = useState([])
 
-
-    // Adding Edit Status
     useEffect(() => {
-        const addEditStatus = user.myProducts.map((item) => {
-            return {
-                ...item,
-                edit: false
-            }
-        })
-        setMyProducts(addEditStatus)
+        if (user.myProducts) {
+            setMyProducts(user.myProducts)
+        } else {
+            setMyProducts(null)
+        }
+
     }, [])
 
-    async function handleSubmit(e, idx) {
-        e.preventDefault()
 
-        try {
-
-            const data = {
-                _id: myProducts[idx]._id,
-                name: myProducts[idx].name,
-                type: myProducts[idx].type,
-                unit: myProducts[idx].unit,
-                barcode: myProducts[idx].barcode,
-                lifeSpan: myProducts[idx].lifeSpan,
-                image: myProducts[idx].image ? myProducts[idx].image : emojiDictionary[myProducts[idx].type],
-            }
-            const res = await axios({
-                method: "PUT",
-                url: `${API.PRODUCT.update}`,
-                data: { data },
-                headers: {
-                    Authorization: `Bearer ${token}`
+    // Shows search Results
+    useEffect(() => {
+        if (search) {
+            const results = []
+            myProducts.forEach((item) => {
+                if (item.name.toLowerCase().includes(search.toLowerCase())) {
+                    const itemChars = [...item.name.toLowerCase()]
+                    const searchChars = [...search.toLowerCase()]
+                    const match = searchChars.every((item, idx) => item === itemChars[idx])
+                    if (match) {
+                        results.push(item)
+                    }
+                }
+                if (item.brand.toLowerCase().includes(search.toLowerCase())) {
+                    const itemChars = [...item.brand.toLowerCase()]
+                    const searchChars = [...search.toLowerCase()]
+                    const match = searchChars.every((item, idx) => item === itemChars[idx])
+                    if (match) {
+                        results.push(item)
+                    }
                 }
             })
-            console.log(res)
-            if (res) {
-                let updatedProducts = myProducts
-                updatedProducts[idx].edit = false
-                setMyProducts([...updatedProducts])
-            }
-        } catch (error) {
-            console.log(error)
-            const { message } = error.response.data
-            console.log(message)
-        }
 
-    }
-
-    function handleLifeSpanChange(e, idx) {
-        let newProduct = [...myProducts]
-        if (e.target.name === "time") {
-            newProduct[idx].lifeSpan = {
-                ...newProduct[idx].lifeSpan,
-                time: e.target.value
-            }
+            let uniqueResults = []
+            results.forEach((element) => {
+                if (!uniqueResults.includes(element)) {
+                    uniqueResults.push(element)
+                }
+            })
+            setSearchResults(uniqueResults)
+        } else {
+            setSearchResults(null)
         }
-        if (e.target.name === "value") {
-            newProduct[idx].lifeSpan = {
-                ...newProduct[idx].lifeSpan,
-                value: e.target.value
-            }
-        }
-        setMyProducts([...newProduct])
-    }
+    }, [search])
 
-    function handleEditChange(e, idx) {
-        let newProduct = myProducts
-        newProduct[idx][e.target.name] = e.target.value
-        setMyProducts([...newProduct])
-    }
 
     async function handleRemoveItem(item) {
-        const userConfirm = window.confirm(`Are you sure you want to delete ${item.name}?`)
+        const userConfirm = window.confirm(`Are you sure you want to remove ${item.brand} ${item.name} from your My Foods?`)
         if (userConfirm) {
             try {
                 const res = await axios({
@@ -113,133 +148,75 @@ function MyFood() {
                 console.log(message)
             }
         }
-
     }
 
-    function editStatus(index) {
-        let copy = myProducts
-        copy[index].edit = true
-        setMyProducts([...copy])
-    }
+
 
     return (
-        <div>
-            <h1>My Product</h1>
-            {myProducts.length
-                ? <ul className="flex flex-col space-y-3">
-                    {myProducts.map((item, idx) => (
-                        item.edit
-                            ? <form onSubmit={(e) => handleSubmit(e, idx)} className='flex space-x-3'>
-                                <span>EDITING</span>
-                                <label>Image:
-                                    <input
-                                        name="image"
-                                        value={item.image}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="w-[30px]"
-                                    />
-                                </label>
+        <div className="min-h-screen ">
 
-                                <label>Name:
-                                    <input
-                                        name="name"
-                                        value={item.name}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="w-[50px]"
-                                    />
-                                </label>
-
-                                <label>Brand:
-                                    <input
-                                        name="brand"
-                                        value={item.brand}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="w-[50px]"
-                                    />
-                                </label>
-
-                                <label>LifeSpan:
-                                    <input
-                                        type="number"
-                                        name="value"
-                                        value={item.lifeSpan.value}
-                                        onChange={(e) => handleLifeSpanChange(e, idx)}
-                                        className="w-[50px]"
-                                    />
-                                    <select
-                                        value={item.lifeSpan.time}
-                                        name="time"
-                                        onChange={(e) => handleLifeSpanChange(e, idx)}
-                                    >
-                                        <option value={'year'}>years</option>
-                                        <option value={'month'}>months</option>
-                                        <option value={'day'}>days</option>
-                                        <option value={'hour'}>hours</option>
-                                    </select>
-                                </label>
-
-                                <label>Type:
-                                    <select
-                                        id="type"
-                                        name="type"
-                                        value={item.type}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="border-2"
-                                    >
-                                        <option value={'food'}>
-                                            food
-                                        </option>
-                                        <option value={'liquid'}>
-                                            liquid
-                                        </option>
-                                    </select>
-                                </label>
-
-                                <label>Unit:
-                                    <select
-                                        id="unit"
-                                        name="unit"
-                                        value={item.unit}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="border-2">
-                                        {unitMeasure[item.type].map((item) => (
-                                            <option key={item} value={item}>
-                                                {item}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-
-                                <label>Barcode:
-                                    <input
-                                        name="barcode"
-                                        value={item.barcode ? item.barcode : ''}
-                                        onChange={(e) => handleEditChange(e, idx)}
-                                        className="w-[50px]"
-                                    />
-                                </label>
-
-                                <button type="submit">✔</button>
-                            </form>
-                            : <div className='flex space-x-3'>
-                                <button onClick={() => handleRemoveItem(item)}>Remove</button>
-                                <button onClick={() => editStatus(idx)}>Edit</button>
-                                <span>{item.image}</span>
-                                <span>{item.name}</span>
-                                <span>{item.brand}</span>
-                                <span>{item.lifeSpan.value} {item.lifeSpan.time}</span>
-                                <span>Type: {item.type}</span>
-                                <span>Unit: {item.unit}</span>
-                                <span>Barcode: {item.barcode}</span>
-                            </div>
-
-                    ))}
-                </ul>
-                : <div>
-                    <Link to='/product/create'>Create Product</Link>
+            {/* Search */}
+            <div className='p-7 flex flex-col space-y-1 '>
+                <label htmlFor="search" className="text-2xl font-semibold">My Foods</label>
+                <div className='relative w-max'>
+                    <BsSearch htmlFor="search" className='absolute fill-secondary top-[50%] -translate-y-[50%] left-2' />
+                    <input
+                        id="search"
+                        className="bg-neutral-200 rounded-xl px-8 py-1.5 focus:outline-none"
+                        onChange={(e) => setSearch(e.target.value)}
+                        value={search}
+                        placeholder="Search by name or brand..."
+                    />
+                    {search &&
+                        <MdCancel
+                            onClick={() => setSearch('')}
+                            className='absolute fill-neutral-400 top-[50%] -translate-y-[50%] right-2 cursor-pointer hover:fill-neutral-500' />
+                    }
                 </div>
-            }
+            </div>
 
+
+            {/* My Foods Display */}
+            <div className='mx-7'>
+                {myProducts.length
+                    ? <>
+                        {searchResults &&
+                            <span>{searchResults.length} result{searchResults.length === 1 ? '' : 's'}</span>
+                        }
+
+                        {!searchResults &&
+                            <span>{myProducts.length} result{myProducts.length === 1 ? '' : 's'}</span>
+                        }
+                        <ProductDisplay data={searchResults ? searchResults : myProducts} handleRemoveItem={handleRemoveItem} />
+
+                        {(searchResults && searchResults.length === 0) &&
+                            <Link
+                                to={`/product/create`}
+                                state={{ name: search, prevPath: location.pathname }}
+                            >
+                                <div className='text-secondary flex flex-col  space-y-2 justify-center items-center h-[20vh] '>
+                                    <h1 className='text-3xl'>Create Item</h1>
+                                    <FaPlusCircle className='block mx-auto text-2xl' />
+                                </div>
+                            </Link>
+                        }
+                    </>
+                    : <>
+                        <span>0 results</span>
+                        <Link
+                            to={`/product/create`}
+                            state={{ name: search, prevPath: location.pathname }}
+                        >
+                            <div className='text-secondary flex flex-col  space-y-2 justify-center items-center h-[20vh] '>
+                                <h1 className='text-3xl'>Create Item</h1>
+                                <FaPlusCircle className='block mx-auto text-2xl' />
+                            </div>
+                        </Link>
+                    </>
+
+                }
+
+            </div>
 
         </div>
     )

@@ -71,6 +71,11 @@ const productSchema = new Schema({
     },
     lifeSpan: {
         type: lifeSpanSchema,
+        required: false,
+        default: {
+            value: 7,
+            time: "day"
+        }
     },
     barcode: {
         type: Number,
