@@ -1,5 +1,5 @@
 // Constants
-import { timeInMs } from './constants';
+import { timeInMs, alphabet } from './constants';
 
 // Emailjs
 import emailjs from '@emailjs/browser';
@@ -39,16 +39,13 @@ export function sendRegisterCode(params) {
 
 
 export function generateHashCode() {
-    const letters = [
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    ]
+
 
     let code = ''
     for (let i = 0; i < 4; i++) {
         let hash = ''
         for (let j = 0; j < 2; j++) {
-            hash += randomItem(letters)
+            hash += randomItem(alphabet)
             hash += (Math.floor(Math.random() * 9)) + 1
         }
         if (i !== 3) {
@@ -73,4 +70,8 @@ export function toTitleCase(str) {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         }
     );
+}
+
+export function convertToValidDate(date) {
+    return new Date(date).toJSON().split('T')[0]
 }

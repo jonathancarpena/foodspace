@@ -20,13 +20,13 @@ export default function Modal({ showModal, setShowModal, content, footer, header
 
                             {/* Card Header */}
                             <h1 className=" text-xl font-semibold text-neutral-800 text-center pt-10 mx-16">
-                                {header}
+                                {header && header}
                             </h1>
 
 
 
                             {/* Card Content */}
-                            {content}
+                            {content && content}
 
 
                             {/* Card Footer */}

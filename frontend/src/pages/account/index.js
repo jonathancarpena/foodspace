@@ -8,7 +8,7 @@ import { refreshMe, clearAuth } from '../../redux/features/auth/authSlice'
 import { useSelector, useDispatch } from 'react-redux'
 
 // Components
-import Avatar from '../../components/pages/Account/Avatar'
+import Avatar, { AvatarModal } from '../../components/pages/Account/Avatar'
 import Button from '../../components/Button'
 
 // Import Swiper React components
@@ -21,9 +21,7 @@ import "swiper/css/pagination";
 
 // Icons 
 import { FaCarrot, FaCog, FaEdit } from 'react-icons/fa'
-import { BsCircleFill } from 'react-icons/bs'
-import { BiFridge, BiTrash } from 'react-icons/bi'
-import { MdSpaceDashboard } from 'react-icons/md'
+import { MdSpaceDashboard, MdLogout } from 'react-icons/md'
 
 
 const links = [
@@ -42,11 +40,30 @@ const links = [
         icon: <FaCog className='block mx-auto text-[4rem] fill-primary-500' />,
         header: "manage account"
     },
+    {
+        link: "/account/logout",
+        icon: <MdLogout className='block mx-auto text-[4rem] fill-primary-500' />,
+        header: "logout"
+    },
 ]
 function Account() {
+    const [showModal, setShowModal] = useState(false)
+    const [newAvatar, setNewAvatar] = useState(null)
     const { user } = useSelector(state => state.auth)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    async function handleUpdateAvatar() {
+        const userConfirm = window.confirm('Does everything look correct?')
+    }
+    function handleLogout() {
+        dispatch(clearAuth())
+        navigate('/')
+    }
     return (
         <div className=' min-h-screen flex flex-col items-center pb-20'>
+            <AvatarModal showModal={showModal} setShowModal={setShowModal} handleComplete={handleUpdateAvatar} />
+
             <div className='h-[35vh] bg-white p-7 w-screen flex flex-col justify-center items-center border-b-2'>
                 <div className='relative'>
                     <Avatar
@@ -55,7 +72,7 @@ function Account() {
                         ring={true}
                         size='xl'
                     />
-                    <span className='cursor-pointer absolute top-0 -right-9 inline-block border-2 border-primary-400 p-1.5 rounded-full'>
+                    <span onClick={() => setShowModal(true)} className='cursor-pointer absolute top-0 -right-9 inline-block border-2 border-primary-400 p-1.5 rounded-full'>
                         <FaEdit className='fill-primary-500 text-center' />
                     </span>
 
@@ -69,14 +86,24 @@ function Account() {
             </div>
 
             <div className='grid grid-cols-2 gap-5 m-5'>
-                {links.map((item) => (
-                    <Link to={item.link}>
-                        <div className='w-full bg-white border-2 border-white text-center mx-auto p-5 rounded-2xl drop-shadow-lg active:bg-primary-200 cursor-pointer active:drop-shadow-2xl active:border-primary-500'>
-                            {item.icon}
-                            <h1 className='text-xl font-semibold capitalize mt-5 text-main'>{item.header}</h1>
-                        </div>
-                    </Link>
-                ))}
+                {links.map((item) => {
+                    if (item.link.includes('logout')) {
+                        return (
+                            <div onClick={handleLogout} className='w-full bg-white border-2 border-white text-center mx-auto p-5 rounded-2xl drop-shadow-lg active:bg-primary-200 cursor-pointer active:drop-shadow-2xl active:border-primary-500'>
+                                {item.icon}
+                                <h1 className='text-xl font-semibold capitalize mt-5 text-main'>{item.header}</h1>
+                            </div>
+                        )
+                    }
+                    return (
+                        <Link to={item.link} key={item.link}>
+                            <div className='w-full bg-white border-2 border-white text-center mx-auto p-5 rounded-2xl drop-shadow-lg active:bg-primary-200 cursor-pointer active:drop-shadow-2xl active:border-primary-500'>
+                                {item.icon}
+                                <h1 className='text-xl font-semibold capitalize mt-5 text-main'>{item.header}</h1>
+                            </div>
+                        </Link>
+                    )
+                })}
             </div>
         </div>
     )

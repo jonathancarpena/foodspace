@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import moment from 'moment'
 
 // Router 
 import { useNavigate, useLocation, Link } from 'react-router-dom'
@@ -29,9 +30,11 @@ function Create() {
     const { user, token } = useSelector(state => state.auth)
     const [name, setName] = useState('')
     const [areas, setAreas] = useState([''])
-    const [foodSpaceId, setFoodSpaceId] = useState(false)
+    const [type, setType] = useState('refrigerator')
+    const [foodSpace, setFoodSpace] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState({ name: null, areas: null })
+
 
 
 
@@ -70,6 +73,7 @@ function Create() {
                 },
                 areas: areaInput,
                 name,
+                type,
             }
 
             try {
@@ -83,8 +87,9 @@ function Create() {
                     }
                 })
 
-                if (res.data.foodSpace._id) {
-                    setFoodSpaceId(res.data.foodSpace._id)
+                if (res.data) {
+                    setFoodSpace(res.data.foodSpace)
+                    dispatch(refreshMe())
                 }
                 setIsLoading(false)
             } catch (error) {
@@ -108,50 +113,29 @@ function Create() {
         setFn(copy)
     }
 
+    let prevPath;
+    let state;
+    try {
+        prevPath = location.state.prevPath
+        state = location.state
+    } catch (error) {
+        prevPath = '/'
+        state = null
+    }
+
     return (
         <div className='min-h-screen p-7 flex flex-col justify-center items-center '>
 
             {/* Back Button */}
-            {location.state
-                ? <>
-                    {(location.state.prevPath.includes('/product') && location.state.prevPath !== '/product/me') &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                All Products
-                            </span>
-                        </Link>
-                    }
-
-                    {(location.state.prevPath.includes('/account') || location.state.prevPath.includes('/foodSpace')) &&
-                        <Link to={"/"}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                Home
-                            </span>
-                        </Link>
-                    }
-
-                    {location.state.prevPath === '/product/me' &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                My Foods
-                            </span>
-                        </Link>
-                    }
-                </>
-                : <Link to={"/product"}>
-                    <span className='fixed top-6 left-6'>
-                        <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                        All Products
-                    </span>
-                </Link>
-            }
+            <Link to={prevPath} state={state}>
+                <span className='fixed top-6 left-6'>
+                    <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
+                </span>
+            </Link>
 
 
             {/* FoodSpace Not Created */}
-            {!foodSpaceId &&
+            {!foodSpace &&
                 <form onSubmit={handleCreateSubmit} className="flex flex-col space-y-5 min-w-[350px] max-w-[350px] min-h-[70vh]">
                     {/* Header */}
                     <h1 className='text-3xl font-semibold tracking-tight text-center'>
@@ -185,8 +169,60 @@ function Create() {
                                 <MdCancel onClick={() => setName('')} className='absolute right-3 top-[50%] -translate-y-[50%] inline-block  fill-neutral-400 hover:fill-neutral-500 text-lg cursor-pointer' />
                             }
                         </div>
+                    </div>
+
+                    {/* Type */}
+                    <div className='flex justify-between items-start'>
+                        <div className='flex flex-col w-max'>
+                            <span htmlFor='type' className='font-semibold text-lg mb-1 '>
+                                Temperature
+                            </span>
+                            <span htmlFor='type' className='font-semibold text-lg mb-1 '>
+                                Range
+                            </span>
+                        </div>
+
+
+                        <div className='flex flex-col'>
+                            <div>
+                                <Button
+                                    onClick={(e) => setType(e.target.value)}
+                                    variant={type === "freezer" ? 'contained' : 'outline'}
+                                    sx={'mr-3  w-[120px]'}
+                                    value={'freezer'}>
+                                    Freezer
+                                </Button>
+                                <span>{`< 32° F`}</span>
+                            </div>
+
+                            <div>
+                                <Button
+                                    onClick={(e) => setType(e.target.value)}
+                                    variant={type === "refrigerator" ? 'contained' : 'outline'}
+                                    sx={'mr-3 w-[120px]'}
+                                    value={'refrigerator'}>
+                                    Refrigerator
+                                </Button>
+                                <span>{`35°-39° F`}</span>
+                            </div>
+
+                            <div>
+                                <Button
+                                    onClick={(e) => setType(e.target.value)}
+                                    variant={type === "pantry" ? 'contained' : 'outline'}
+                                    sx={'mr-3  w-[120px]'}
+                                    value={'pantry'}>
+                                    Pantry
+                                </Button>
+                                <span>{`> 40° F`}</span>
+                            </div>
+
+
+                        </div>
+
 
                     </div>
+
 
 
                     {/* Areas */}
@@ -216,7 +252,7 @@ function Create() {
                                             className="bg-white rounded-lg px-3 py-2  border-2 w-[90%] mt-2.5 flex items-center justify-center text-secondary"
                                         >
                                             <FiPlusCircle className='inline-block mr-1 ' />
-                                            Add Area
+                                            Add Another Area
                                         </button>
                                     }
 
@@ -244,7 +280,8 @@ function Create() {
                 </form>
             }
 
-            {foodSpaceId &&
+            {
+                foodSpace &&
                 <div >
                     <div className='flex flex-col justify-center items-center'>
                         {/* Header */}
@@ -262,18 +299,22 @@ function Create() {
                     <div className='mt-10'>
                         <Link
                             to={`/foodSpace/${name}`}
-                            state={{ foodSpace_id: foodSpaceId, currentUsers: [] }}
+                            state={{
+                                prevPath: location.pathname,
+                                foodSpace_id: foodSpace._id,
+                                foodSpace,
+                            }}
                         >
-                            <Button variant='outline'>
+                            <Button type="button" variant='outline'>
                                 Your FoodSpace
                             </Button>
                         </Link>
 
                         <Link
                             to={`/foodSpace/admin/${name}/add-user`}
-                            state={{ foodSpace_id: foodSpaceId }}
+                            state={{ foodSpace, prevPath: location.pathname }}
                         >
-                            <Button>
+                            <Button type="button">
                                 Invite Users
                             </Button>
                         </Link>

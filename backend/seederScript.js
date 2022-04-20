@@ -90,7 +90,13 @@ const addFoodSpaceAdmin = async () => {
         _id: foodSpace._id,
         name: foodSpace.name,
         expiredStock: foodSpace.expiredStock,
-        admin: user.avatar,
+        admin: {
+            _id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            avatar: user.avatar
+        },
         users: foodSpace.users
     }
 

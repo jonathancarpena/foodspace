@@ -13,26 +13,28 @@ import Login from './pages/login'
 import SignUp from './pages/signup';
 import OnBoarding from './pages/onboarding';
 import Products from './pages/product'
-import ProductDetails from './pages/product/details'
+import ProductDetails from './pages/product/[id]'
 import NotFound from './pages/404';
 
 // Regular User
 import Account from './pages/account/'
-import Manage from './pages/account/manage'
+import ManageAccount from './pages/account/manage'
+import DeleteAccount from './pages/account/manage/deleteAccount';
 import Dashboard from './pages/account/dashboard'
 import CreateProduct from './pages/product/create'
 import MyProducts from './pages/product/me'
 import CreateFoodSpace from './pages/foodspace/create'
 import FoodSpace from './pages/foodspace'
 import AddItem from './pages/foodspace/addItem'
+import AddItemDetails from './pages/foodspace/addItem/[id]'
 import Notifcations from './pages/account/notifications'
+import FoodSpaceItem from './pages/foodspace/item'
 
 // Admin Pages
-import AdminFoodSpace from './pages/foodspace/admin'
 import AddArea from './pages/foodspace/admin/addArea'
-import ManageUsers from './pages/foodspace/admin/manageUsers';
 import AddUser from './pages/foodspace//admin/addUser'
-import ChooseFoodSapce from './pages/foodspace/chooseFoodSpace';
+import ManageFoodSpace from './pages/foodspace/admin/manage';
+import ChooseFoodSpace from './pages/foodspace/chooseFoodSpace';
 
 
 function App() {
@@ -56,7 +58,10 @@ function App() {
         <Route exact path='/account/' element={<Account />} />
 
         {/* Manage Account Page */}
-        <Route exact path='/account/manage' element={<Manage />} />
+        <Route exact path='/account/manage' element={<ManageAccount />} />
+
+        {/* Delete Account */}
+        <Route exact path='/account/manage/delete' element={<DeleteAccount />} />
 
         {/* Notifications Page */}
         <Route exact path='/account/notifications' element={<Notifcations />} />
@@ -86,16 +91,22 @@ function App() {
         <Route exact path='/product/me' element={<MyProducts />} />
 
         {/* FoodSpace Page */}
-        <Route exact path='/foodSpace/:name' element={<AdminFoodSpace />} />
+        <Route exact path='/foodSpace/:name' element={<FoodSpace />} />
 
         {/* Choose FoodSpace Page */}
-        <Route exact path='/foodSpace/choose' element={<ChooseFoodSapce />} />
+        <Route exact path='/foodSpace/choose' element={<ChooseFoodSpace />} />
 
         {/* Create FoodSpace Page */}
         <Route exact path='/foodSpace/create' element={<CreateFoodSpace />} />
 
-        {/* Add Item to FoodSpace Page */}
+        {/* FoodSpace: Stock Item */}
+        <Route exact path='/foodSpace/:name/item/:stockNum' element={<FoodSpaceItem />} />
+
+        {/* Add Item  */}
         <Route exact path='/foodSpace/add-item' element={<AddItem />} />
+
+        {/* Add Item Details  */}
+        <Route exact path='/foodSpace/add-item/:id' element={<AddItemDetails />} />
 
         {/* Admin: Add User  */}
         <Route exact path='/foodSpace/admin/:name/add-user' element={<AddUser />} />
@@ -103,8 +114,8 @@ function App() {
         {/* Admin: Add Area */}
         <Route exact path='/foodSpace/admin/:name/add-area' element={<AddArea />} />
 
-        {/* Admin: Manage Users*/}
-        <Route exact path='/foodSpace/admin/:name/manage/users' element={<ManageUsers />} />
+        {/* Admin: Manage */}
+        <Route exact path='/foodSpace/admin/:name/manage' element={<ManageFoodSpace />} />
 
         {/* 404 Page */}
         <Route path='*' element={<NotFound />} />

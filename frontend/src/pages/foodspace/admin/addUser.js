@@ -34,30 +34,28 @@ function AddUser() {
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState()
 
-    useEffect(() => {
-        if (location.state) {
-            if (!location.state.foodSpace_id) {
-                navigate("/foodSpace/choose", {
-                    state: {
-                        prevPath: location.state.prevPath,
-                        nextPath: location.pathname
-                    }
-                })
-            }
 
-        } else {
-            navigate("/foodSpace/choose", { state: { prevPath: location.pathname } })
+    useEffect(() => {
+        if (!location.state) {
+            navigate("/foodSpace/choose", {
+                state: {
+                    prevPath: location.state.prevPath,
+                    nextPath: location.pathname
+                }
+            })
         }
+
     }, [])
+
     async function handleSubmit(e) {
         e.preventDefault()
-        if (users.length === 1)
+        if (users.length > 1) {
             for (const input of users) {
                 setIsLoading(true)
                 if (input.status === "success") {
                     const data = {
                         email: input.value,
-                        foodSpace_id: location.state.foodSpace_id
+                        foodSpace_id: location.state.foodSpace._id
                     }
 
                     try {
@@ -69,7 +67,6 @@ function AddUser() {
                                 Authorization: `Bearer ${token}`
                             }
                         })
-                        console.log(res)
                     } catch (error) {
                         const { message } = error.response.data
                         setError(error)
@@ -77,11 +74,42 @@ function AddUser() {
                 }
 
             }
+        } else if (users.length === 1) {
+            // Validating Previous User
+            // Updating Previous User State 
+            users[0]["edit"] = false
+            users[0]["status"] = "loading"
+            setUsers([...users])
+            await validateUser(users, users[0], 0)
+            if (users[0].status === "success") {
+                const data = {
+                    email: users[0].value,
+                    foodSpace_id: location.state.foodSpace._id
+                }
+
+                try {
+                    const res = await axios({
+                        method: "POST",
+                        url: `${API.ADMIN.addUser}`,
+                        data: data,
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    })
+                    console.log(res)
+                } catch (error) {
+                    const { message } = error.response.data
+                    setError(message)
+                }
+            }
+        }
+
         setIsLoading(false)
 
         if (!isLoading && !error) {
             dispatch(refreshMe())
             setSuccess(true)
+            navigate(`/`)
             console.log('SUCCESS')
         }
 
@@ -114,179 +142,111 @@ function AddUser() {
                 status = "error"
             }
         }
-
         return status
-
     }
 
-    // async function validateUser(prevIndex, prevField) {
-    //     let copy = [...users]
-    //     let prevField = copy[prevIndex]
+    function errorCheck(input) {
+        let error
+        const foodSpace = user.admin.find((item) => item._id === location.state.foodSpace._id)
+        const userAlreadyAdded = foodSpace.users.find((item) => item.email === input.value)
+        if (userAlreadyAdded) {
+            error = "User is already added."
+        }
+        if (input.value === user.email) {
+            error = "You cannot add yourself."
+        }
+        if (!input.value.includes('@')) {
+            error = "Please provide a valid email."
+        }
+        return error
+    }
 
-    //     // Validation
-    //     let error = null
+    async function validateUser(fields, input, index) {
+        console.log('Validating', fields)
+        // let fields = [...users]
+        let userToValidate = fields[index]
 
-    //     if (prevField.value === user.email) {
-    //         error = "You cannot add yourself"
-    //     }
-
-    //     if (location.state.currentUsers) {
-    //         const userAlreadyAdded = location.state.currentUsers.find((item) => item.email === user.email)
-    //         if (userAlreadyAdded) {
-    //             error = "User is already added"
-    //         }
-    //     }
-
-
-    //     return error
-    // }
-    async function addAnotherUserField(prevIndex) {
-        let copy = [...users]
-        let prevField = copy[prevIndex]
 
         // Validation
-        let error = null
+        const error = errorCheck(input)
+        if (error) {
+            // Shows User the Error
+            userToValidate["error"] = error
+            userToValidate["status"] = null
+            fields[index] = userToValidate
+            setUsers([...fields])
 
-        if (prevField.value === user.email) {
-            error = "You cannot add yourself"
-        }
-
-        if (location.state.currentUsers) {
-            const userAlreadyAdded = location.state.currentUsers.find((item) => item.email === user.email)
-            if (userAlreadyAdded) {
-                error = "User is already added"
+            // Removes the error
+            setTimeout(() => {
+                userToValidate["error"] = null
+                userToValidate["edit"] = true
+                fields[index] = userToValidate
+                setUsers([...fields])
+            }, [3000])
+        } else {
+            const status = await checkUserExist(userToValidate)
+            if (status === "success") {
+                userToValidate["status"] = status
+                fields[index] = userToValidate
+                setUsers([...fields])
+            } else {
+                userToValidate["status"] = status
+                fields[index] = userToValidate
+                setUsers([...fields])
             }
         }
 
 
-        if (error) {
-            prevField["error"] = error
-            copy[prevIndex] = prevField
-            setUsers([...copy])
-
-            setTimeout(() => {
-                prevField["error"] = null
-                copy[prevIndex] = prevField
-                setUsers([...copy])
-            }, [3000])
-            return
-        }
-        const newUserField = { value: '', edit: true, status: null, error: null }
-        copy.push(newUserField)
-        prevField["edit"] = false
-        prevField["status"] = "loading"
-        copy[prevIndex] = prevField
-        setUsers([...copy])
-
-        const status = await checkUserExist(prevField)
-        if (status === "success") {
-            prevField["status"] = status
-            copy[prevIndex] = prevField
-            setUsers([...copy])
-        } else {
-            prevField["status"] = status
-            copy[prevIndex] = prevField
-            setUsers([...copy])
-        }
-
-
     }
-    // async function addAnotherUserField(prevIndex) {
-    //     let copy = [...users]
-    //     let prevField = copy[prevIndex]
+    async function addAnotherUserField(prevIndex) {
+        let fields = [...users]
+        let prevUser = fields[prevIndex]
 
-    //     // // Validation
-    //     // let error = null
-
-    //     // if (prevField.value === user.email) {
-    //     //     error = "You cannot add yourself"
-    //     // }
-
-    //     // if (location.state.currentUsers) {
-    //     //     const userAlreadyAdded = location.state.currentUsers.find((item) => item.email === user.email)
-    //     //     if (userAlreadyAdded) {
-    //     //         error = "User is already added"
-    //     //     }
-    //     // }
+        // Updating Previous User State 
+        prevUser["edit"] = false
+        prevUser["status"] = "loading"
+        fields[prevIndex] = prevUser
 
 
-    //     // if (error) {
-    //     //     prevField["error"] = error
-    //     //     copy[prevIndex] = prevField
-    //     //     setUsers([...copy])
+        const error = errorCheck(prevUser)
+        if (prevUser.value !== "" && !error) {
+            // Adding New Field
+            fields.push({ value: '', edit: true, status: null, error: null })
 
-    //     //     setTimeout(() => {
-    //     //         prevField["error"] = null
-    //     //         copy[prevIndex] = prevField
-    //     //         setUsers([...copy])
-    //     //     }, [3000])
-    //     //     return
-    //     // } 
-    //     const newUserField = { value: '', edit: true, status: null, error: null }
-    //     copy.push(newUserField)
-    //     prevField["edit"] = false
-    //     prevField["status"] = "loading"
-    //     copy[prevIndex] = prevField
-    //     setUsers([...copy])
+            // Updating State
+            setUsers([...fields])
+        }
 
-    //     const status = await checkUserExist(prevField)
-    //     if (status === "success") {
-    //         prevField["status"] = status
-    //         copy[prevIndex] = prevField
-    //         setUsers([...copy])
-    //     } else {
-    //         prevField["status"] = status
-    //         copy[prevIndex] = prevField
-    //         setUsers([...copy])
-    //     }
+        // Validating Previous User
+        await validateUser(fields, prevUser, prevIndex)
+    }
 
-
-    // }
 
     function removeField(idx, array, setFn) {
         let copy = [...array]
         copy.splice(idx, 1)
         setFn(copy)
     }
+
+    let prevPath;
+    let state;
+    try {
+        prevPath = location.state.prevPath
+        state = location.state
+    } catch (error) {
+        prevPath = '/'
+        state = null
+    }
     return (
         <div className='min-h-screen p-7 flex flex-col justify-center items-center'>
+
             {/* Back Button */}
-            {location.state.prevPath
-                ? <>
-                    {(location.state.prevPath.includes('/product') && location.state.prevPath !== '/product/me') &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                All Products
-                            </span>
-                        </Link>
-                    }
+            <Link to={prevPath} state={state}>
+                <span className='fixed top-6 left-6'>
+                    <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
+                </span>
+            </Link>
 
-                    {(location.state.prevPath.includes('/account') || location.state.prevPath.includes('/foodSpace')) &&
-                        <Link to={"/"}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                Home
-                            </span>
-                        </Link>
-                    }
-
-                    {location.state.prevPath === '/product/me' &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                My Foods
-                            </span>
-                        </Link>
-                    }
-                </>
-                : <Link to={"/"}>
-                    <span className='fixed top-6 left-6'>
-                        <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                        Home
-                    </span>
-                </Link>
-            }
             <form onSubmit={handleSubmit} className="flex flex-col space-y-5 min-w-[350px] max-w-[350px] min-h-[70vh]">
                 <div>
                     {/* Header */}
@@ -301,11 +261,11 @@ function AddUser() {
 
 
 
-                <ul className='flex flex-col space-y-2.5 items-center'>
+                <ul className='flex flex-col space-y-5 items-center'>
                     {users.map((item, idx) => (
                         <div className='relative' key={`user-field-${idx}`}>
                             {users[idx].error &&
-                                <span className='absolute text-xs text-red-600 -top-5'>{users[idx].error}</span>
+                                <span className='absolute text-xs text-red-600 -top-4'>{users[idx].error}</span>
                             }
                             <input
                                 disabled={!users[idx].edit || users[idx].error}
@@ -325,9 +285,8 @@ function AddUser() {
                             {(users[idx].status === "error") &&
                                 <Tooltip message="User Doesn't Exist">
                                     <span>
-                                        <RiErrorWarningFill className="inline-block text-lg mb-1 text-red-600" />
+                                        <RiErrorWarningFill className="absolute -top-3.5 -right-3.5 inline-block text-red-600" />
                                     </span>
-
                                 </Tooltip>
                             }
 
@@ -345,10 +304,10 @@ function AddUser() {
                                 <button
                                     type="button"
                                     onClick={() => addAnotherUserField(idx)}
-                                    className=" bg-white rounded-lg px-3 py-2  border-2 min-w-[300px] max-w-[300px] mt-2.5 flex items-center justify-center text-secondary"
+                                    className=" bg-white rounded-lg px-3 py-2  border-2 min-w-[300px] max-w-[300px] mt-5 flex items-center justify-center text-secondary"
                                 >
                                     <FiPlusCircle className='inline-block mr-1 ' />
-                                    Add User
+                                    Add Another User
                                 </button>
                             }
 

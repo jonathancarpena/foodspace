@@ -31,7 +31,7 @@ module.exports = {
 
       },
       animation: {
-        'wiggle': 'wiggle 200ms ease-in-out ',
+        'wiggle': 'wiggle 300ms ease-in-out ',
         'spin-slow': 'spin 7s linear infinite',
       },
     },

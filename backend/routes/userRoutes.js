@@ -5,7 +5,8 @@ import {
     login,
     logout,
     me,
-    emailCheck
+    emailCheck,
+    deleteMe
 } from '../controller/userController.js';
 
 import auth from '../middleware/auth.js'
@@ -36,6 +37,11 @@ router.get("/me", auth, me)
 //@route    DELETE /api/user/logout
 ///@access  Authenticated
 router.delete("/logout", auth, logout)
+
+//@desc     DELETE user from database
+//@route    DELETE /api/user/delete
+///@access  Authenticated
+router.delete("/deleteMe", auth, deleteMe)
 
 
 export default router;

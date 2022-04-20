@@ -57,7 +57,7 @@ function Layout({ children }) {
 
 
     return (
-        <div className={`${(showNavbar && showFooter) ? 'bg-white' : 'bg-[#F7F6F3] '}  font-body `}>
+        <div className={`${(showNavbar && showFooter) ? 'bg-white' : 'bg-[#F7F6F3] '}  font-body overflow-x-hidden`}>
 
             <AddModal showModal={showAddModal} setShowModal={setShowAddModal} />
             {showNavbar && <Navbar />}
@@ -66,7 +66,7 @@ function Layout({ children }) {
             </div>
 
             {/* Mobile Footer */}
-            <footer className='sm:hidden fixed bottom-0 w-full px-5 pb-3 pt-3 flex justify-between items-center bg-white'>
+            <footer className={`sm:hidden shadow-lg fixed bottom-0 w-full px-5 pb-3 pt-3 flex justify-between items-center bg-white ${showAddModal ? 'z-[50]' : 'z-[100]'}`} >
 
                 <div className='flex space-x-10 ml-8 w-[30vw]'>
                     <Link to='/account/dashboard' className={`${highlightMobileFooter(homePages) ? 'text-primary-500' : 'text-secondary'}`}>

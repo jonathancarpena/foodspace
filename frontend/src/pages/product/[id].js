@@ -97,7 +97,6 @@ function ProductDetails() {
     const [name, setName] = useState(null)
     const [brand, setBrand] = useState(null)
     const [type, setType] = useState(null)
-    const [unit, setUnit] = useState(null)
     const [lifeSpan, setLifeSpan] = useState(null)
     const [time, setTime] = useState(null)
     const [barcode, setBarcode] = useState(null)
@@ -116,7 +115,6 @@ function ProductDetails() {
                         setName(res.data.name)
                         setBrand(res.data.brand)
                         setType(res.data.type)
-                        setUnit(res.data.unit)
                         setLifeSpan(res.data.lifeSpan.value)
                         setTime(res.data.lifeSpan.time)
                         setBarcode(res.data.barcode)
@@ -142,7 +140,6 @@ function ProductDetails() {
                     _id: product._id,
                     name: name,
                     type: type,
-                    unit: unit,
                     barcode: barcode,
                     lifeSpan: {
                         value: lifeSpan,
@@ -330,7 +327,7 @@ function ProductDetails() {
             </div>
 
 
-            {/* Author, ID, Type, Unit, Date Added */}
+            {/* Author, ID, Type, Date Added */}
             <div className='flex flex-col space-y-3 px-7 '>
 
                 {isLoading
@@ -405,23 +402,11 @@ function ProductDetails() {
                                 <FaRulerVertical className='inline-block mr-2 mb-0.5' />
                                 <span className='font-semibold'>Unit of Measure: </span>
                             </div>
-                            {(editStatus && author)
-                                ? <select
-                                    id="unit"
-                                    value={unit}
-                                    onChange={(e) => setUnit(e.target.value)}
-                                    className='py-3 ml-7 capitalize active:outline-none focus:outline-none w-max'>
 
-                                    {unitMeasure[type].map((item) => (
-                                        <option className='block p-2' key={item} value={item}>
-                                            {item}
-                                        </option>
-                                    ))}
-                                </select>
-                                : <p className='py-3 ml-7 capitalize'>
-                                    {product.unit}
-                                </p>
-                            }
+                            <p className='py-3 ml-7 capitalize'>
+                                {unitMeasure[product.type].map((item, idx) => <span key={item}>{item}{`${idx === unitMeasure[product.type].length - 1 ? '' : ', '}`}</span>)}
+                            </p>
+
                         </div>
 
                         {/* LifeSpan */}
@@ -505,7 +490,7 @@ function ProductDetails() {
                                 <span className='font-semibold'>Date Added: </span>
                             </div>
                             <p className='py-3 ml-7 capitalize'>
-                                {new Date(product.createdAt).toDateString().substring(3)}
+                                {product.createdAt}
                             </p>
                         </div>
 

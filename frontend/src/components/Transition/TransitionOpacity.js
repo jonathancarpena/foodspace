@@ -5,7 +5,7 @@ import { Transition } from '@tailwindui/react'
 
 function TransitionOpacity({ children, show, hidden = true, relative = true }) {
     return (
-        <Transition show={show} className={`${relative && 'relative'} z-[50]`}>
+        <Transition show={show} className={`${relative && 'relative'} z-[100]`}>
             <Transition.Child
                 enter={`transition-opacity ease-in-linear duration-300`}
                 enterFrom="opacity-0 "

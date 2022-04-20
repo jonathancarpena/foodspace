@@ -1,4 +1,5 @@
 import pkg from "mongoose"
+import moment from "moment"
 const { Schema, ObjectId, model } = pkg
 
 
@@ -50,23 +51,42 @@ const product_lifeSpanSchema = new Schema({
         default: 'day'
     }
 })
+const product_tempLifeSpanSchema = new Schema({
+    refrigerator: {
+        type: product_lifeSpanSchema,
+        default: {
+            value: 1,
+            time: 'week'
+        }
+    },
+    freezer: {
+        type: product_lifeSpanSchema,
+        default: {
+            value: 1,
+            time: 'year'
+        }
+    },
+    pantry: {
+        type: product_lifeSpanSchema,
+        default: {
+            value: 1,
+            time: 'day'
+        }
+    },
+})
 const product_productSchema = new Schema({
     name: {
         type: String,
         required: true
     },
-    type: {
-        type: String,
-        required: false,
-        default: "food"
-    },
     brand: {
         type: String,
         default: "generic"
     },
-    unit: {
+    type: {
         type: String,
-        default: "count"
+        required: false,
+        default: "food"
     },
     image: {
         type: String,
@@ -74,15 +94,30 @@ const product_productSchema = new Schema({
         default: "🍽"
     },
     lifeSpan: {
-        type: product_lifeSpanSchema,
+        type: product_tempLifeSpanSchema,
+        required: false,
+        default: {
+            refrigerator: {
+                value: 1,
+                time: 'week'
+            },
+            freezer: {
+                value: 1,
+                time: 'year'
+            },
+            pantry: {
+                value: 1,
+                time: 'day'
+            },
+        }
     },
     barcode: {
         type: Number,
         required: false,
     },
     createdAt: {
-        type: Date,
-        default: Date.now()
+        type: String,
+        default: moment(new Date(Date.now())).format("YYYY-MM-DD")
     },
     author: {
         type: product_authorSchema,
@@ -123,6 +158,10 @@ const foodSpace_foodSpaceItemSchema = new Schema({
         required: false,
         default: 1
     },
+    unit: {
+        type: String,
+        default: "count"
+    },
     area: {
         type: String,
         required: false,
@@ -134,9 +173,9 @@ const foodSpace_foodSpaceItemSchema = new Schema({
         default: false
     },
     purchasedDate: {
-        type: Date,
+        type: String,
         required: false,
-        default: Date.now()
+        default: moment(new Date(Date.now())).format("YYYY-MM-DD")
     },
     owner: {
         type: foodSpace_foodSpaceUserSchema,
@@ -154,17 +193,22 @@ const userFoodSpaceSchema = new Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        required: false,
+        default: 'refrigerator'
+    },
     expiredStock: {
         type: [foodSpace_foodSpaceItemSchema],
         required: false,
         default: [],
     },
     admin: {
-        type: avatarSchema,
+        type: foodSpace_foodSpaceUserSchema,
         required: true
     },
     users: {
-        type: [avatarSchema],
+        type: [foodSpace_foodSpaceUserSchema],
         required: false
     }
 })
@@ -190,7 +234,6 @@ const userTaskSchema = new Schema({
         default: false,
     }
 })
-
 const userSchema = new Schema({
     first_name: {
         type: String,

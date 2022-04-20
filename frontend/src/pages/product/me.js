@@ -57,7 +57,7 @@ const ProductDisplay = ({ handleRemoveItem, data }) => {
                                         <div className='flex flex-col space-y-0.5'>
                                             <p className='font-semibold text-inherit capitalize '>{item.name}</p>
                                             <p className=' text-secondary text-xs capitalize'>{item.brand}</p>
-                                            <p className=' text-secondary text-xs capitalize'><FaRegClock className='inline-block' /> Date Added: {new Date(item.createdAt).toDateString().substring(3)}</p>
+                                            <p className=' text-secondary text-xs capitalize'><FaRegClock className='inline-block' /> Date Added: {item.createdAt}</p>
                                         </div>
                                     </div>
 

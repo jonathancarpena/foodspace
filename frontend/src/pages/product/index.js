@@ -14,7 +14,7 @@ import { FaAngleRight, FaRegClock, FaPlusCircle, FaPlusSquare } from 'react-icon
 import Tooltip from '../../components/Tooltip'
 
 // Components
-const ProductDisplay = ({ data }) => {
+export const ProductDisplay = ({ data }) => {
     return (
         <ul className='flex flex-col space-y-2'>
             {data.map((item) => (
@@ -27,7 +27,7 @@ const ProductDisplay = ({ data }) => {
                                 <div className='flex flex-col space-y-0.5'>
                                     <p className='font-semibold text-inherit capitalize '>{item.name}</p>
                                     <p className=' text-secondary text-xs capitalize'>{item.brand}</p>
-                                    <p className=' text-secondary text-xs capitalize'><FaRegClock className='inline-block' /> Date Added: {new Date(item.createdAt).toDateString().substring(3)}</p>
+                                    <p className=' text-secondary text-xs capitalize'><FaRegClock className='inline-block' /> Date Added: {item.createdAt}</p>
                                 </div>
                             </div>
 
@@ -36,7 +36,6 @@ const ProductDisplay = ({ data }) => {
                         </div>
                     </Link>
                 </li>
-
             ))}
         </ul>
     )
@@ -240,6 +239,7 @@ function Products() {
                                 {/* Search Results Length */}
                                 <span>{searchResults.length} result{searchResults.length === 1 ? '' : 's'}</span>
                                 <ProductDisplay data={searchResults} />
+
                                 {(searchResults.length === 0)
                                     ? <Link
                                         to={`/product/create`}
@@ -272,15 +272,6 @@ function Products() {
                             </>
 
                         }
-
-
-
-
-
-
-
-
-
 
                     </div>
                 </>

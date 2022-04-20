@@ -7,7 +7,8 @@ export const API = {
         email: `${BASE_API}/user/email`,
         me: `${BASE_API}/user/me`,
         logout: `${BASE_API}/user/logout`,
-        myProducts: `${BASE_API}/products/me`
+        myProducts: `${BASE_API}/products/me`,
+        deleteMe: `${BASE_API}/user/deleteMe`,
     },
     ADMIN: {
         base: `${BASE_API}/foodSpace/admin`,

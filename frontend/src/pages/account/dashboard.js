@@ -59,37 +59,9 @@ function Dashboard() {
         return (<div>Not a User</div>)
     }
 
+    console.log(user)
     return (
         <div className='flex flex-col space-y-5 min-h-screen pb-20'>
-
-            {/* <Link to='/foodSpace/create'>
-                <Button>
-                    Create FoodSpace
-                </Button>
-            </Link>
-
-            <Link to='/product/create'>
-                <Button>
-                    Create Product
-                </Button>
-            </Link>
-
-            <Link to='/product/me'>
-                <Button>
-                    My Products
-                </Button>
-            </Link>
-
-            <Link to='/product'>
-                <Button>
-                    All Products
-                </Button>
-            </Link>
-
-            <Button onClick={logout}>
-                Logout
-            </Button> */}
-
 
             {/* Loading Animation */}
             {/* <div className="border  shadow rounded-md p-4 max-w-sm w-full mx-auto">
@@ -114,12 +86,19 @@ function Dashboard() {
                     <h2 className='text-secondary'>What are we having today?</h2>
                 </div>
 
-                <Avatar
-                    emoji={user.avatar.emoji}
-                    bg={user.avatar.favoriteColor}
-                    ring={true}
-                    size='sm'
-                />
+
+                <Link to='/account' className='cursor-pointer'>
+                    <span className='cursor-pointer'>
+                        <Avatar
+                            emoji={user.avatar.emoji}
+                            bg={user.avatar.favoriteColor}
+                            ring={true}
+                            size='sm'
+                            sx="cursor-pointer"
+                        />
+                    </span>
+                </Link>
+
             </div>
 
 
@@ -190,7 +169,7 @@ function Dashboard() {
                             <Link
                                 key={item.name}
                                 to={`/foodSpace/${item.name}`}
-                                state={{ foodSpace_id: item._id }}>
+                                state={{ foodSpace_id: item._id, foodSpace: item }}>
                                 <div className='relative flex cursor-pointer p-4 bg-white capitalize rounded-xl h-[200px] drop-shadow-lg overflow-hidden'>
 
                                     <div className='flex flex-col justify-evenly'>
@@ -199,20 +178,23 @@ function Dashboard() {
                                         <div className='mb-5 flex '>
 
                                             {/* Admin */}
-                                            <div className='border-r-2 inline-block pr-2.5 mr-7 relative'>
+                                            <div className='inline-block mr-3 relative'>
                                                 <FaCrown className='absolute text-yellow-500 text-xs -top-4 left-[50%] -translate-x-[50%]' />
-                                                <Avatar bg={item.admin.favoriteColor} emoji={item.admin.emoji} ring={true} size={'xs'} />
+                                                <Avatar bg={item.admin.avatar.favoriteColor} emoji={item.admin.avatar.emoji} ring={true} size={'xs'} />
                                             </div>
-
 
                                             {/* Users */}
-                                            <div className='inline-block'>
-                                                {item.users.map((user, idx) => (
-                                                    <React.Fragment key={user._id}>
-                                                        <Avatar bg={user.favoriteColor} emoji={user.emoji} ring={true} size={'xs'} sx={`mx-[-15px] z-[${idx}]`} />
-                                                    </React.Fragment>
-                                                ))}
-                                            </div>
+                                            {(item.users.length > 0) &&
+                                                <div className='inline-block border-l-2 pl-7'>
+                                                    {item.users.map((user, idx) => (
+                                                        <React.Fragment key={user._id}>
+                                                            <Avatar bg={user.avatar.favoriteColor} emoji={user.avatar.emoji} ring={true} size={'xs'} sx={`mx-[-15px] z-[${idx}]`} />
+                                                        </React.Fragment>
+                                                    ))}
+                                                </div>
+                                            }
+
+
 
                                         </div>
 
@@ -235,12 +217,12 @@ function Dashboard() {
 
                         ))
                     }
-                    {user.foodspaces &&
-                        user.foodspaces.map((item) => (
+                    {user.foodSpaces &&
+                        user.foodSpaces.map((item) => (
                             <Link
                                 key={item.name}
                                 to={`/foodSpace/${item.name}`}
-                                state={{ foodSpace_id: item._id }}>
+                                state={{ foodSpace_id: item._id, foodSpace: item }}>
                                 <div className='relative flex cursor-pointer p-4 bg-white capitalize rounded-xl h-[200px] drop-shadow-lg overflow-hidden'>
 
                                     <div className='flex flex-col justify-evenly'>
@@ -249,21 +231,23 @@ function Dashboard() {
                                         <div className='mb-5 flex '>
 
                                             {/* Admin */}
-                                            <div className='border-r-2 inline-block pr-2.5 mr-7 relative'>
+                                            <div className='inline-block mr-3 relative'>
                                                 <FaCrown className='absolute text-yellow-500 text-xs -top-4 left-[50%] -translate-x-[50%]' />
-                                                <Avatar bg={item.admin.favoriteColor} emoji={item.admin.emoji} ring={true} size={'xxs'} />
+                                                <Avatar bg={item.admin.avatar.favoriteColor} emoji={item.admin.avatar.emoji} ring={true} size={'xs'} />
                                             </div>
-
 
                                             {/* Users */}
-                                            <div className='inline-block'>
-                                                {item.users.map((user, idx) => (
-                                                    <React.Fragment key={`${user._id}-user`}>
-                                                        <Avatar bg={user.favoriteColor} emoji={user.emoji} ring={true} size={'xxs'} sx={`mx-[-15px] z-[${idx}]`} />
-                                                    </React.Fragment>
+                                            {(item.users.length > 0) &&
+                                                <div className='inline-block border-l-2 pl-7'>
+                                                    {item.users.map((user, idx) => (
+                                                        <React.Fragment key={user._id}>
+                                                            <Avatar bg={user.avatar.favoriteColor} emoji={user.avatar.emoji} ring={true} size={'xs'} sx={`mx-[-15px] z-[${idx}]`} />
+                                                        </React.Fragment>
+                                                    ))}
+                                                </div>
+                                            }
 
-                                                ))}
-                                            </div>
+
 
                                         </div>
 
@@ -283,6 +267,7 @@ function Dashboard() {
 
                                 </div>
                             </Link>
+
                         ))
                     }
                 </ul>

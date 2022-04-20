@@ -19,9 +19,10 @@ const disabledStyles = {
     contained: `${defaultButtonStyles} ring-primary-100 bg-primary-100 text-white cursor-default`
 }
 
-function Button({ children, onClick, variant = 'contained', disabled = false, size = 'sm', sx, type = "button" }) {
+function Button({ children, onClick, variant = 'contained', disabled = false, size = 'sm', sx, type = "button", value = null }) {
     return (
         <button
+            value={value}
             type={type}
             onClick={onClick}
             className={`${disabled ? disabledStyles[variant] : variantOptions[variant]} 

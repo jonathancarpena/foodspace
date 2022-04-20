@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import FoodSpace from '../models/FoodSpace.js'
+import moment from 'moment'
 
 
 async function checkIfInFoodSpace(foodSpace_id, user_id) {
@@ -52,6 +53,7 @@ export const getAllFoodSpaces = async (req, res) => {
 export const getFoodSpaceById = async (req, res) => {
     const { _id } = req.user
     const foodSpace_id = req.params.id
+    console.log(foodSpace_id)
 
     const userExist = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!userExist) {
@@ -75,6 +77,7 @@ export const getFoodSpaceById = async (req, res) => {
 
 
 export const getAdminFoodSpaceById = async (req, res) => {
+    console.log('FETCHING ADMIN FOODSPACE')
     const { _id } = req.user
     const foodSpace_id = req.params.id
     let foodSpace;
@@ -118,6 +121,7 @@ export const getAllAdminFoodSpace = async (req, res) => {
 export const createFoodSpace = async (req, res) => {
     const { _id } = req.user
 
+    console.log('CREATING FOODSPACE')
     try {
 
         // Creating a new FoodSpace
@@ -130,7 +134,7 @@ export const createFoodSpace = async (req, res) => {
             _id: newFoodSpace._id,
             name: newFoodSpace.name,
             expiredStock: newFoodSpace.expiredStock,
-            admin: newFoodSpace.admin.avatar,
+            admin: newFoodSpace.admin,
             users: newFoodSpace.users
         }
         user.admin.push(foodSpaceModel)
@@ -221,7 +225,6 @@ export const addUserToFoodSpace = async (req, res) => {
 
         if (newUser) {
             const userExist = await checkIfInFoodSpace(foodSpace_id, newUser._id.toString())
-
             // Validation: User Exist
             if (userExist) {
                 console.log('USER ALREADY EXIST')
@@ -236,55 +239,67 @@ export const addUserToFoodSpace = async (req, res) => {
                 })
             }
 
-            // Grabbing FoodSpace
-            const foodSpace = await FoodSpace.findById(foodSpace_id)
-
-            // Creating User Schema
-            const newUserData = {
-                _id: newUser._id,
-                first_name: newUser.first_name,
-                last_name: newUser.last_name,
-                email: newUser.email,
-                avatar: newUser.avatar
-            }
-
-            // Adding User to FoodSpace
-            foodSpace.users.push(newUserData)
-            await foodSpace.save()
+            try {
+                // Grabbing FoodSpace
+                const foodSpace = await FoodSpace.findById(foodSpace_id)
 
 
-            // Adding FoodSpace to New User
-            const foodSpaceModel = {
-                _id: foodSpace._id,
-                name: foodSpace.name,
-                expiredStock: foodSpace.expiredStock,
-                admin: foodSpace.admin.avatar,
-                users: foodSpace.users
-            }
-            newUser.foodSpaces.push(foodSpaceModel)
-            await newUser.save()
-
-            // Updating Admin Data
-            const adminUser = await User.findById(_id)
-            let adminFoodSpace = adminUser.admin.find((item) => item._id.toString() === foodSpace_id)
-            adminFoodSpace.users.push(newUserData.avatar)
-            await adminUser.save()
-
-            // Updating Current Users Data
-            for (const current of foodSpace.users) {
-                if (current._id.toString() !== newUser._id.toString()) {
-                    const user = await User.findById(current._id)
-                    let userFoodSpace = user.foodSpaces.find((item) => item._id.toString() === foodSpace_id)
-                    userFoodSpace.users.push(newUserData.avatar)
-                    await user.save()
+                // Creating User Schema
+                const newUserModel = {
+                    _id: newUser._id,
+                    first_name: newUser.first_name,
+                    last_name: newUser.last_name,
+                    email: newUser.email,
+                    avatar: newUser.avatar
                 }
 
+
+                // Adding User to FoodSpace
+                foodSpace.users.push(newUserModel)
+                await foodSpace.save()
+
+                // Adding FoodSpace to New User
+                const foodSpaceModel = {
+                    _id: foodSpace._id,
+                    name: foodSpace.name,
+                    expiredStock: foodSpace.expiredStock,
+                    admin: foodSpace.admin,
+                    users: foodSpace.users
+                }
+
+                newUser.foodSpaces.push(foodSpaceModel)
+                await newUser.save()
+
+                // Updating Admin Data
+                const adminUser = await User.findById(_id)
+                let adminFoodSpace = adminUser.admin.find((item) => item._id.toString() === foodSpace_id)
+                adminFoodSpace.users.push(newUserModel)
+                await adminUser.save()
+                console.log('UPDATED ADMIN')
+
+                // Updating Current Users Data
+                for (const current of foodSpace.users) {
+                    if (current._id.toString() !== newUser._id.toString()) {
+                        const user = await User.findById(current._id)
+                        let userFoodSpace = user.foodSpaces.find((item) => item._id.toString() === foodSpace_id)
+                        userFoodSpace.users.push(newUserData)
+                        await user.save()
+                    }
+                }
+
+
+                return res.status(200).json({
+                    message: `Added user to your FoodSpace: #${foodSpace_id}`,
+                    foodSpace: foodSpace
+                })
+
+
+            } catch (error) {
+                return res.status(400).json({
+                    message: `Could not find the FoodSpace.`
+                })
             }
 
-            return res.status(200).json({
-                message: `Added user to your FoodSpace: #${foodSpace_id}`,
-                foodSpace: foodSpace
-            })
         } else {
             return res.status(400).json({
                 message: `${email} does not exist.`
@@ -313,6 +328,7 @@ export const removeUserFromFoodSpace = async (req, res) => {
 
 
     try {
+        // const foodSpace = await FoodSpace.findById(foodSpace_id)
         // Remove User from FoodSpace
         const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
             "$pull": {
@@ -330,6 +346,29 @@ export const removeUserFromFoodSpace = async (req, res) => {
                 }
             }
         })
+
+        // Updating Admin's FoodSpace
+        const admin = await User.findById(_id)
+        let foodSpaceToUpdate = admin.admin.find((item) => item._id.toString() === foodSpace_id)
+        const updatedUsers = foodSpaceToUpdate.users.filter((user) => user._id.toString() !== user_id)
+        foodSpaceToUpdate.users = [...updatedUsers]
+        await admin.save()
+
+
+        // Updating Current Users In FoodSpace Data
+        if (foodSpace.users.length > 0) {
+            for (const current of foodSpace.users) {
+                if (current._id.toString() !== user_id) {
+                    const user = await User.findById(current._id)
+                    let foodSpaceToUpdate = user.foodSpaces.find((item) => item._id.toString() === foodSpace_id)
+                    console.log('BEFORE ', foodSpaceToUpdate)
+                    const updatedUsers = foodSpaceToUpdate.users.filter((user) => user._id.toString() !== user_id)
+                    foodSpaceToUpdate.users = [...updatedUsers]
+                    console.log('After  ', foodSpaceToUpdate)
+                    await user.save()
+                }
+            }
+        }
 
         return res.status(200).json({
             message: `Removed user from your FoodSpace: #${foodSpace_id}`,
@@ -424,6 +463,8 @@ export const addItemToFoodSpace = async (req, res) => {
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
 
+
+
         if (foodSpace.areas.length === 0) {
             foodSpace.areas = ['default']
             await foodSpace.save()
@@ -435,6 +476,7 @@ export const addItemToFoodSpace = async (req, res) => {
             }
             foodSpace.stock.push(item)
         })
+
         await foodSpace.save()
         return res.status(200).json({
             message: `Added item to FoodSpace: #${foodSpace_id}`,

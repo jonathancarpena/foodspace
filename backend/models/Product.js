@@ -1,4 +1,5 @@
 import pkg from "mongoose"
+import moment from "moment"
 const { Schema, model, ObjectId } = pkg
 
 // Should be imported from User
@@ -46,6 +47,30 @@ const lifeSpanSchema = new Schema({
         default: 'day'
     }
 })
+
+const tempLifeSpanSchema = new Schema({
+    refrigerator: {
+        type: lifeSpanSchema,
+        default: {
+            value: 1,
+            time: 'week'
+        }
+    },
+    freezer: {
+        type: lifeSpanSchema,
+        default: {
+            value: 1,
+            time: 'year'
+        }
+    },
+    pantry: {
+        type: lifeSpanSchema,
+        default: {
+            value: 1,
+            time: 'day'
+        }
+    },
+})
 const productSchema = new Schema({
     name: {
         type: String,
@@ -60,21 +85,27 @@ const productSchema = new Schema({
         required: false,
         default: "food"
     },
-    unit: {
-        type: String,
-        default: "count"
-    },
     image: {
         type: String,
         required: false,
         default: "🍽"
     },
     lifeSpan: {
-        type: lifeSpanSchema,
+        type: tempLifeSpanSchema,
         required: false,
         default: {
-            value: 7,
-            time: "day"
+            refrigerator: {
+                value: 1,
+                time: 'week'
+            },
+            freezer: {
+                value: 1,
+                time: 'year'
+            },
+            pantry: {
+                value: 1,
+                time: 'day'
+            },
         }
     },
     barcode: {
@@ -82,8 +113,8 @@ const productSchema = new Schema({
         required: false,
     },
     createdAt: {
-        type: Date,
-        default: Date.now()
+        type: String,
+        default: moment(new Date(Date.now())).format("YYYY-MM-DD")
     },
     author: {
         type: authorSchema,

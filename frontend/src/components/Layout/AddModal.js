@@ -15,6 +15,9 @@ import { FaTimes, FaRegLemon, FaBarcode } from 'react-icons/fa'
 
 function AddModal({ showModal, setShowModal }) {
     const location = useLocation()
+
+
+
     return (
         <>
             <TransitionOpacity show={showModal} >
@@ -64,8 +67,8 @@ function AddModal({ showModal, setShowModal }) {
                             {/* Add Food */}
                             <Link
                                 onClick={() => setShowModal(false)}
-                                to='/foodSpace/add-item'
-                                state={{ prevPath: location.pathname }}
+                                to='/foodSpace/choose'
+                                state={{ prevPath: location.pathname, nextPath: '/foodSpace/add-item' }}
                                 className="absolute bottom-10 left-28 flex flex-col items-center justify-between w-[50px]"
                             >
                                 <span className="bg-white rounded-full w-max hover:bg-primary-500 hover:text-white transition-all duration-120">
@@ -85,7 +88,7 @@ function AddModal({ showModal, setShowModal }) {
                     </div>
 
                     {/* Background */}
-                    <div onClick={() => setShowModal(false)} className="opacity-75 fixed inset-0 z-100 bg-black"></div>
+                    <div onClick={() => setShowModal(false)} className="opacity-75 fixed inset-0 z-90 bg-black"></div>
                 </>
             </TransitionOpacity>
         </>

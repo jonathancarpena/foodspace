@@ -54,3 +54,1183 @@ export const timeInMs = {
     month: 2592000000,
     year: 31556952000
 }
+
+export const alphabet = [
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+]
+
+
+
+// https://www.canstarblue.com.au/appliances/shelf-life-guide-foods-fridge/
+export const shelfLife = {
+    food: {
+        "General Meat Products": {
+            "Raw beef, lamb and steak": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 6,
+                    "time": "month"
+                }
+            },
+            "Raw pork roast and lamb chops": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 4,
+                    "time": "month"
+                }
+            },
+            "Pork sausages and raw pork": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 1,
+                    "time": "month"
+                }
+            },
+            "Roast beef and roast lamb": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 6,
+                    "time": "month"
+                }
+            },
+            "Cooked steak": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 6,
+                    "time": "month"
+                }
+            },
+            "Stewed meat and casseroles": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 2,
+                    "time": "month"
+                }
+            },
+            "Beef mince": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 2,
+                    "time": "month"
+                }
+            },
+            "Pre-packaged ham slices": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 4,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 1,
+                    "time": "month"
+                }
+            },
+            "Sausages and salami": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 4,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 1,
+                    "time": "month"
+                }
+            }
+        },
+        "Fish Products": {
+            "Raw fish and prawns": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            },
+            "Cooked fish and prawns": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 4,
+                    "time": "month"
+                }
+            },
+            "Cooked salmon": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": 2,
+                    "time": "month"
+                }
+            },
+            "Tinned tuna\t": {
+                "pantry": {
+                    "value": 12,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Crabs and oysters": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 6,
+                    "time": "month"
+                }
+            }
+        },
+        "Poultry and Other Products": {
+            "Chicken mince and raw poultry": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            },
+            "Raw poultry": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            },
+            "Cooked poultry": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            },
+            "Cooked chicken nuggets": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 1,
+                    "time": "month"
+                }
+            },
+            "Cooked poultry with stuffing": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 1,
+                    "time": "month"
+                }
+            },
+            "Tofu and meat substitutes": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 4,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 6,
+                    "time": "week"
+                }
+            },
+            "Frozen dinners": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            }
+        },
+        "Dairy Products": {
+            "Ice-cream": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": 1,
+                    "time": "month"
+                }
+            },
+            "Hard cheeses": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Cottage and cream cheeses": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Butter": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Margarine": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+        "Fat Products": {
+            "Peanut butter": {
+                "pantry": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Raw eggs": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 5,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Hard-boiled eggs, cooked eggs": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Milk chocolate": {
+                "pantry": {
+                    "value": 7,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 7,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Dark chocolate": {
+                "pantry": {
+                    "value": 1,
+                    "time": "year"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "year"
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+        "Grain, Flour and Wheat Products": {
+            "Cooked rice": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 5,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Raw white rice": {
+                "pantry": {
+                    "value": 1,
+                    "time": "year"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Raw brown rice": {
+                "pantry": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Pasta": {
+                "pantry": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Cereal": {
+                "pantry": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Bread": {
+                "pantry": {
+                    "value": 5,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            },
+            "Cakes": {
+                "pantry": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": 3,
+                    "time": "month"
+                }
+            }
+        },
+        "Canned and Bottled Goods": {
+            "Dried fruits and gravy powder": {
+                "pantry": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Canned fruits and vegetables": {
+                "pantry": {
+                    "value": 12,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Pate": {
+                "pantry": {
+                    "value": 5,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Baby food": {
+                "pantry": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+        "Fruits and Vegetables": {
+            "Apples": {
+                "pantry": {
+                    "value": 4,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Avocadoes": {
+                "pantry": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Bananas": {
+                "pantry": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Citrus": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Grapes": {
+                "pantry": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Kiwi fruit": {
+                "pantry": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Melons": {
+                "pantry": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Peaches": {
+                "pantry": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Pears": {
+                "pantry": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Pineapple": {
+                "pantry": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Strawberries": {
+                "pantry": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Watermelon": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Frozen vegetables": {
+                "pantry": {
+                    "value": 2,
+                    "time": "day"
+                },
+                "refrigerator": {
+                    "value": 6,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Canned vegetables": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "year"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Asparagus\t": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Beans": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Broccoli": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Cabbage": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 5,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Carrots": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Capsicum": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Cauliflower": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Celery ": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Corn": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Cucumber": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 3,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Eggplants": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 10,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Lettuce and mushrooms": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 10,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Onions": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 10,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Peas ": {
+                "pantry": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Sweet and white potatoes": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 5,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Tomatoes": {
+                "pantry": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+    },
+    liquid: {
+        "Poultry and Other Products": {
+            "Meat juice and gravy": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": 2,
+                    "time": "month"
+                }
+            },
+        },
+        "Dairy Products": {
+            "Milk": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Cream": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 5,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Yoghurt": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Condensed milk": {
+                "pantry": {
+                    "value": 1,
+                    "time": "year"
+                },
+                "refrigerator": {
+                    "value": 4,
+                    "time": "day"
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+        "Fat Products": {
+            "Vegetable oil": {
+                "pantry": {
+                    "value": 1,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Salad oil": {
+                "pantry": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Olive oil": {
+                "pantry": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+        "Canned and Bottled Goods": {
+            "Mayonnaise/salad dressing": {
+                "pantry": {
+                    "value": null
+                },
+                "refrigerator": {
+                    "value": 2,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Tomato/barbeque sauce": {
+                "pantry": {
+                    "value": 4,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 4,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Bottled fruit juice": {
+                "pantry": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "refrigerator": {
+                    "value": 1,
+                    "time": "week"
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Canned fruit juice": {
+                "pantry": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": null
+                },
+                "freezer": {
+                    "value": null
+                }
+            },
+            "Soft drink": {
+                "pantry": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "refrigerator": {
+                    "value": 6,
+                    "time": "month"
+                },
+                "freezer": {
+                    "value": null
+                }
+            }
+        },
+    }
+}
+
+
+
+const items = `Mayonnaise/salad dressing
+Tomato/barbeque sauce
+Bottled fruit juice
+Canned fruit juice
+Soft drink`
+
+const pantry = `null
+4 month
+1 week
+6 month
+6 month`
+
+const fridge = `2 month
+4 month
+1 week
+null
+6 month`
+
+const freezer = `null
+null
+null
+null
+null`
+
+const itemsArray = ['Mayonnaise/salad dressing', 'Tomato/barbeque sauce', 'Bottled fruit juice', 'Canned fruit juice', 'Soft drink']
+const pantryArray = ['null', '4 month', '1 week', '6 month', '6 month']
+const fridgeArray = ['2 month', '4 month', '1 week', 'null', '6 month']
+const freezerArray = ['null', 'null', 'null', 'null', 'null']
+
+console.log(items.split('\n'))
+console.log(pantry.split('\n'))
+console.log(fridge.split('\n'))
+console.log(freezer.split('\n'))
+
+const finalObject = {}
+for (const item of itemsArray) {
+    const index = itemsArray.findIndex((element) => element === item)
+
+    // Pantry Date: ['4', 'year']
+    const pantryDate = pantryArray[index].split(' ')
+    const pantryObject = {
+        value: parseInt(pantryDate[0]),
+        time: pantryDate[1]
+    }
+
+    // Fridge Date: ['5', 'day']
+    const fridgeDate = fridgeArray[index].split(' ')
+    const fridgeObject = {
+        value: parseInt(fridgeDate[0]),
+        time: fridgeDate[1]
+    }
+
+    // Freezer Date: ['2', 'year']
+    const freezerDate = freezerArray[index].split(' ')
+    const freezerObject = {
+        value: parseInt(freezerDate[0]),
+        time: freezerDate[1]
+    }
+
+    finalObject[item] = {
+        pantry: {
+            ...pantryObject
+        },
+        refrigerator: {
+            ...fridgeObject
+        },
+        freezer: {
+            ...freezerObject
+        }
+
+    }
+
+}
+
+console.log(JSON.stringify(finalObject))

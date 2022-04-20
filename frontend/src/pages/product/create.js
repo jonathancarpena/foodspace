@@ -14,18 +14,19 @@ import { API } from '../../lib/urls'
 import { toTitleCase, convertToMs } from '../../lib/utils'
 
 // Constants
-import { unitMeasure, emojiDictionary } from '../../lib/constants'
+import { unitMeasure, emojiDictionary, shelfLife } from '../../lib/constants'
 
 // Icons
 import { BiArrowBack } from 'react-icons/bi'
 import { MdDocumentScanner, MdCancel } from 'react-icons/md'
 import { BsCameraFill, BsUpcScan } from 'react-icons/bs'
-import { FaCheck, FaRegEdit, FaHashtag } from 'react-icons/fa'
+import { FaCheck, FaRegEdit, FaHashtag, FaCaretDown, FaCaretUp } from 'react-icons/fa'
 
 // Components
 import Button from '../../components/Button'
 import Tooltip from '../../components/Tooltip'
 import Modal from '../../components/Modal'
+import Dropdown, { DropdownItem } from '../../components/Dropdown'
 import BarcodeScannerComponent from "react-qr-barcode-scanner"
 const ImageSearch = ({ setImage, setShowModal }) => {
     const [search, setSearch] = useState('')
@@ -169,6 +170,19 @@ const BarcodeScanModal = ({ setScan, setBarcode }) => {
 
     )
 }
+
+// refrigerator: {
+//     value: 1,
+//     time: 'week'
+// },
+// freezer: {
+//     value: 1,
+//     time: 'year'
+// },
+// pantry: {
+//     value: 1,
+//     time: 'day'
+// },
 function Create() {
     const location = useLocation()
     const navigate = useNavigate()
@@ -179,14 +193,22 @@ function Create() {
     // Form
     const [name, setName] = useState('')
     const [brand, setBrand] = useState('')
-    const [type, setType] = useState('food')
     const [image, setImage] = useState('')
-    const [unit, setUnit] = useState(unitMeasure[type][0])
-    const [lifeSpan, setLifeSpan] = useState(7)
-    const [time, setTime] = useState('day')
     const [barcode, setBarcode] = useState(null)
     const [errors, setErrors] = useState({ name: null, brand: null, image: null, lifeSpan: null })
+    const [advancedOptions, setAdvancedOptions] = useState(false)
+    const [refrigeratorInput, setRefrigeratorInput] = useState({ value: 0, time: { show: false, value: 'week' } })
+    const [pantryInput, setPantryInput] = useState({ value: 0, time: { show: false, value: 'week' } })
+    const [freezerInput, setFreezerInput] = useState({ value: 0, time: { show: false, value: 'week' } })
 
+    const [type, setType] = useState({
+        show: false,
+        value: 'food'
+    })
+    const [category, setCategory] = useState({
+        show: false,
+        value: 'food'
+    })
 
     // Modals
     const [showModal, setShowModal] = useState(false)
@@ -200,6 +222,7 @@ function Create() {
             }
         }
     }, [])
+
 
     // Gets ALl Products from Database
     useEffect(() => {
@@ -270,11 +293,11 @@ function Create() {
             } else {
                 validErrors["image"] = null
             }
-            if (!lifeSpan || parseInt(lifeSpan) === 0) {
-                validErrors["lifeSpan"] = "Please provide a life span."
-            } else {
-                validErrors["lifeSpan"] = null
-            }
+            // if (!lifeSpan || parseInt(lifeSpan) === 0) {
+            //     validErrors["lifeSpan"] = "Please provide a life span."
+            // } else {
+            //     validErrors["lifeSpan"] = null
+            // }
 
             setErrors({ ...validErrors })
             const readyToSubmit = Object.values(validErrors).every((item) => item === null)
@@ -283,12 +306,10 @@ function Create() {
                     name: name.toLowerCase(),
                     brand: brand.toLowerCase(),
                     type,
-                    unit,
                     barcode: parseInt(barcode),
-                    lifeSpan: {
-                        value: lifeSpan,
-                        time: time,
-                    },
+
+
+
                     image: image ? image : emojiDictionary[type],
                     author: {
                         _id: user._id,
@@ -320,47 +341,14 @@ function Create() {
         <div className='min-h-screen p-7 flex flex-col justify-center items-center '>
 
             {/* Back Button */}
-            {location.state
-                ? <>
-                    {(location.state.prevPath.includes('/product') && location.state.prevPath !== '/product/me') &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                All Products
-                            </span>
-                        </Link>
-                    }
-
-                    {(location.state.prevPath.includes('/account') || location.state.prevPath.includes('/foodSpace')) &&
-                        <Link to={"/"}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                Home
-                            </span>
-                        </Link>
-                    }
-
-                    {location.state.prevPath === '/product/me' &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                My Foods
-                            </span>
-                        </Link>
-                    }
-                </>
-                : <Link to={"/product"}>
-                    <span className='fixed top-6 left-6'>
-                        <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                        All Products
-                    </span>
-                </Link>
-            }
+            <Link to={`/foodSpace/`} state={location.state}>
+                <span className=''>
+                    <BiArrowBack className=' absolute left-6 inline-block text-[1rem] text-main mr-1 mb-1' />
+                </span>
+            </Link>
 
 
-
-
-            <form onSubmit={handleSubmit} className="flex flex-col space-y-5 min-w-[350px] max-w-[350px] min-h-[70vh]">
+            <form onSubmit={handleSubmit} className="flex flex-col space-y-5 min-w-[350px] max-w-[350px] ">
 
                 <h1 className='text-3xl font-semibold mx-auto tracking-tight'>Create a Product</h1>
 
@@ -458,75 +446,160 @@ function Create() {
                 </div>
 
 
-
-
-
-                {/* Type & Unit */}
-                <div className='flex space-x-5'>
-                    {/* Type */}
-                    <div className=''>
-                        <label htmlFor='type' className='font-semibold text-main mr-2'>Category</label>
-                        <select
-                            id="type"
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                            className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300"
-                        >
-                            <option value={'food'}>
-                                food
-                            </option>
-                            <option value={'liquid'}>
-                                liquid
-                            </option>
-                        </select>
-                    </div>
-
-
-
-                    {/* Unit */}
-                    <div className=''>
-                        <label htmlFor='unit' className='font-semibold text-main mr-2'>Unit</label>
-                        <select
-                            id="unit"
-                            value={unit}
-                            onChange={(e) => setUnit(e.target.value)}
-                            className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300"
-                        >
-                            {unitMeasure[type].map((item) => (
-                                <option className='block p-2' key={item} value={item}>
-                                    {item}
-                                </option>
-                            ))}
-                        </select>
-
-                    </div>
+                {/* Type */}
+                <div className=''>
+                    <label htmlFor='type' className='font-semibold text-lg text-main mr-2'>
+                        Type
+                    </label>
+                    <Dropdown
+                        id="type"
+                        select
+                        sx={`w-max z-[50] p-1.5 bg-white relative top-[1.5px] ${type.show ? 'ring-[1.5px] ring-sky-300  border-2' : 'border-2 '} capitalize`}
+                        direction="center"
+                        button={
+                            <div onClick={() => setType({ ...type, show: !type.show })} className="cursor-pointer text-center capitalize">
+                                <span className='text-xl '>
+                                    {type.value}
+                                    {!type.show
+                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                    }
+                                </span>
+                            </div>
+                        }>
+                        {["food", "liquid"].map((item) => (
+                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-50`} onClick={() => setType({ show: false, value: item })} >
+                                {item}
+                            </DropdownItem>
+                        ))}
+                    </Dropdown>
                 </div>
 
 
+                {/* Category */}
+                <div className=''>
+                    <label htmlFor='category' className='font-semibold text-lg text-main mr-2'>
+                        Category
+                    </label>
+                    <Dropdown
+                        select
+                        listSx={`h-[200px] w-[300px] left-[-10px] overflow-y-scroll`}
+                        sx={`w-max z-[40] p-1.5 bg-white relative top-[1.5px] ${category.show ? 'ring-[1.5px] ring-sky-300  border-2' : 'border-2 '}`}
+                        direction="right"
+                        button={
+                            <div onClick={() => setCategory({ ...category, show: !category.show })} className="cursor-pointer text-center capitalize">
+                                <span className='text-xl '>
+                                    {category.value}
+                                    {!category.show
+                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                    }
+                                </span>
+                            </div>
+                        }>
+                        {Object.keys(shelfLife[type.value]).map((item) => (
+                            <DropdownItem key={item} sx={`text-start text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[40] capitalize`} onClick={() => setCategory({ show: false, value: item })} >
+                                {item}
+                            </DropdownItem>
+                        ))}
+                    </Dropdown>
+
+                </div>
 
 
                 {/* LifeSpan */}
                 <div className='flex flex-col'>
                     <div>
-                        <label htmlFor='lifeSpan' className='font-semibold text-main'>LifeSpan </label>
-                        <input
-                            id="lifeSpan"
-                            type="number"
-                            value={lifeSpan}
-                            onChange={(e) => setLifeSpan(e.target.value)}
-                            className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
-                        />
+                        {/* Label */}
+                        <label htmlFor='lifeSpan' className='font-semibold text-lg text-main mr-2'>
+                            LifeSpan
+                        </label>
 
-                        <select
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                            className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300"
-                        >
-                            <option value={'year'}>years</option>
-                            <option value={'month'}>months</option>
-                            <option value={'day'}>days</option>
-                            <option value={'hour'}>hours</option>
-                        </select>
+                        {/* Default Life Span Input */}
+                        {!advancedOptions &&
+                            <>
+                                {/* Input */}
+                                <div className='inline-block'>
+                                    <input
+                                        id="lifeSpan"
+                                        type="number"
+                                        step={1}
+                                        min={0}
+                                        value={refrigeratorInput.value}
+                                        onChange={(e) => setRefrigeratorInput({ ...refrigeratorInput, value: e.target.value })}
+                                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                                    />
+                                    <Dropdown
+                                        select
+                                        sx={`w-max z-[30] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                                        direction="center"
+                                        button={
+                                            <div onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { ...refrigeratorInput.time, show: true } })} className="cursor-pointer text-center">
+                                                <span className='text-xl '>
+                                                    {refrigeratorInput.time.value}
+                                                    {!refrigeratorInput.time.show
+                                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                                    }
+                                                </span>
+                                            </div>
+                                        }>
+                                        {['day', 'month', 'year', 'hour'].map((item) => (
+                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[30]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
+                                                {item}
+                                            </DropdownItem>
+                                        ))}
+                                    </Dropdown>
+                                    <span onClick={() => setAdvancedOptions(true)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
+                                        Advanced options
+                                    </span>
+                                </div>
+                            </>
+                        }
+
+                        {/* All Life Span Inputs */}
+                        {advancedOptions &&
+                            <>
+                                {/* Input */}
+                                <div className='inline-block'>
+                                    <input
+                                        id="lifeSpan"
+                                        type="number"
+                                        step={1}
+                                        min={0}
+                                        value={refrigeratorInput.value}
+                                        onChange={(e) => setRefrigeratorInput({ ...refrigeratorInput, value: e.target.value })}
+                                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                                    />
+                                    <Dropdown
+                                        select
+                                        sx={`w-max z-[30] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                                        direction="center"
+                                        button={
+                                            <div onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { ...refrigeratorInput.time, show: true } })} className="cursor-pointer text-center">
+                                                <span className='text-xl '>
+                                                    {refrigeratorInput.time.value}
+                                                    {!refrigeratorInput.time.show
+                                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                                    }
+                                                </span>
+                                            </div>
+                                        }>
+                                        {['day', 'month', 'year', 'hour'].map((item) => (
+                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[30]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
+                                                {item}
+                                            </DropdownItem>
+                                        ))}
+                                    </Dropdown>
+                                    <span onClick={() => setAdvancedOptions(false)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
+                                        Hide options
+                                    </span>
+                                </div>
+                            </>
+                        }
+
+
                     </div>
 
 
