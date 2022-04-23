@@ -53,7 +53,22 @@ function FoodSpaceItem() {
             navigate('/')
         }
         const foodSpace = location.state.foodSpace
-        const stockItem = location.state.foodSpace.stock[stockNum - 1]
+        let stockItem;
+        // Find Item in Stock
+        if (location.state.product.expired) {
+            for (const item of foodSpace.expiredStock) {
+                if (item._id === location.state.product._id) {
+                    stockItem = item
+                }
+            }
+        } else {
+            for (const item of foodSpace.stock) {
+                if (item._id === location.state.product._id) {
+                    stockItem = item
+                }
+            }
+        }
+
         if (stockItem.owner) {
             if (foodSpace.admin.email !== user.email) {
                 if (stockItem.owner.email !== user.email) {
@@ -64,7 +79,6 @@ function FoodSpaceItem() {
 
         }
 
-
         setItem(stockItem)
         setQuantity(stockItem.quantity)
         setUnit({ ...unit, value: stockItem.unit })
@@ -74,19 +88,18 @@ function FoodSpaceItem() {
 
 
     }, [])
-
+    console.log(item)
     async function handleEditSubmit(e) {
         e.preventDefault()
         const foodSpace = location.state.foodSpace
-
 
         let itemOwner = null;
         if (owner.value !== "everyone") {
             let sameOwner = false;
             let newOwner;
-            if (foodSpace.stock[stockNum - 1].owner.first_name === owner.value) {
-                sameOwner = foodSpace.stock[stockNum - 1].owner
-                itemOwner = foodSpace.stock[stockNum - 1].owner
+            if (item.owner.first_name === owner.value) {
+                sameOwner = item.owner
+                itemOwner = item.owner
             }
             if (!sameOwner) {
                 if (owner.value === foodSpace.admin.first_name) {
@@ -109,6 +122,7 @@ function FoodSpaceItem() {
                 unit: unit.value,
                 purchasedDate: convertedDate
             },
+            expired: item.expired,
             foodSpace_id: foodSpace._id
         }
 
@@ -145,6 +159,7 @@ function FoodSpaceItem() {
                     method: "DELETE",
                     url: `${API.FOODSPACE.removeItem}`,
                     data: {
+                        expired: item.expired,
                         item_id: item._id,
                         foodSpace_id: location.state.foodSpace._id
                     },
@@ -177,7 +192,7 @@ function FoodSpaceItem() {
     return (
         <div className='min-h-screen bg-white overflow-visible mb-[4.2rem]'>
 
-            <div className='bg-white fixed top-6 w-full text-center z-[50]'>
+            <div className='bg-white fixed pt-6 pb-3 w-full text-center z-[50]'>
                 {/* Back Button */}
                 <Link to={`/foodSpace/${location.state.foodSpace.name}`} state={location.state}>
                     <span className=''>
@@ -192,7 +207,7 @@ function FoodSpaceItem() {
 
                 {/* Save Button */}
                 <span onClick={handleEditSubmit} className=' absolute right-6 cursor-pointer'>
-                    <BiCheck className='inline-block text-[1.8rem] text-main  mb-1' />
+                    <BiCheck className='inline-block text-[1.5rem] text-main  mb-1' />
                 </span>
             </div>
 
@@ -200,7 +215,7 @@ function FoodSpaceItem() {
 
 
             {/* Image, Name, Brand */}
-            <div className='flex flex-col items-center justify-center h-[40vh]'>
+            <div className='relative pt-7 flex flex-col items-center justify-center h-[35vh]  border-b-2'>
 
                 {/* Item Image */}
                 <Avatar
@@ -208,6 +223,7 @@ function FoodSpaceItem() {
                     bg={'bg-neutral-200'}
                     ring
                     size='xl'
+                    ringColor={item.expired ? 'ring-red-500' : 'ring-white'}
                 />
                 <h1 className='text-3xl capitalize text-main font-semibold mt-3 '>
                     {item.product.name}
@@ -216,11 +232,19 @@ function FoodSpaceItem() {
                     {item.product.brand}
                 </h2>
 
+                {item.expired &&
+                    <h2 className='text-lg capitalize text-red-500 absolute bottom-10 italic'>
+                        *Expired
+                    </h2>
+                }
+
+
+
             </div>
 
 
             {/* Form */}
-            <form onSubmit={handleEditSubmit} className="flex flex-col space-y-7 w-[80%] mx-auto">
+            <form onSubmit={handleEditSubmit} className="mt-7 flex flex-col space-y-7 w-[80%] mx-auto">
                 {/* Quantity */}
                 <div className='flex justify-between'>
                     <label className='text-lg font-semibold'>Quantity</label>

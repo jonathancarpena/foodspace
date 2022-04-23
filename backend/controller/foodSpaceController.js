@@ -28,6 +28,7 @@ async function checkIfInFoodSpace(foodSpace_id, user_id) {
 
 // Access to Admin and Users
 export const getAllFoodSpaces = async (req, res) => {
+    console.log('GETTING ALL FOODSPACES')
     const { _id } = req.user
     const userExist = await checkIfInFoodSpace(foodSpace_id, _id)
 
@@ -102,6 +103,7 @@ export const getAdminFoodSpaceById = async (req, res) => {
 }
 
 export const getAllAdminFoodSpace = async (req, res) => {
+    console.log('GETTING ALL ADMIN FOODSPACES')
     const { _id } = req.user
 
     try {
@@ -474,8 +476,10 @@ export const addItemToFoodSpace = async (req, res) => {
             if (!foodSpace.areas.includes(item.area)) {
                 item.area = foodSpace.areas[0]
             }
+
             foodSpace.stock.push(item)
         })
+
 
         await foodSpace.save()
         return res.status(200).json({
@@ -495,7 +499,7 @@ export const removeItemFromFoodSpace = async (req, res) => {
     console.log('REMOVING ITEM')
     // Validate if User is an Admin or User
     const { _id } = req.user
-    const { item_id, foodSpace_id } = req.body
+    const { item_id, foodSpace_id, expired } = req.body
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!check) {
         return res.status(400).json({
@@ -504,34 +508,91 @@ export const removeItemFromFoodSpace = async (req, res) => {
     }
 
     try {
-        const item = ((await FoodSpace.findById(foodSpace_id)).stock).find((item) => item._id.toString() === item_id)
+        const foodSpace = await FoodSpace.findById(foodSpace_id)
 
-        // Item does not Exist
-        if (!item) {
-            return res.status(400).json({
-                message: "Item does not exist"
-            })
-        }
+        if (!expired) {
+            const item = foodSpace.stock.find((item) => item._id.toString() === item_id)
+            // Item does not Exist
+            if (!item) {
+                return res.status(400).json({
+                    message: "Item does not exist"
+                })
+            }
 
-        // Only Owner and Admin access
-        if (item.owner !== null && item.owner._id.toString() !== _id && check !== "admin") {
-            return res.status(400).json({
-                message: "Access Denied"
-            })
+            // Only Owner and Admin access
+            if (item.owner !== null && item.owner._id.toString() !== _id && check !== "admin") {
+                return res.status(400).json({
+                    message: "Access Denied"
+                })
+            } else {
+                const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
+                    "$pull": {
+                        "stock": {
+                            "_id": item_id
+                        }
+                    }
+                })
+
+                return res.status(200).json({
+                    message: `Removed item ${item_id} from your FoodSpace`,
+                    foodSpace
+                })
+            }
         } else {
-            const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
-                "$pull": {
-                    "stock": {
-                        "_id": item_id
+
+            // Expired Stock
+            const item = foodSpace.expiredStock.find((item) => item._id.toString() === item_id)
+
+            // Item does not Exist
+            if (!item) {
+                return res.status(400).json({
+                    message: "Item does not exist"
+                })
+            }
+
+            // Only Owner and Admin access
+            if (item.owner !== null && item.owner._id.toString() !== _id && check !== "admin") {
+                return res.status(400).json({
+                    message: "Access Denied"
+                })
+            } else {
+                const foodSpace = await FoodSpace.findByIdAndUpdate(foodSpace_id, {
+                    "$pull": {
+                        "expiredStock": {
+                            "_id": item_id
+                        }
+                    }
+                })
+
+                // Updating Admin's FoodSpace
+                const admin = await User.findById(_id)
+                let foodSpaceToUpdate = admin.admin.find((item) => item._id.toString() === foodSpace_id)
+                const updatedExpStock = foodSpaceToUpdate.expiredStock.filter((item) => item._id.toString() !== item_id)
+                foodSpaceToUpdate.expiredStock = [...updatedExpStock]
+                await admin.save()
+
+
+                // Updating Current Users In FoodSpace Data
+                if (foodSpace.users.length > 0) {
+                    for (const current of foodSpace.users) {
+                        const user = await User.findById(current._id)
+                        let foodSpaceToUpdate = user.foodSpaces.find((item) => item._id.toString() === foodSpace_id)
+                        const updatedExpStock = foodSpaceToUpdate.expiredStock.filter((item) => item._id.toString() !== item_id)
+                        foodSpaceToUpdate.expiredStock = [...updatedExpStock]
+                        await user.save()
                     }
                 }
-            })
 
-            return res.status(200).json({
-                message: `Removed item ${item_id} from your FoodSpace`,
-                foodSpace
-            })
+
+                return res.status(200).json({
+                    message: `Removed item ${item_id} from your FoodSpace`,
+                    foodSpace
+                })
+            }
         }
+
+
+
 
 
     } catch (error) {
@@ -547,7 +608,7 @@ export const updateItemFromFoodSpace = async (req, res) => {
     console.log('UPDATING ITEM')
     // Validate if User is an Admin or User
     const { _id } = req.user
-    const { item_id: id, foodSpace_id, info } = req.body
+    const { item_id: id, foodSpace_id, expired, info } = req.body
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
     if (!check) {
         return res.status(400).json({
@@ -562,39 +623,75 @@ export const updateItemFromFoodSpace = async (req, res) => {
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
 
-        // Grab Index
-        const updateIndex = foodSpace.stock.findIndex((item) => (item._id).toString() === id)
+        if (!expired) {
+            // Grab Index
+            const updateIndex = foodSpace.stock.findIndex((item) => (item._id).toString() === id)
 
-        // Grab Item and Update
-        let itemToUpdate = foodSpace.stock.find((item) => (item._id).toString() === id)
+            // Grab Item and Update
+            let itemToUpdate = foodSpace.stock.find((item) => (item._id).toString() === id)
 
-        // Item is owned by someone
-        if (itemToUpdate.owner && check === "user") {
-            // User must be the owner or Admin
-            if (itemToUpdate.owner._id.toString() !== _id) {
-                return res.status(400).json({
-                    message: "Change Not Allowed."
-                })
+            // Item is owned by someone
+            if (itemToUpdate.owner && check === "user") {
+                // User must be the owner or Admin
+                if (itemToUpdate.owner._id.toString() !== _id) {
+                    return res.status(400).json({
+                        message: "Change Not Allowed."
+                    })
+                }
             }
-        }
 
-        if (owner) {
-            itemToUpdate['owner'] = owner
+            if (owner) {
+                itemToUpdate['owner'] = owner
+            } else {
+                itemToUpdate['owner'] = null
+            }
+
+            if (area) {
+                itemToUpdate['area'] = area
+            }
+
+            if (quantity) {
+                itemToUpdate['quantity'] = quantity
+            }
+
+            // Update FoodSpace
+            foodSpace.stock[updateIndex] = itemToUpdate
         } else {
-            itemToUpdate['owner'] = null
+            // Grab Index
+            const updateIndex = foodSpace.expiredStock.findIndex((item) => (item._id).toString() === id)
+
+            // Grab Item and Update
+            let itemToUpdate = foodSpace.expiredStock.find((item) => (item._id).toString() === id)
+
+            // Item is owned by someone
+            if (itemToUpdate.owner && check === "user") {
+                // User must be the owner or Admin
+                if (itemToUpdate.owner._id.toString() !== _id) {
+                    return res.status(400).json({
+                        message: "Change Not Allowed."
+                    })
+                }
+            }
+
+            if (owner) {
+                itemToUpdate['owner'] = owner
+            } else {
+                itemToUpdate['owner'] = null
+            }
+
+            if (area) {
+                itemToUpdate['area'] = area
+            }
+
+            if (quantity) {
+                itemToUpdate['quantity'] = quantity
+            }
+
+            // Update FoodSpace
+            foodSpace.expiredStock[updateIndex] = itemToUpdate
         }
 
-        if (area) {
-            itemToUpdate['area'] = area
-        }
-
-        if (quantity) {
-            itemToUpdate['quantity'] = quantity
-        }
-
-        // Update FoodSpace
-        foodSpace.stock[updateIndex] = itemToUpdate
-        foodSpace.save()
+        await foodSpace.save()
 
         return res.status(200).json({
             message: `Updated your item in your FoodSpace`,

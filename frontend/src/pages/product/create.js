@@ -171,18 +171,11 @@ const BarcodeScanModal = ({ setScan, setBarcode }) => {
     )
 }
 
-// refrigerator: {
-//     value: 1,
-//     time: 'week'
-// },
-// freezer: {
-//     value: 1,
-//     time: 'year'
-// },
-// pantry: {
-//     value: 1,
-//     time: 'day'
-// },
+
+
+const defaultPantryInput = ["fruits and vegetables", "canned and bottled goods", "grain, flour and wheat products", "fat products"]
+const defaultRefrigeratorInput = ["general meat products", "fish products", "poultry and other products", "dairy products"]
+
 function Create() {
     const location = useLocation()
     const navigate = useNavigate()
@@ -200,15 +193,19 @@ function Create() {
     const [refrigeratorInput, setRefrigeratorInput] = useState({ value: 0, time: { show: false, value: 'week' } })
     const [pantryInput, setPantryInput] = useState({ value: 0, time: { show: false, value: 'week' } })
     const [freezerInput, setFreezerInput] = useState({ value: 0, time: { show: false, value: 'week' } })
-
     const [type, setType] = useState({
         show: false,
         value: 'food'
     })
     const [category, setCategory] = useState({
         show: false,
-        value: 'food'
+        value: Object.keys(shelfLife[type.value])[0]
     })
+    const [subCategory, setSubCategory] = useState({
+        show: false,
+        value: Object.keys(shelfLife[type.value][category.value])[0]
+    })
+
 
     // Modals
     const [showModal, setShowModal] = useState(false)
@@ -270,7 +267,42 @@ function Create() {
 
     }, [brand])
 
+    // refrigerator: {
+    //     value: 1,
+    //     time: 'week'
+    // },
+    // freezer: {
+    //     value: 1,
+    //     time: 'year'
+    // },
+    // pantry: {
+    //     value: 1,
+    //     time: 'day'
+    // },
 
+    function generateDefaultLifeSpan() {
+        let lifeSpan = {
+            refrigerator: {
+                value: parseInt(refrigeratorInput.value),
+                time: refrigeratorInput.time.value
+            },
+            freezer: {
+                value: parseInt(freezerInput.value),
+                time: freezerInput.time.value
+            },
+            pantry: {
+                value: parseInt(pantryInput.value),
+                time: pantryInput.time.value
+            }
+        }
+        const defaultLifeSpan = shelfLife[type.value][category.value][subCategory.value]
+        for (const key in lifeSpan) {
+            if (lifeSpan[key].value === NaN || lifeSpan[key].value === 0) {
+                lifeSpan[key] = defaultLifeSpan[key]
+            }
+        }
+        return lifeSpan
+    }
     async function handleSubmit(e) {
         e.preventDefault()
         const userConfirm = window.confirm("Are you sure everything is correct?")
@@ -293,23 +325,18 @@ function Create() {
             } else {
                 validErrors["image"] = null
             }
-            // if (!lifeSpan || parseInt(lifeSpan) === 0) {
-            //     validErrors["lifeSpan"] = "Please provide a life span."
-            // } else {
-            //     validErrors["lifeSpan"] = null
-            // }
+
 
             setErrors({ ...validErrors })
+            const lifeSpan = generateDefaultLifeSpan()
             const readyToSubmit = Object.values(validErrors).every((item) => item === null)
             if (readyToSubmit) {
                 const product = {
                     name: name.toLowerCase(),
                     brand: brand.toLowerCase(),
-                    type,
+                    type: type.value,
                     barcode: parseInt(barcode),
-
-
-
+                    lifeSpan,
                     image: image ? image : emojiDictionary[type],
                     author: {
                         _id: user._id,
@@ -328,22 +355,113 @@ function Create() {
                     }
                 })
 
-                if (res) {
+
+                if (res.status === 200) {
                     navigate('/')
                 }
             }
 
         }
-
-
     }
+
+    function handleTypeChange(item) {
+        let prevType = type.value
+        if (prevType !== item) {
+            const newCategory = Object.keys(shelfLife[item])[0]
+            setType({ show: false, value: item })
+            setCategory({ ...category, value: newCategory })
+            setSubCategory({ ...subCategory, value: Object.keys(shelfLife[item][newCategory])[0] })
+        }
+    }
+
+    function defaultLifeSpanInput() {
+
+        if (defaultRefrigeratorInput.includes(category.value.toLowerCase())) {
+            return (
+                <div className='inline-block'>
+                    <input
+                        id="lifeSpan"
+                        type="number"
+                        step={1}
+                        min={0}
+                        value={refrigeratorInput.value}
+                        onChange={(e) => setRefrigeratorInput({ ...refrigeratorInput, value: e.target.value })}
+                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                    />
+                    <Dropdown
+                        select
+                        sx={`w-max z-[20] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                        direction="center"
+                        button={
+                            <div onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { ...refrigeratorInput.time, show: true } })} className="cursor-pointer text-center">
+                                <span className='text-xl '>
+                                    {refrigeratorInput.time.value}
+                                    {!refrigeratorInput.time.show
+                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                    }
+                                </span>
+                            </div>
+                        }>
+                        {['day', 'month', 'year', 'hour'].map((item) => (
+                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[20]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
+                                {item}
+                            </DropdownItem>
+                        ))}
+                    </Dropdown>
+                    <span onClick={() => setAdvancedOptions(true)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
+                        Advanced options
+                    </span>
+                </div>
+            )
+        } else {
+            return (
+                <div className='inline-block'>
+                    <input
+                        id="lifeSpan"
+                        type="number"
+                        step={1}
+                        min={0}
+                        value={pantryInput.value}
+                        onChange={(e) => setPantryInput({ ...pantryInput, value: e.target.value })}
+                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                    />
+                    <Dropdown
+                        select
+                        sx={`w-max z-[20] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                        direction="center"
+                        button={
+                            <div onClick={() => setPantryInput({ ...pantryInput, time: { ...pantryInput.time, show: true } })} className="cursor-pointer text-center">
+                                <span className='text-xl '>
+                                    {pantryInput.time.value}
+                                    {!pantryInput.time.show
+                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                    }
+                                </span>
+                            </div>
+                        }>
+                        {['day', 'month', 'year', 'hour'].map((item) => (
+                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[20]`} onClick={() => setPantryInput({ ...pantryInput, time: { value: item, show: false } })} >
+                                {item}
+                            </DropdownItem>
+                        ))}
+                    </Dropdown>
+                    <span onClick={() => setAdvancedOptions(true)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
+                        Advanced options
+                    </span>
+                </div>
+            )
+        }
+    }
+
     return (
-        <div className='min-h-screen p-7 flex flex-col justify-center items-center '>
+        <div className='min-h-screen p-7 flex flex-col justify-center items-center mb-[4.2rem]'>
 
             {/* Back Button */}
             <Link to={`/foodSpace/`} state={location.state}>
                 <span className=''>
-                    <BiArrowBack className=' absolute left-6 inline-block text-[1rem] text-main mr-1 mb-1' />
+                    <BiArrowBack className=' fixed top-6 left-6 inline-block text-[1rem] text-main mr-1 mb-1' />
                 </span>
             </Link>
 
@@ -468,7 +586,7 @@ function Create() {
                             </div>
                         }>
                         {["food", "liquid"].map((item) => (
-                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-50`} onClick={() => setType({ show: false, value: item })} >
+                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-50`} onClick={() => handleTypeChange(item)} >
                                 {item}
                             </DropdownItem>
                         ))}
@@ -477,7 +595,7 @@ function Create() {
 
 
                 {/* Category */}
-                <div className=''>
+                <div className='flex flex-col'>
                     <label htmlFor='category' className='font-semibold text-lg text-main mr-2'>
                         Category
                     </label>
@@ -503,7 +621,35 @@ function Create() {
                             </DropdownItem>
                         ))}
                     </Dropdown>
+                </div>
 
+                {/* Sub Category */}
+                <div className='flex flex-col'>
+                    <label htmlFor='category' className='font-semibold text-lg text-main mr-2'>
+                        Sub-Category
+                    </label>
+                    <Dropdown
+                        select
+                        listSx={`h-[200px] w-[300px] left-[-10px] overflow-y-scroll`}
+                        sx={`w-max z-[30] p-1.5 bg-white relative top-[1.5px] ${subCategory.show ? 'ring-[1.5px] ring-sky-300  border-2' : 'border-2 '}`}
+                        direction="right"
+                        button={
+                            <div onClick={() => setSubCategory({ ...subCategory, show: !subCategory.show })} className="cursor-pointer text-center capitalize">
+                                <span className='text-xl '>
+                                    {subCategory.value}
+                                    {!subCategory.show
+                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                    }
+                                </span>
+                            </div>
+                        }>
+                        {Object.keys(shelfLife[type.value][category.value]).map((item) => (
+                            <DropdownItem key={item} sx={`text-start text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[30] capitalize`} onClick={() => setSubCategory({ show: false, value: item })} >
+                                {item}
+                            </DropdownItem>
+                        ))}
+                    </Dropdown>
                 </div>
 
 
@@ -513,55 +659,61 @@ function Create() {
                         {/* Label */}
                         <label htmlFor='lifeSpan' className='font-semibold text-lg text-main mr-2'>
                             LifeSpan
+                            {advancedOptions &&
+                                <span onClick={() => setAdvancedOptions(false)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
+                                    Hide options
+                                </span>
+                            }
                         </label>
 
                         {/* Default Life Span Input */}
                         {!advancedOptions &&
                             <>
                                 {/* Input */}
-                                <div className='inline-block'>
-                                    <input
-                                        id="lifeSpan"
-                                        type="number"
-                                        step={1}
-                                        min={0}
-                                        value={refrigeratorInput.value}
-                                        onChange={(e) => setRefrigeratorInput({ ...refrigeratorInput, value: e.target.value })}
-                                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
-                                    />
-                                    <Dropdown
-                                        select
-                                        sx={`w-max z-[30] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
-                                        direction="center"
-                                        button={
-                                            <div onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { ...refrigeratorInput.time, show: true } })} className="cursor-pointer text-center">
-                                                <span className='text-xl '>
-                                                    {refrigeratorInput.time.value}
-                                                    {!refrigeratorInput.time.show
-                                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
-                                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
-                                                    }
-                                                </span>
-                                            </div>
-                                        }>
-                                        {['day', 'month', 'year', 'hour'].map((item) => (
-                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[30]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
-                                                {item}
-                                            </DropdownItem>
-                                        ))}
-                                    </Dropdown>
-                                    <span onClick={() => setAdvancedOptions(true)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
-                                        Advanced options
-                                    </span>
-                                </div>
+                                {defaultLifeSpanInput()}
                             </>
                         }
 
                         {/* All Life Span Inputs */}
                         {advancedOptions &&
                             <>
-                                {/* Input */}
-                                <div className='inline-block'>
+                                {/* Freezer Input */}
+                                <div className='block'>
+                                    <label className='mr-2'>Freezer</label>
+                                    <input
+                                        id="lifeSpan"
+                                        type="number"
+                                        step={1}
+                                        min={0}
+                                        value={freezerInput.value}
+                                        onChange={(e) => setFreezerInput({ ...freezerInput, value: e.target.value })}
+                                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                                    />
+                                    <Dropdown
+                                        select
+                                        sx={`w-max z-[15] p-1.5 bg-white relative top-[1.5px] ${freezerInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                                        direction="center"
+                                        button={
+                                            <div onClick={() => setFreezerInput({ ...freezerInput, time: { ...freezerInput.time, show: true } })} className="cursor-pointer text-center">
+                                                <span className='text-xl '>
+                                                    {freezerInput.time.value}
+                                                    {!freezerInput.time.show
+                                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                                    }
+                                                </span>
+                                            </div>
+                                        }>
+                                        {['day', 'month', 'year', 'hour'].map((item) => (
+                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[15]`} onClick={() => setFreezerInput({ ...freezerInput, time: { value: item, show: false } })} >
+                                                {item}
+                                            </DropdownItem>
+                                        ))}
+                                    </Dropdown>
+                                </div>
+                                {/* Refrigerator Input */}
+                                <div className='block'>
+                                    <label className='mr-2'>Refrigerator</label>
                                     <input
                                         id="lifeSpan"
                                         type="number"
@@ -573,7 +725,7 @@ function Create() {
                                     />
                                     <Dropdown
                                         select
-                                        sx={`w-max z-[30] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                                        sx={`w-max z-[10] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
                                         direction="center"
                                         button={
                                             <div onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { ...refrigeratorInput.time, show: true } })} className="cursor-pointer text-center">
@@ -587,14 +739,46 @@ function Create() {
                                             </div>
                                         }>
                                         {['day', 'month', 'year', 'hour'].map((item) => (
-                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[30]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
+                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[10]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
                                                 {item}
                                             </DropdownItem>
                                         ))}
                                     </Dropdown>
-                                    <span onClick={() => setAdvancedOptions(false)} className='text-xs underline text-primary-500 ml-3 cursor-pointer'>
-                                        Hide options
-                                    </span>
+                                </div>
+
+                                {/* Pantry Input */}
+                                <div className='block'>
+                                    <label className='mr-2'>Pantry</label>
+                                    <input
+                                        id="lifeSpan"
+                                        type="number"
+                                        step={1}
+                                        min={0}
+                                        value={pantryInput.value}
+                                        onChange={(e) => setPantryInput({ ...pantryInput, value: e.target.value })}
+                                        className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                                    />
+                                    <Dropdown
+                                        select
+                                        sx={`w-max z-[5] p-1.5 bg-white relative top-[1.5px] ${pantryInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                                        direction="center"
+                                        button={
+                                            <div onClick={() => setPantryInput({ ...pantryInput, time: { ...pantryInput.time, show: true } })} className="cursor-pointer text-center">
+                                                <span className='text-xl '>
+                                                    {pantryInput.time.value}
+                                                    {!pantryInput.time.show
+                                                        ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                                        : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                                    }
+                                                </span>
+                                            </div>
+                                        }>
+                                        {['day', 'month', 'year', 'hour'].map((item) => (
+                                            <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[5]`} onClick={() => setPantryInput({ ...pantryInput, time: { value: item, show: false } })} >
+                                                {item}
+                                            </DropdownItem>
+                                        ))}
+                                    </Dropdown>
                                 </div>
                             </>
                         }

@@ -110,7 +110,7 @@ export function AvatarModal({ showModal, setShowModal, handleComplete }) {
     )
 }
 
-function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = false, sx, onClick, key = '' }) {
+function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = false, sx, onClick, key = '', ringColor = "ring-white" }) {
     const sizeOptions = {
         xs: {
             bg: "h-[50px]",
@@ -134,7 +134,7 @@ function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = fal
         },
     }
     return (
-        <div key={key} onClick={onClick} className={`w-max ${sizeOptions[size].bg} rounded-[100%] ${bg} ${ring ? 'ring-4 ring-white drop-shadow-lg' : ''} flex justify-center items-center cursor-default rounded-full  text-center ${sx}`}>
+        <div key={key} onClick={onClick} className={`w-max ${sizeOptions[size].bg} rounded-[100%] ${bg} ${ring ? `ring-4 ${ringColor} drop-shadow-lg` : ''} flex justify-center items-center cursor-default rounded-full  text-center ${sx}`}>
             <span className={`${sizeOptions[size].emoji} p-2`}>
                 {emoji}
             </span>

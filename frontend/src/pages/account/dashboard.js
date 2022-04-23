@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment'
 
 // Router
 import { Link, useNavigate } from 'react-router-dom'
@@ -22,21 +23,88 @@ import "swiper/css/pagination";
 // Icons 
 import { FaCrown } from 'react-icons/fa'
 import { BsCircleFill } from 'react-icons/bs'
-import { BiFridge, BiTrash } from 'react-icons/bi'
+import { BiFridge, BiTrash, BiTrashAlt } from 'react-icons/bi'
 
 
 function Dashboard() {
+    const [expStock, setExpStock] = useState([])
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { ready, user } = useSelector(state => state.auth)
 
     useEffect(() => {
-        if (ready && user.avatar) {
+        if (!user && ready) {
+            dispatch(clearAuth())
+        }
+        if (ready && user) {
             dispatch(refreshMe())
         } else {
             navigate('/')
         }
     }, [])
+
+    useEffect(() => {
+        const allExpStock = []
+        const today = moment()
+
+        // Checking Admin Spaces
+        user.admin.forEach((item) => {
+            const type = item.type
+            const foodSpace_name = item.name
+            const foodSpace_id = item._id
+            item.expiredStock.forEach((item) => {
+                // Calculate Life Span based on Type
+                const qty = item.product.lifeSpan[type].value
+                const time = item.product.lifeSpan[type].time
+                const expDate = moment(item.purchasedDate).add(qty, time)
+                const diff = expDate.diff(today, 'days')
+                const message = moment.duration(diff, "days").humanize(true)
+                allExpStock.push({
+                    info: {
+                        name: item.product.name,
+                        image: item.product.image,
+                        owner: { ...item.owner }
+                    },
+                    message,
+                    foodSpace: {
+                        name: foodSpace_name,
+                        area: item.area,
+                        _id: foodSpace_id
+                    }
+                })
+            })
+        })
+
+        // Checking User Spaces
+        user.foodSpaces.forEach((item) => {
+            const type = item.type
+            const foodSpace_name = item.name
+            const foodSpace_id = item._id
+            item.expiredStock.forEach((item) => {
+                // Calculate Life Span based on Type
+                const qty = item.product.lifeSpan[type].value
+                const time = item.product.lifeSpan[type].time
+                const expDate = moment(item.purchasedDate).add(qty, time)
+                const diff = expDate.diff(today, 'days')
+                const message = moment.duration(diff, "days").humanize(true)
+                allExpStock.push({
+                    info: {
+                        name: item.product.name,
+                        image: item.product.image,
+                        owner: { ...item.owner }
+                    },
+                    message,
+                    foodSpace: {
+                        name: foodSpace_name,
+                        area: item.area,
+                        _id: foodSpace_id
+                    }
+                })
+            })
+        })
+        setExpStock(allExpStock)
+    }, [user])
+
 
 
     function foodSpaceLength() {
@@ -51,34 +119,15 @@ function Dashboard() {
 
         return total;
     }
-    function logout() {
-        dispatch(clearAuth())
-        navigate('/')
-    }
+
+
     if (!ready) {
         return (<div>Not a User</div>)
     }
 
-    console.log(user)
     return (
         <div className='flex flex-col space-y-5 min-h-screen pb-20'>
 
-            {/* Loading Animation */}
-            {/* <div className="border  shadow rounded-md p-4 max-w-sm w-full mx-auto">
-                <div className="animate-pulse flex space-x-4">
-                    <div className="rounded-full bg-slate-400 h-10 w-10"></div>
-                    <div className="flex-1 space-y-6 py-1">
-                        <div className="h-2 bg-slate-400 rounded"></div>
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-3 gap-4">
-                                <div className="h-2 bg-slate-400 rounded col-span-2"></div>
-                                <div className="h-2 bg-slate-400 rounded col-span-1"></div>
-                            </div>
-                            <div className="h-2 bg-slate-400 rounded"></div>
-                        </div>
-                    </div>
-                </div>
-            </div> */}
 
             <div className='flex px-7 pt-5 pb-2.5 items-center justify-between'>
                 <div>
@@ -106,8 +155,12 @@ function Dashboard() {
             {/* Header */}
             <div className='bg-primary-500 p-5 mx-7 rounded-xl relative overflow-hidden '>
                 <div>
-                    <h1 className='text-white text-sm'>Today</h1>
-                    <h2 className='text-white text-xl font-semibold mt-2'>5 items</h2>
+                    <h1 className='text-white text-sm'>Today - {moment().format('MMM DD, YYYY')}</h1>
+                    {expStock.length > 0
+                        ? <h2 className='text-white text-xl font-semibold mt-2'>{expStock.length} items</h2>
+                        : <h2 className='text-white text-xl font-semibold mt-2'>Clean Spaces</h2>
+                    }
+
                 </div>
 
                 <BiTrash className='text-[8rem] rotate-[25deg] text-primary-700 absolute right-5 bottom-[-2rem]' />
@@ -118,38 +171,51 @@ function Dashboard() {
             <div className='mx-7'>
                 <h1 className='font-semibold text-xl'>To do
                     <span className='bg-primary-100 rounded-xl px-3 text-primary-600 ml-1'>
-                        {user.tasks.length}
+                        {expStock.length}
                     </span>
                 </h1>
 
                 <Swiper spaceBetween={20} watchSlidesProgress={true} >
-                    {["a", "b", "c", "d", "e"].map((item) => (
-                        <SwiperSlide key={item} className='max-w-max '>
-                            {() => (
-                                <>
-                                    {/* <Link
-                                key={item.name}
-                                to={`/foodSpace/admin/${item.name}`}
-                                state={{ foodSpace_id: item._id }}> */}
+                    {expStock &&
+                        expStock.map((item, idx) => (
+                            <SwiperSlide key={`${item.info.name}-${idx}`} className='max-w-max '>
+                                <Link
+                                    key={item.name}
+                                    to={`/foodSpace/${item.foodSpace.name}`}
+                                    state={{ foodSpace: { _id: item.foodSpace._id } }}>
                                     <div className={` cursor-pointer bg-primary-50 capitalize rounded-xl  flex flex-col space-y-3 justify-evenly h-[150px] w-[150px] drop-shadow-lg mt-4 mb-2 p-3`}>
-                                        <p className='text-secondary text-xs'>
-                                            <BiFridge className='inline-block mr-1 text-lg' />FoodSpace {item}
-                                        </p>
+                                        <div className='flex text-secondary '>
+                                            <BiFridge className='inline-block mr-1  text-lg' />
+                                            <div className='flex flex-col'>
+                                                <span className=' text-xs'>
+                                                    {item.foodSpace.name}
+                                                </span>
+                                                <span className=' text-xs'>
+                                                    {item.foodSpace.area}
+                                                </span>
+
+                                            </div>
+                                        </div>
+
+
                                         <p className='font-semibold'>
-                                            Tomato
+                                            {item.info.name}
                                         </p>
                                         <p className='text-secondary text-xs'>
                                             <BsCircleFill className='inline-block mr-1.5 mb-0.5 text-blue-500' />
-                                            Exp. 3 days ago
+                                            Exp. {item.message}
                                         </p>
                                     </div>
-                                    {/* </Link> */}
-                                </>
-                            )}
-
-                        </SwiperSlide>
-                    ))}
+                                </Link>
+                            </SwiperSlide>
+                        ))
+                    }
                 </Swiper>
+                {(expStock.length === 0) &&
+                    <div className=''>
+                        <h1 className='text-xl p-5'>No Tasks</h1>
+                    </div>
+                }
             </div>
 
 
@@ -200,7 +266,7 @@ function Dashboard() {
 
                                         {/* Expired Stock */}
                                         {item.expiredStock.length
-                                            ? <p className='text-sm'>{item.expiredStock.length} items to throw</p>
+                                            ? <p className='text-sm'><BiTrashAlt className='inline-block mb-1 mr-1 text-base' />{item.expiredStock.length} Expired Items</p>
                                             : <p className='text-sm'>Clean Space.</p>
                                         }
 
@@ -253,7 +319,7 @@ function Dashboard() {
 
                                         {/* Expired Stock */}
                                         {item.expiredStock.length
-                                            ? <p className='text-sm'>{item.expiredStock.length} items to throw</p>
+                                            ? <p className='text-sm'><BiTrashAlt className='inline-block mb-1 mr-1 text-base' />{item.expiredStock.length} Expired Items</p>
                                             : <p className='text-sm'>Clean Space.</p>
                                         }
 

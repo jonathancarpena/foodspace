@@ -28,10 +28,13 @@ import {
     FaRegEdit,
     FaCalendarTimes,
     FaCheck,
-    FaRegTrashAlt
+    FaRegTrashAlt,
+    FaCaretDown,
+    FaCaretUp
 } from 'react-icons/fa'
 
 // Components
+import Dropdown, { DropdownItem } from '../../components/Dropdown'
 import Avatar from '../../components/pages/Account/Avatar'
 import Modal from '../../components/Modal'
 import BarcodeScannerComponent from "react-qr-barcode-scanner"
@@ -76,6 +79,115 @@ const BarcodeScanModal = ({ setScan, setBarcode }) => {
 
     )
 }
+const LifeSpanInput = ({ refrigeratorInput, setRefrigeratorInput, pantryInput, setPantryInput, freezerInput, setFreezerInput }) => {
+    return (
+        <>
+            {/* Freezer Input */}
+            <div className='block'>
+                <label className='mr-2'>Freezer</label>
+                <input
+                    id="lifeSpan"
+                    type="number"
+                    step={1}
+                    min={0}
+                    value={freezerInput.value}
+                    onChange={(e) => setFreezerInput({ ...freezerInput, value: e.target.value })}
+                    className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                />
+                <Dropdown
+                    select
+                    sx={`w-max z-[15] p-1.5 bg-white relative top-[1.5px] ${freezerInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                    direction="center"
+                    button={
+                        <div onClick={() => setFreezerInput({ ...freezerInput, time: { ...freezerInput.time, show: true } })} className="cursor-pointer text-center">
+                            <span className='text-xl '>
+                                {freezerInput.time.value}
+                                {!freezerInput.time.show
+                                    ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                    : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                }
+                            </span>
+                        </div>
+                    }>
+                    {['day', 'month', 'year', 'hour'].map((item) => (
+                        <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[15]`} onClick={() => setFreezerInput({ ...freezerInput, time: { value: item, show: false } })} >
+                            {item}
+                        </DropdownItem>
+                    ))}
+                </Dropdown>
+            </div>
+            {/* Refrigerator Input */}
+            <div className='block'>
+                <label className='mr-2'>Refrigerator</label>
+                <input
+                    id="lifeSpan"
+                    type="number"
+                    step={1}
+                    min={0}
+                    value={refrigeratorInput.value}
+                    onChange={(e) => setRefrigeratorInput({ ...refrigeratorInput, value: e.target.value })}
+                    className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                />
+                <Dropdown
+                    select
+                    sx={`w-max z-[10] p-1.5 bg-white relative top-[1.5px] ${refrigeratorInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                    direction="center"
+                    button={
+                        <div onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { ...refrigeratorInput.time, show: true } })} className="cursor-pointer text-center">
+                            <span className='text-xl '>
+                                {refrigeratorInput.time.value}
+                                {!refrigeratorInput.time.show
+                                    ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                    : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                }
+                            </span>
+                        </div>
+                    }>
+                    {['day', 'month', 'year', 'hour'].map((item) => (
+                        <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[10]`} onClick={() => setRefrigeratorInput({ ...refrigeratorInput, time: { value: item, show: false } })} >
+                            {item}
+                        </DropdownItem>
+                    ))}
+                </Dropdown>
+            </div>
+
+            {/* Pantry Input */}
+            <div className='block'>
+                <label className='mr-2'>Pantry</label>
+                <input
+                    id="lifeSpan"
+                    type="number"
+                    step={1}
+                    min={0}
+                    value={pantryInput.value}
+                    onChange={(e) => setPantryInput({ ...pantryInput, value: e.target.value })}
+                    className="border-2 p-2 capitalize focus:outline-offset-1 focus:outline-sky-300 w-[60px]"
+                />
+                <Dropdown
+                    select
+                    sx={`w-max z-[5] p-1.5 bg-white relative top-[1.5px] ${pantryInput.time.show ? 'ring-[1.5px] ring-sky-300  border-y-2 border-r-2' : 'border-y-2 border-r-2'}`}
+                    direction="center"
+                    button={
+                        <div onClick={() => setPantryInput({ ...pantryInput, time: { ...pantryInput.time, show: true } })} className="cursor-pointer text-center">
+                            <span className='text-xl '>
+                                {pantryInput.time.value}
+                                {!pantryInput.time.show
+                                    ? <FaCaretDown className="mb-1 ml-1 inline-block" />
+                                    : <FaCaretUp className="mb-1 ml-1 inline-block" />
+                                }
+                            </span>
+                        </div>
+                    }>
+                    {['day', 'month', 'year', 'hour'].map((item) => (
+                        <DropdownItem key={item} sx={`text-xl bg-white px-4 py-2 cursor-pointer hover:bg-neutral-200 z-[5]`} onClick={() => setPantryInput({ ...pantryInput, time: { value: item, show: false } })} >
+                            {item}
+                        </DropdownItem>
+                    ))}
+                </Dropdown>
+            </div>
+        </>
+    )
+}
 
 function ProductDetails() {
     // Router
@@ -96,11 +208,13 @@ function ProductDetails() {
     const [editStatus, setEditStatus] = useState(false)
     const [name, setName] = useState(null)
     const [brand, setBrand] = useState(null)
-    const [type, setType] = useState(null)
-    const [lifeSpan, setLifeSpan] = useState(null)
-    const [time, setTime] = useState(null)
     const [barcode, setBarcode] = useState(null)
     const [scan, setScan] = useState(false)
+
+    // Life Span
+    const [refrigeratorInput, setRefrigeratorInput] = useState({ value: 0, time: { show: false, value: 'week' } })
+    const [pantryInput, setPantryInput] = useState({ value: 0, time: { show: false, value: 'week' } })
+    const [freezerInput, setFreezerInput] = useState({ value: 0, time: { show: false, value: 'week' } })
 
     // Grabbing Product
     useEffect(() => {
@@ -114,9 +228,9 @@ function ProductDetails() {
                         setAuthor(true)
                         setName(res.data.name)
                         setBrand(res.data.brand)
-                        setType(res.data.type)
-                        setLifeSpan(res.data.lifeSpan.value)
-                        setTime(res.data.lifeSpan.time)
+                        setRefrigeratorInput({ value: res.data.lifeSpan.refrigerator.value, time: { show: false, value: res.data.lifeSpan.refrigerator.time } })
+                        setFreezerInput({ value: res.data.lifeSpan.freezer.value, time: { show: false, value: res.data.lifeSpan.freezer.time } })
+                        setPantryInput({ value: res.data.lifeSpan.pantry.value, time: { show: false, value: res.data.lifeSpan.pantry.time } })
                         setBarcode(res.data.barcode)
                     }
                     setProduct(res.data)
@@ -127,7 +241,24 @@ function ProductDetails() {
             .catch((err) => setErrors(err))
     }, [])
 
+    function generateDefaultLifeSpan() {
+        let lifeSpan = {
+            refrigerator: {
+                value: parseInt(refrigeratorInput.value),
+                time: refrigeratorInput.time.value
+            },
+            freezer: {
+                value: parseInt(freezerInput.value),
+                time: freezerInput.time.value
+            },
+            pantry: {
+                value: parseInt(pantryInput.value),
+                time: pantryInput.time.value
+            }
+        }
 
+        return lifeSpan
+    }
 
     async function handleSubmit(e, idx) {
         e.preventDefault()
@@ -136,15 +267,12 @@ function ProductDetails() {
 
         if (userConfirm) {
             try {
+                const lifeSpan = generateDefaultLifeSpan()
                 const data = {
                     _id: product._id,
                     name: name,
-                    type: type,
                     barcode: barcode,
-                    lifeSpan: {
-                        value: lifeSpan,
-                        time: time
-                    },
+                    lifeSpan,
                 }
                 const res = await axios({
                     method: "PUT",
@@ -372,25 +500,13 @@ function ProductDetails() {
                         <div className='border-b-2 flex flex-col text-xl'>
                             <div>
                                 <FaFilter className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>Category: </span>
+                                <span className='font-semibold'>Type: </span>
                             </div>
 
-                            {(editStatus && author)
-                                ? <select
-                                    value={type}
-                                    onChange={(e) => setType(e.target.value)}
-                                    className='py-3 ml-7 capitalize active:outline-none focus:outline-none w-max'>
-                                    <option value={'food'}>
-                                        food
-                                    </option>
-                                    <option value={'liquid'}>
-                                        liquid
-                                    </option>
-                                </select>
-                                : <p className='py-3 ml-7 capitalize'>
-                                    {product.type}
-                                </p>
-                            }
+                            <p className='py-3 ml-7 capitalize'>
+                                {product.type}
+                            </p>
+
 
 
                         </div>
@@ -416,26 +532,30 @@ function ProductDetails() {
                                 <span className='font-semibold'>LifeSpan: </span>
                             </div>
                             {(editStatus && author)
-                                ? <div>
-                                    <input
-                                        value={lifeSpan}
-                                        type="number"
-                                        onChange={(e) => setLifeSpan(e.target.value)}
-                                        className='py-3 ml-7 capitalize active:outline-none focus:outline-none w-[45px] inline-block' />
-                                    <select
-                                        value={time}
-                                        onChange={(e) => setTime(e.target.value)}
-                                        className='inline-block py-3 capitalize active:outline-none focus:outline-none w-max'
-                                    >
-                                        <option value={'year'}>years</option>
-                                        <option value={'month'}>months</option>
-                                        <option value={'day'}>days</option>
-                                        <option value={'hour'}>hours</option>
-                                    </select>
+                                ? <div className='py-3 ml-7 capitalize'>
+                                    <LifeSpanInput
+                                        refrigeratorInput={refrigeratorInput}
+                                        setRefrigeratorInput={setRefrigeratorInput}
+                                        pantryInput={pantryInput}
+                                        setPantryInput={setPantryInput}
+                                        freezerInput={freezerInput}
+                                        setFreezerInput={setFreezerInput}
+                                    />
                                 </div>
-                                : <p className='py-3 ml-7 capitalize'>
-                                    {product.lifeSpan.value}  {product.lifeSpan.time}s
-                                </p>
+                                : <div className='py-3 ml-7 capitalize'>
+                                    <p>Freezer:
+                                        <span className='ml-3 mr-2'>{product.lifeSpan.freezer.value ? product.lifeSpan.freezer.value : "Not Recommended"}</span>
+                                        {product.lifeSpan.freezer.time ? product.lifeSpan.freezer.time : ''}{product.lifeSpan.freezer.value > 1 ? 's' : ''}
+                                    </p>
+                                    <p>Refrigerator:
+                                        <span className='ml-3 mr-2'>{product.lifeSpan.refrigerator.value ? product.lifeSpan.refrigerator.value : "Not Recommended"}</span>
+                                        {product.lifeSpan.refrigerator.time ? product.lifeSpan.refrigerator.time : ''}{product.lifeSpan.freezer.value > 1 ? 's' : ''}
+                                    </p>
+                                    <p>Pantry:
+                                        <span className='ml-3 mr-2'>{product.lifeSpan.pantry.value ? product.lifeSpan.pantry.value : "Not Recommended"}</span>
+                                        {product.lifeSpan.pantry.time ? product.lifeSpan.pantry.time : ''}{product.lifeSpan.freezer.value > 1 ? 's' : ''}
+                                    </p>
+                                </div>
                             }
                         </div>
 

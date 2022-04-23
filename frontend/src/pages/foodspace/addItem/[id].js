@@ -96,7 +96,7 @@ function AddItemDetails() {
         show: false,
         value: "everyone"
     })
-    const [purchaseDate, setPurchaseDate] = useState(moment(new Date(Date.now())).format("YYYY-MM-DD"))
+    const [purchasedDate, setPurchasedDate] = useState(moment(new Date(Date.now())).format("YYYY-MM-DD"))
 
 
 
@@ -141,13 +141,12 @@ function AddItemDetails() {
             quantity,
             area: area.value,
             unit: unit.value,
-            purchaseDate,
+            purchasedDate,
             owner: ownerInput
         }
 
         const res = await addToFoodSpace(token, location.state.foodSpace, product, input)
         if (res.status === 200) {
-
             alert(`${toTitleCase(input.product.brand)} ${toTitleCase(input.product.name)} was added to ${toTitleCase(location.state.foodSpace.name)}.`)
             navigate(`/foodSpace/add-item`, {
                 state: {
@@ -312,10 +311,10 @@ function AddItemDetails() {
                     <label className='text-lg font-semibold'>Date Purchased</label>
                     <input
                         className='text-xl p-2 bg-white rounded-lg focus:outline-offset-1 focus:outline-sky-300 cursor-pointer'
-                        name="purchaseDate"
+                        name="purchasedDate"
                         type="date"
-                        value={purchaseDate}
-                        onChange={(e) => setPurchaseDate(e.target.value)}
+                        value={purchasedDate}
+                        onChange={(e) => setPurchasedDate(e.target.value)}
                     />
                 </div>
 

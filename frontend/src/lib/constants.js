@@ -1159,78 +1159,78 @@ export const shelfLife = {
 
 
 
-const items = `Mayonnaise/salad dressing
-Tomato/barbeque sauce
-Bottled fruit juice
-Canned fruit juice
-Soft drink`
+// const items = `Mayonnaise/salad dressing
+// Tomato/barbeque sauce
+// Bottled fruit juice
+// Canned fruit juice
+// Soft drink`
 
-const pantry = `null
-4 month
-1 week
-6 month
-6 month`
+// const pantry = `null
+// 4 month
+// 1 week
+// 6 month
+// 6 month`
 
-const fridge = `2 month
-4 month
-1 week
-null
-6 month`
+// const fridge = `2 month
+// 4 month
+// 1 week
+// null
+// 6 month`
 
-const freezer = `null
-null
-null
-null
-null`
+// const freezer = `null
+// null
+// null
+// null
+// null`
 
-const itemsArray = ['Mayonnaise/salad dressing', 'Tomato/barbeque sauce', 'Bottled fruit juice', 'Canned fruit juice', 'Soft drink']
-const pantryArray = ['null', '4 month', '1 week', '6 month', '6 month']
-const fridgeArray = ['2 month', '4 month', '1 week', 'null', '6 month']
-const freezerArray = ['null', 'null', 'null', 'null', 'null']
+// const itemsArray = ['Mayonnaise/salad dressing', 'Tomato/barbeque sauce', 'Bottled fruit juice', 'Canned fruit juice', 'Soft drink']
+// const pantryArray = ['null', '4 month', '1 week', '6 month', '6 month']
+// const fridgeArray = ['2 month', '4 month', '1 week', 'null', '6 month']
+// const freezerArray = ['null', 'null', 'null', 'null', 'null']
 
-console.log(items.split('\n'))
-console.log(pantry.split('\n'))
-console.log(fridge.split('\n'))
-console.log(freezer.split('\n'))
+// console.log(items.split('\n'))
+// console.log(pantry.split('\n'))
+// console.log(fridge.split('\n'))
+// console.log(freezer.split('\n'))
 
-const finalObject = {}
-for (const item of itemsArray) {
-    const index = itemsArray.findIndex((element) => element === item)
+// const finalObject = {}
+// for (const item of itemsArray) {
+//     const index = itemsArray.findIndex((element) => element === item)
 
-    // Pantry Date: ['4', 'year']
-    const pantryDate = pantryArray[index].split(' ')
-    const pantryObject = {
-        value: parseInt(pantryDate[0]),
-        time: pantryDate[1]
-    }
+//     // Pantry Date: ['4', 'year']
+//     const pantryDate = pantryArray[index].split(' ')
+//     const pantryObject = {
+//         value: parseInt(pantryDate[0]),
+//         time: pantryDate[1]
+//     }
 
-    // Fridge Date: ['5', 'day']
-    const fridgeDate = fridgeArray[index].split(' ')
-    const fridgeObject = {
-        value: parseInt(fridgeDate[0]),
-        time: fridgeDate[1]
-    }
+//     // Fridge Date: ['5', 'day']
+//     const fridgeDate = fridgeArray[index].split(' ')
+//     const fridgeObject = {
+//         value: parseInt(fridgeDate[0]),
+//         time: fridgeDate[1]
+//     }
 
-    // Freezer Date: ['2', 'year']
-    const freezerDate = freezerArray[index].split(' ')
-    const freezerObject = {
-        value: parseInt(freezerDate[0]),
-        time: freezerDate[1]
-    }
+//     // Freezer Date: ['2', 'year']
+//     const freezerDate = freezerArray[index].split(' ')
+//     const freezerObject = {
+//         value: parseInt(freezerDate[0]),
+//         time: freezerDate[1]
+//     }
 
-    finalObject[item] = {
-        pantry: {
-            ...pantryObject
-        },
-        refrigerator: {
-            ...fridgeObject
-        },
-        freezer: {
-            ...freezerObject
-        }
+//     finalObject[item] = {
+//         pantry: {
+//             ...pantryObject
+//         },
+//         refrigerator: {
+//             ...fridgeObject
+//         },
+//         freezer: {
+//             ...freezerObject
+//         }
 
-    }
+//     }
 
-}
+// }
 
-console.log(JSON.stringify(finalObject))
+// console.log(JSON.stringify(finalObject))

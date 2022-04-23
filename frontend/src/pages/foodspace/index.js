@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import moment from 'moment'
 
 // Redux
 import { useSelector } from 'react-redux'
@@ -29,16 +30,18 @@ import { FaTrashAlt, FaEdit, FaCheck, FaCrown, FaCog, FaRing } from 'react-icons
 import { BiFridge } from 'react-icons/bi'
 import { ImCross, ImSpoonKnife } from 'react-icons/im'
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from 'react-icons/ai'
-import { MdPeopleAlt } from 'react-icons/md'
+import { MdPeopleAlt, MdPersonPin, MdPerson } from 'react-icons/md'
+import { FiList, FiGrid } from 'react-icons/fi'
 
 // Utils
 import { toTitleCase } from '../../lib/utils'
 
 
-function Admin() {
+function FoodSpace() {
     const location = useLocation()
     const navigate = useNavigate()
     const [foodSpace, setFoodSpace] = useState(null)
+    const [stock, setStock] = useState(null)
     const [my_swiper, set_my_swiper] = useState({});
     const { user, token } = useSelector(state => state.auth)
     const [error, setError] = useState(false)
@@ -46,6 +49,7 @@ function Admin() {
     const [area, setArea] = useState("all")
     const [showModal, setShowModal] = useState(false)
     const [adminView, setAdminView] = useState(false)
+    const [stockView, setStockView] = useState('list')
 
 
     useEffect(() => {
@@ -60,6 +64,7 @@ function Admin() {
         }).then((res) => {
             if (res.status === 200) {
                 setFoodSpace(res.data.foodSpace)
+                setStock([...res.data.foodSpace.stock, ...res.data.foodSpace.expiredStock])
                 if (res.data.foodSpace.admin._id === user._id) {
                     setAdminView(true)
                 }
@@ -73,6 +78,7 @@ function Admin() {
         })
     }, [])
 
+    console.log(stock)
 
 
     async function handleRemoveItem(item) {
@@ -84,6 +90,7 @@ function Admin() {
                     method: "DELETE",
                     url: `${API.FOODSPACE.removeItem}`,
                     data: {
+                        expired: item.expired,
                         item_id: item._id,
                         foodSpace_id: foodSpace._id
                     },
@@ -91,8 +98,8 @@ function Admin() {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                const filteredStock = foodSpace.stock.filter((stock) => stock !== item)
-                setFoodSpace({ ...foodSpace, stock: filteredStock })
+                const filteredStock = stock.filter((stock) => stock !== item)
+                setStock([...filteredStock])
             } catch (error) {
                 const { message } = error.response.data
                 setError(message)
@@ -103,14 +110,14 @@ function Admin() {
 
     function areaSpecific() {
         if (area === "all") {
-            return foodSpace.stock
+            return stock
         } else {
-            return foodSpace.stock.filter((item) => item.area === area)
+            return stock.filter((item) => item.area === area)
         }
     }
 
     function stockNumber(item) {
-        return foodSpace.stock.findIndex((stock) => stock._id === item._id)
+        return stock.findIndex((stock) => stock._id === item._id)
     }
 
     async function handleDeleteFoodSpace() {
@@ -138,6 +145,22 @@ function Admin() {
     }
 
 
+    function generateExpirationSoon(item) {
+        const today = moment()
+        const type = foodSpace.type
+        const qty = item.product.lifeSpan[type].value
+        if (qty === null) {
+            return null
+        } else {
+            const time = item.product.lifeSpan[type].time
+            const expDate = moment(item.purchasedDate).add(qty, time)
+            const diff = expDate.diff(today, 'days')
+            const message = moment.duration(diff, "days").humanize(true)
+            return message
+        }
+
+    }
+
 
     if (isLoading) {
         return <div>Loading...</div>
@@ -148,12 +171,12 @@ function Admin() {
 
     }
     return (
-        <div className='min-h-screen mb-[4.2rem]'>
+        <div className='min-h-screen mb-[5rem]'>
 
             <UsersModal showModal={showModal} setShowModal={setShowModal} foodSpace={foodSpace} />
 
             {/* Header */}
-            <div className='border-b-2 p-7'>
+            <div className='p-7 border-b-2'>
 
                 <div className='pb-5 flex justify-between items-center'>
                     {/* FoodSpace Name, Users Modal */}
@@ -166,9 +189,9 @@ function Admin() {
                     {/* Admin Settings */}
                     {adminView &&
                         <Dropdown sx={'z-[50]'} button={<FaCog className='text-secondary text-2xl hover:text-neutral-600 cursor-pointer' />}>
-                            <DropdownItem onClick={() => navigate(`/foodSpace/admin/${foodSpace.name}/add-user`, { state: { prevPath: location.pathname, foodSpace } })} >
+                            <DropdownItem onClick={() => navigate(`/ foodSpace / admin / ${foodSpace.name} /add-user`, { state: { prevPath: location.pathname, foodSpace } })} >
                                 Add User
-                            </DropdownItem>
+                            </DropdownItem >
                             <DropdownItem onClick={() => navigate(`/foodSpace/admin/${foodSpace.name}/add-area`, { state: { prevPath: location.pathname, foodSpace } })} >
                                 Add Area
                             </DropdownItem>
@@ -178,39 +201,41 @@ function Admin() {
                             <DropdownItem onClick={handleDeleteFoodSpace}>
                                 Delete FoodSpace
                             </DropdownItem>
-                        </Dropdown>
+                        </Dropdown >
                     }
 
 
-                </div>
+                </div >
 
                 {/* Add Button */}
-                <div className='flex justify-between'>
+                < div className='flex justify-between' >
                     <Button onClick={() => navigate(`/foodSpace/add-item`, { state: { prevPath: location.pathname, foodSpace } })} sx={'w-[50%]'}>
                         Add Item
                     </Button>
 
                     <div>
-                        <p>{foodSpace.stock.length} items</p>
+                        <p>{foodSpace.expiredStock.length} items</p>
                     </div>
-                </div>
+                </div >
 
-            </div>
+            </div >
 
 
             {/* Areas */}
-            <Swiper
+            < Swiper
                 onInit={(ev) => {
                     set_my_swiper(ev)
-                }}
+                }
+                }
                 spaceBetween={5}
                 className="w-[100vw] "
                 slidesPerView={3}
                 // centeredSlides={true}
-                onSlideChange={(swiper) => setArea(foodSpace.areas[swiper.activeIndex])}
+                onSlideChange={(swiper) => setArea(foodSpace.areas[swiper.activeIndex])
+                }
             >
                 {/* DEFAULT: ALL */}
-                <SwiperSlide className='text-center my-5'>
+                < SwiperSlide className='text-center my-5' >
                     <span
                         onClick={() => {
                             my_swiper.slideTo(0);
@@ -219,7 +244,7 @@ function Admin() {
                         className={`${"all" === area ? 'text-main border-b-2 border-b-primary-500 ' : 'text-secondary'}   font-semibold capitalize cursor-pointer `}>
                         All
                     </span>
-                </SwiperSlide>
+                </SwiperSlide >
 
                 {/* AREA */}
                 {foodSpace.areas.map((item, idx) => (
@@ -233,83 +258,179 @@ function Admin() {
                             {item}
                         </span>
                     </SwiperSlide>
-                ))}
-            </Swiper>
+                ))
+                }
+            </Swiper >
 
 
             {/* Stock */}
-            <div className='mx-5'>
-                {areaSpecific().length > 0
-                    ? areaSpecific().map((item, idx) => (
-                        <div key={`${idx}-${idx}`} className="flex space-x-3">
-                            <Swiper
-                                initialSlide={0}
-                                slidesPerView={"auto"}
-                                className="w-full "
-                            >
-                                <SwiperSlide className='w-[80vw] pb-5 px-1.5 cursor-pointer'>
-                                    <Link
-                                        to={`/foodSpace/${foodSpace.name}/item/${stockNumber(item) + 1}`}
-                                        state={{
-                                            prevPath: location.pathname,
-                                            foodSpace
-                                        }}>
-                                        <div className='p-5 bg-white  rounded-xl drop-shadow-lg flex w-full justify-between items-center'>
-                                            <div className='flex items-center space-x-3'>
+            < div className='mx-5' >
 
+                {/* Stock Length, Grid or List Buttons */}
+                < div className='p-2 flex justify-between items-center' >
+                    {(areaSpecific().length > 0) &&
+                        <>
+                            {/* Stock Length */}
+                            <span className=''>
+                                {areaSpecific().length} item{areaSpecific().length === 1 ? '' : 's'}
+                            </span>
+
+                            {/* Grid View */}
+                            <div className='rounded-lg border-2 overflow-hidden'>
+                                <button className={`p-2 border-r-2 ${stockView === 'grid' ? 'bg-primary-200' : 'bg-white text-secondary'}`} onClick={() => setStockView('grid')}>
+                                    <FiGrid className='inline-block text-lg ' />
+                                </button>
+                                <button className={`p-2 ${stockView === 'list' ? 'bg-primary-200' : 'bg-white text-secondary'}`} onClick={() => setStockView('list')}>
+                                    <FiList className='inline-block text-lg' />
+                                </button>
+                            </div>
+                        </>
+                    }
+                </div >
+
+                {(areaSpecific().length > 0) &&
+                    // List View
+                    <>
+                        {stockView === "list" && (
+                            <div className='flex flex-col space-y-3'>
+                                {areaSpecific().map((item, idx) => (
+                                    <Swiper
+                                        key={`list-${item._id}-${idx}`}
+                                        initialSlide={0}
+                                        slidesPerView={"auto"}
+                                        className=" w-full drop-shadow-lg min-h-full "
+                                    >
+                                        <SwiperSlide className={`w-[80vw]  px-1.5 cursor-pointer`}>
+                                            <Link
+                                                to={`/foodSpace/${foodSpace.name}/item/${stockNumber(item) + 1}`}
+                                                state={{
+                                                    prevPath: location.pathname,
+                                                    product: item,
+                                                    foodSpace
+                                                }}>
                                                 <span className='text-xs absolute top-4 left-4 text-secondary'>#{stockNumber(item) + 1}</span>
-                                                {/* Image */}
-                                                <Avatar
-                                                    emoji={item.product.image}
-                                                    size="sm"
-                                                />
 
-                                                {/* Name */}
-                                                <div className={`${item.owner ? 'border-r-2 pr-4' : ''}`}>
-                                                    <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
-                                                    <p className='text-main capitalize'>{item.product.name}</p>
-                                                    {/* Qty */}
-                                                    <p>{item.quantity} <span className='text-secondary'>{item.product.unit}</span></p>
-                                                </div>
+                                                <div className={`${item.expired ? 'border-4 border-red-500 bg-white' : 'bg-white'}  p-5 rounded-xl flex w-full justify-between items-center`}>
+                                                    <div className='flex items-center space-x-3'>
 
-                                                {/* Owner */}
-                                                {item.owner &&
-                                                    <div className='text-center ml-4'>
-                                                        <span className='text-xs text-secondary mb-1 block'>Owner </span>
+                                                        {/* Image */}
                                                         <Avatar
-                                                            bg={item.owner.avatar.favoriteColor}
-                                                            emoji={item.owner.avatar.emoji}
-                                                            size="xs"
+                                                            emoji={item.product.image}
+                                                            size="sm"
                                                         />
-                                                        {/* First and Last Initial */}
-                                                        <span className='text-xs text-secondary mb-1 block'>
-                                                            {toTitleCase(item.owner.first_name)} {toTitleCase(item.owner.last_name[0])}.
-                                                        </span>
+
+                                                        {/* Name */}
+                                                        <div className={``}>
+                                                            <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
+                                                            <p className='text-main capitalize'>{item.product.name}</p>
+                                                            {/* Qty */}
+                                                            <p>{item.quantity} <span className='text-secondary'>{item.unit}</span></p>
+                                                        </div>
+
+                                                        {/* Owner */}
+                                                        {item.owner &&
+                                                            <div className='text-center ml-4 border-l-2 pl-4'>
+                                                                <span className='text-xs text-secondary mb-1 block'><MdPerson className='inline-block mb-0.5 mr-0.5' />Owner</span>
+                                                                {/* First and Last Initial */}
+                                                                <span className='text-xs text-secondary mb-1 block'>
+                                                                    {toTitleCase(item.owner.first_name)} {toTitleCase(item.owner.last_name[0])}.
+                                                                </span>
+                                                            </div>
+                                                        }
                                                     </div>
-                                                }
+
+                                                    {/* Expired */}
+                                                    <div className='text-center text-sm'>
+                                                        {generateExpirationSoon(item) === null
+                                                            ? <>
+                                                                <p>Not Recommended</p>
+                                                                <p>in FoodSpace</p>
+                                                            </>
+                                                            : <>
+                                                                <p>{item.expired ? 'Expired' : 'Expires'}</p>
+                                                                <p>{generateExpirationSoon(item)}</p>
+                                                            </>
+                                                        }
+
+                                                    </div>
+
+                                                </div>
+                                            </Link>
+                                        </SwiperSlide>
+
+                                        <SwiperSlide className='max-w-max '>
+                                            <div onClick={() => handleRemoveItem(item)} className={`bg-red-500 cursor-pointer flex flex-col justify-center items-center rounded-xl  space-y-1 h-[105px] w-[15vw] `}>
+                                                <FaTrashAlt className='text-white inline-block text-[2rem] ' />
+                                                <span className='text-white text-sm'>Delete</span>
                                             </div>
+                                        </SwiperSlide>
+                                    </Swiper>
 
-                                            {/* Expired */}
-                                            <p>{item.expired ? "expired" : "Expires in 2 days"}</p>
-                                        </div>
-                                    </Link>
-                                </SwiperSlide>
+                                ))}
+                            </div>
+                        )}
 
-                                <SwiperSlide className='text-left max-w-max  pb-5 px-1.5 flex '>
-                                    <div onClick={() => handleRemoveItem(item)} className={`bg-red-600 cursor-pointer rounded-xl drop-shadow-lg flex flex-col justify-center items-center space-y-1 h-full w-[15vw] `}>
-                                        <FaTrashAlt className='text-white inline-block text-[2rem] ' />
-                                        <span className='text-white text-sm'>Delete</span>
-                                    </div>
+                        {/* Grid View */}
+                        {stockView === "grid" && (
+                            <div className='grid grid-cols-3 gap-4 px-1.5'>
+                                {areaSpecific().map((item, idx) => (
+                                    <Swiper
+                                        key={`grid-${item._id}-${idx}`}
+                                        initialSlide={0}
+                                        slidesPerView={1}
+                                        className="overflow-hidden w-full drop-shadow-lg truncate"
+                                    >
+                                        <SwiperSlide className='w-full cursor-pointer '>
+                                            <Link
+                                                to={`/foodSpace/${foodSpace.name}/item/${stockNumber(item) + 1}`}
+                                                state={{
+                                                    prevPath: location.pathname,
+                                                    foodSpace
+                                                }}>
+                                                <div className={`${item.expired ? 'border-4 border-red-500' : ''} p-5 bg-white  rounded-xl  flex justify-between items-center w-full`}>
+                                                    <span className='text-xs absolute top-4 right-4 text-secondary'>#{stockNumber(item) + 1}</span>
 
-                                </SwiperSlide>
+                                                    <div className='flex items-center space-x-3 '>
+                                                        {/* Name */}
+                                                        <div className={`${item.owner ? 'border-r-2 pr-4' : ''} `}>
+                                                            <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
+                                                            <p className='text-main capitalize '>
+                                                                {item.product.name.length > 12
+                                                                    ? `${item.product.name.substring(0, 9)}...`
+                                                                    : `${item.product.name}`
+                                                                }
+                                                            </p>
+                                                            {/* Qty */}
+                                                            <p>{item.quantity} <span className='text-secondary'>{item.unit}</span></p>
+                                                        </div>
+                                                    </div>
 
+                                                    {item.owner &&
+                                                        <MdPersonPin className='absolute bottom-4 right-4 text-secondary' />
+                                                    }
+                                                </div>
+                                            </Link>
+                                        </SwiperSlide>
 
-                            </Swiper>
+                                        <SwiperSlide>
+                                            <div onClick={() => handleRemoveItem(item)} className={`bg-red-500 cursor-pointer rounded-xl flex flex-col justify-center items-center space-y-1 h-full mx-auto w-[95%] `}>
+                                                <FaTrashAlt className='text-white inline-block text-[2rem] ' />
+                                                <span className='text-white text-sm'>Delete</span>
+                                            </div>
+                                        </SwiperSlide>
+                                    </Swiper>
 
+                                ))}
+                            </div>
+                        )}
 
-                        </div>
-                    ))
-                    : <div className='flex justify-center items-center h-[30vh] '>
+                    </>
+
+                }
+
+                {/* No Items */}
+                {(areaSpecific().length === 0) &&
+                    <div className='flex justify-center items-center h-[30vh] '>
                         <h1 className='text-secondary text-2xl'>
                             Empty Space
                             <FaRing className='inline-block mb-1 ml-3' />
@@ -318,9 +439,10 @@ function Admin() {
                     </div>
                 }
 
-            </div>
+
+            </div >
         </div >
     )
 }
 
-export default Admin
+export default FoodSpace

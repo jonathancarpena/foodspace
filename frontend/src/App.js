@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 
 // Redux
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearAuth } from './redux/features/auth/authSlice';
 
 // Router
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -40,11 +41,16 @@ import ChooseFoodSpace from './pages/foodspace/chooseFoodSpace';
 function App() {
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useDispatch()
   const auth = useSelector(state => state.auth)
 
   useEffect(() => {
     if (auth.user && location.pathname === '/') {
       navigate('/account/dashboard')
+    }
+    if (!auth.user && auth.ready) {
+      dispatch(clearAuth())
+      navigate('/')
     }
   }, [auth])
   return (

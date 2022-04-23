@@ -1,8 +1,12 @@
+// Models
 import User from '../models/User.js'
 import FoodSpace from '../models/FoodSpace.js'
 import Product from '../models/Product.js'
 
+// Moment
+import moment from 'moment'
 
+// Auth
 import jwt from 'jsonwebtoken'
 import { genSalt, hash, compare } from 'bcrypt'
 import dotenv from "dotenv"
@@ -113,10 +117,71 @@ export const login = async (req, res) => {
 }
 
 
+function checkForExpiredStock(foodSpace) {
+    console.log('CHECK EXP: ', foodSpace.name)
+    const expiredStock = []
+
+    // Check FoodSpace Type
+    const type = foodSpace.type
+
+    for (const item of foodSpace.stock) {
+
+        let updatedItem = item
+        // Calculate Life Span based on Type
+        const qty = updatedItem.product.lifeSpan[type].value
+        const time = updatedItem.product.lifeSpan[type].time
+        const expDate = moment(updatedItem.purchasedDate).add(qty, time)
+
+        const today = moment()
+        if (qty !== null) {
+            const diff = expDate.diff(today, 'days')
+
+            if (diff < 0) {
+                updatedItem.expired = true
+                expiredStock.push(updatedItem)
+            }
+        }
+
+    }
+
+    return expiredStock
+}
 export const me = async (req, res) => {
     console.log('FETCHING ME')
     try {
+        // Grab User
         const user = await User.findById(req.user._id)
+
+        // Check Expired Stock 
+        for (const item of user.admin) {
+            let foodSpace = await FoodSpace.findById(item._id)
+            const expiredStock = checkForExpiredStock(foodSpace)
+            if (expiredStock.length > 0) {
+                console.log('MOVING EXP ITEMS')
+
+                // Remove Expired Items from Stock
+                const filteredStock = foodSpace.stock.filter((item) => !expiredStock.includes(item));
+
+                // Update Users expiredStock
+                const admin = await User.findById(foodSpace.admin._id)
+                let adminFoodSpaceToUpdate = admin.admin.find((item) => item._id.toString() === foodSpace._id.toString())
+                adminFoodSpaceToUpdate.expiredStock.push(...expiredStock)
+                await admin.save()
+                for (const user of foodSpace.users) {
+                    const currentUser = await User.findById(user._id)
+                    let foodSpaceToUpdate = currentUser.foodSpaces.find((item) => item._id.toString() === foodSpace._id.toString())
+                    foodSpaceToUpdate.expiredStock.push(...expiredStock)
+                    await currentUser.save()
+                }
+
+                // Add Expired Items to Expired Stock
+                foodSpace.expiredStock.push(...expiredStock)
+                foodSpace.stock = [...filteredStock]
+                await foodSpace.save()
+
+            }
+        }
+
         return res.status(200).json({
             user
         })
