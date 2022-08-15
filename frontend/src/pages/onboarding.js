@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,7 +35,7 @@ function OnBoarding() {
         if (auth.ready || !auth.user.email) {
             navigate('/')
         }
-    }, [auth])
+    }, [auth, navigate])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -56,7 +55,7 @@ function OnBoarding() {
 
 
     return (
-        <section className='bg-[#F7F6F3]  h-screen relative flex flex-col justify-center items-center'>
+        <section className='bg-[#F7F6F3]  h-[90vh] relative flex flex-col justify-center items-center'>
 
             <AvatarModal showModal={showModal} setShowModal={setShowModal} handleComplete={handleComplete} />
             <div className=' mx-[5rem] flex flex-col space-y-6'>
@@ -195,7 +194,7 @@ function OnBoarding() {
             </div>
 
             {/* Image */}
-            <img src={img} className='absolute h-[160px] left-3 bottom-3 grayscale contrast-150 z-20' />
+            <img alt="onboarding" src={img} className='fixed h-[160px] left-3 bottom-3 grayscale contrast-150 z-20' />
         </section>
     )
 }

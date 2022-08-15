@@ -16,21 +16,21 @@ const reviewsData = [
     {
         img: image1,
         company: 'MatchFood',
-        message: 'Notion is a workspace that adapts to your needs. It’s as minimal or as powerful as you need it to be.',
+        message: 'FoodSpace is a food management system that adapts to your needs. It’s as minimal or as powerful as you need it to be.',
         name: 'John Smith',
         position: 'Director of Product'
     },
     {
         img: image2,
         company: 'StomachSpace',
-        message: 'Notion continues to be the easiest way to get information centralized somewhere and shout it out to someone else. For us, that’s extremely important because half our team is remote.',
+        message: 'FoodSpace continues to be the easiest way to get your groceries centralized somewhere and shout it out to someone else. For us, that’s extremely important because our family is always hungry.',
         name: 'Kate Smith',
         position: 'Co-founder and Head of Engineering'
     },
     {
         img: image3,
         company: 'Figs',
-        message: 'Notion’s ease of use is one of its hallmarks. It helps you visually navigate content and remember where something is.',
+        message: 'FoodSpace ease of use is one of its hallmarks. It helps you visually navigate your food spaces and remember where something is.',
         name: 'Alex Smith',
         position: 'Head of People Ops'
     },
@@ -55,7 +55,7 @@ const Review = ({ content }) => {
 
             <div className='flex space-x-3'>
                 {/* Avatar */}
-                <img src={img} className='w-[55px] grayscale contrast-200' />
+                <img alt='avatar' src={img} className='w-[55px] grayscale contrast-200' />
 
                 {/* Name and Position */}
                 <div>
@@ -74,7 +74,7 @@ function Reviews() {
             {/* Heading */}
             <div className='flex flex-col'>
                 {/* Image */}
-                <img src={main} className='grayscale contrast-150' />
+                <img alt='main' src={main} className='grayscale contrast-150' />
 
                 <div>
                     {/* Heading */}

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // Router
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 // Redux
 import { useSelector } from 'react-redux'
@@ -10,24 +10,20 @@ import { useSelector } from 'react-redux'
 // Urls
 import { API } from '../../lib/urls'
 
-// Utils
-import { toTitleCase, convertToMs } from '../../lib/utils'
-
 // Constants
-import { unitMeasure, emojiDictionary, shelfLife } from '../../lib/constants'
+import { emojiDictionary, shelfLife } from '../../lib/constants'
 
 // Icons
-import { BiArrowBack } from 'react-icons/bi'
 import { MdDocumentScanner, MdCancel } from 'react-icons/md'
-import { BsCameraFill, BsUpcScan } from 'react-icons/bs'
+import { BsCameraFill } from 'react-icons/bs'
 import { FaCheck, FaRegEdit, FaHashtag, FaCaretDown, FaCaretUp } from 'react-icons/fa'
 
 // Components
 import Button from '../../components/Button'
-import Tooltip from '../../components/Tooltip'
 import Modal from '../../components/Modal'
 import Dropdown, { DropdownItem } from '../../components/Dropdown'
-import BarcodeScannerComponent from "react-qr-barcode-scanner"
+import Loading from '../../components/Layout/Loading'
+
 const ImageSearch = ({ setImage, setShowModal }) => {
     const [search, setSearch] = useState('')
     const [results, setResults] = useState([])
@@ -68,9 +64,12 @@ const ImageSearch = ({ setImage, setShowModal }) => {
     }, [search])
 
     return (
-        <div className='pb-10 w-[70vw] mx-auto '>
+        <div className='pb-10 w-[90%] mx-auto cursor-default '>
 
+            {/* Search Input & User Select */}
             <div className='flex justify-between items-center'>
+
+                {/* Search Input */}
                 <div className='relative mt-8 mb-4 inline-block'>
                     <span className='absolute -top-4 left-1 text-secondary text-xs'>Search</span>
                     <input
@@ -83,10 +82,10 @@ const ImageSearch = ({ setImage, setShowModal }) => {
 
                 {userClick &&
                     <div className=''>
-                        <span className='text-2xl border-b-2 border-b-primary-500 pb-1 mr-1'>{userClick}</span>
+                        <span className='text-2xl mr-1'>{userClick}</span>
                         <FaCheck
                             onClick={handleSaveUserClick}
-                            className='inline-block text-xl text-main ml-1 hover:text-primary-500'
+                            className='inline-block text-xl text-main ml-1 hover:text-primary-500 cursor-pointer'
                         />
                     </div>
                 }
@@ -94,55 +93,56 @@ const ImageSearch = ({ setImage, setShowModal }) => {
             </div>
 
 
+            {/* Search Input */}
             {search &&
-                <div>
+                <div className='h-[275px]  flex flex-col   bg-neutral-100 rounded-xl overflow-hidden'>
                     {results
-                        ? <ul className='h-[300px] w-full flex flex-col overflow-y-scroll p-8 bg-neutral-200 rounded-xl'>
+                        ? <ul className='overflow-y-scroll'>
                             {results.map((item, idx) => (
                                 <li
                                     key={item.emoji}
                                     onClick={() => setUserClick(item.emoji)}
-                                    className={`${userClick === item.emoji ? "bg-neutral-400" : ""} py-2 text-3xl border-t-2 border-t-neutral-300 w-full flex items-center space-x-4 `}>
+                                    className={`${userClick === item.emoji ? "bg-primary-500 text-white" : ""} px-4 cursor-pointer py-4 text-3xl last:border-b-0 border-b-2 border-b-neutral-300 w-full flex items-center space-x-4 `}>
                                     <span>{item.emoji}</span>
                                     <span className='capitalize text-base'>{item.key}</span>
                                 </li>
                             ))}
                         </ul>
-                        : <p>No Results</p>
+                        : <p className='h-[275px] w-full flex flex-col overflow-y-scroll p-8 bg-neutral-100 rounded-xl'>No Results</p>
 
                     }
                 </div>
             }
 
+            {/*No Search Input */}
             {!search &&
-                <div>
-                    <ul className='w-full flex flex-col items-evenly  flex-wrap h-[300px] overflow-x-scroll p-8 bg-neutral-200 rounded-xl '>
-                        {Object.keys(emojiDictionary).map((item, idx) => {
-                            let uniqueEmoji = true
+                <ul className='w-full  flex flex-col items-evenly  justify-center flex-wrap h-[275px] overflow-x-scroll p-8 bg-neutral-100 rounded-xl '>
+                    {Object.keys(emojiDictionary).map((item, idx) => {
+                        let uniqueEmoji = true
 
-                            if (idx !== 0) {
-                                let prevEmoji = emojiDictionary[Object.keys(emojiDictionary)[idx - 1]]
-                                if (emojiDictionary[item] === prevEmoji) {
-                                    uniqueEmoji = false
-                                }
+                        if (idx !== 0) {
+                            let prevEmoji = emojiDictionary[Object.keys(emojiDictionary)[idx - 1]]
+                            if (emojiDictionary[item] === prevEmoji) {
+                                uniqueEmoji = false
                             }
+                        }
 
-                            if (uniqueEmoji) {
-                                return (
-                                    <React.Fragment key={item}>
-                                        <Tooltip message={item} size="sm">
-                                            <li
-                                                onClick={() => setUserClick(emojiDictionary[item])}
-                                                className={`text-3xl mx-1 ${userClick === emojiDictionary[item] ? 'bg-neutral-400 p-2 rounded-full' : 'p-2'}`}>
-                                                {emojiDictionary[item]}
-                                            </li>
-                                        </Tooltip>
-                                    </React.Fragment>
-                                )
-                            }
-                        })}
-                    </ul>
-                </div>
+                        if (uniqueEmoji) {
+                            return (
+
+
+                                <li key={item}
+                                    onClick={() => setUserClick(emojiDictionary[item])}
+                                    className={`text-3xl mx-1 ${userClick === emojiDictionary[item] ? 'bg-primary-500 p-2 rounded-full' : 'p-2'} cursor-pointer`}>
+                                    {emojiDictionary[item]}
+                                </li>
+
+                            )
+                        } else {
+                            return <></>
+                        }
+                    })}
+                </ul>
             }
 
 
@@ -150,30 +150,8 @@ const ImageSearch = ({ setImage, setShowModal }) => {
         </div>
     )
 }
-const BarcodeScanModal = ({ setScan, setBarcode }) => {
-    const barcodeScannerComponentHandleUpdate = (error, result) => {
-        if (result) {
-            setBarcode(result.text);
-            window.navigator.vibrate(100);
-            setScan(false);
-        }
-    };
-    return (
-        <div className='h-[350px] relative '>
-            <div className="w-[80%] h-12 mx-auto mt-7 ">
-                <BarcodeScannerComponent
-                    onUpdate={barcodeScannerComponentHandleUpdate}
-                />
-            </div>
-
-        </div>
-
-    )
-}
 
 
-
-const defaultPantryInput = ["fruits and vegetables", "canned and bottled goods", "grain, flour and wheat products", "fat products"]
 const defaultRefrigeratorInput = ["general meat products", "fish products", "poultry and other products", "dairy products"]
 
 function Create() {
@@ -182,6 +160,7 @@ function Create() {
     const { user, token } = useSelector(state => state.auth)
     const [products, setProducts] = useState([])
     const [brandSearch, setBrandSearch] = useState([])
+    const [loading, setLoading] = useState(false)
 
     // Form
     const [name, setName] = useState('')
@@ -209,16 +188,14 @@ function Create() {
 
     // Modals
     const [showModal, setShowModal] = useState(false)
-    const [scan, setScan] = useState(false);
-
 
     useEffect(() => {
         if (location.state) {
-            if (location.state.name) {
+            if (location.state.name && !name) {
                 setName(location.state.name)
             }
         }
-    }, [])
+    }, [location.state, name])
 
 
     // Gets ALl Products from Database
@@ -228,9 +205,14 @@ function Create() {
             if (productDb) {
                 setProducts(productDb.data)
             }
+            setLoading(false)
         }
-        fetchProductData()
-    }, [])
+        if (!products) {
+            setLoading(true)
+            fetchProductData()
+        }
+
+    }, [products])
 
 
     // Suggested Brands
@@ -265,20 +247,8 @@ function Create() {
 
 
 
-    }, [brand])
+    }, [brand, products])
 
-    // refrigerator: {
-    //     value: 1,
-    //     time: 'week'
-    // },
-    // freezer: {
-    //     value: 1,
-    //     time: 'year'
-    // },
-    // pantry: {
-    //     value: 1,
-    //     time: 'day'
-    // },
 
     function generateDefaultLifeSpan() {
         let lifeSpan = {
@@ -297,7 +267,7 @@ function Create() {
         }
         const defaultLifeSpan = shelfLife[type.value][category.value][subCategory.value]
         for (const key in lifeSpan) {
-            if (lifeSpan[key].value === NaN || lifeSpan[key].value === 0) {
+            if (lifeSpan[key].value.isNan() || lifeSpan[key].value === 0) {
                 lifeSpan[key] = defaultLifeSpan[key]
             }
         }
@@ -346,6 +316,7 @@ function Create() {
                         avatar: user.avatar
                     }
                 }
+                setLoading(true)
                 const res = await axios({
                     method: "POST",
                     url: `${API.PRODUCT.create}`,
@@ -355,8 +326,8 @@ function Create() {
                     }
                 })
 
-
                 if (res.status === 200) {
+                    setLoading(false)
                     navigate('/')
                 }
             }
@@ -455,16 +426,12 @@ function Create() {
         }
     }
 
+
+    if (loading) {
+        return <Loading />
+    }
     return (
-        <div className='min-h-screen p-7 flex flex-col justify-center items-center mb-[4.2rem]'>
-
-            {/* Back Button */}
-            <Link to={`/foodSpace/`} state={location.state}>
-                <span className=''>
-                    <BiArrowBack className=' fixed top-6 left-6 inline-block text-[1rem] text-main mr-1 mb-1' />
-                </span>
-            </Link>
-
+        <div className='min-h-screen pt-20 p-7 flex flex-col justify-center items-center mb-[5rem]'>
 
             <form onSubmit={handleSubmit} className="flex flex-col space-y-5 min-w-[350px] max-w-[350px] ">
 
@@ -475,11 +442,11 @@ function Create() {
                     if (!showModal) {
                         setShowModal(true)
                     }
-                }} className={`cursor-pointer `}>
+                }} className={`cursor-pointer w-max mx-auto`}>
                     {image
                         ? <>
-                            <div className='w-max bg-neutral-300 rounded-full ring-4 ring-white drop-shadow-lg mx-auto relative'>
-                                <FaRegEdit className='absolute text-neutral-500 -right-6 text-xl' />
+                            <div className='w-[90px] h-[90px] bg-neutral-300 rounded-full ring-4 ring-white drop-shadow-lg mx-auto relative flex justify-center items-center'>
+                                <FaRegEdit className='absolute text-neutral-500 -right-6 text-xl top-0' />
                                 <span className='fill-white text-[40px] inline-block p-4' >{image}</span>
                             </div>
                         </>
@@ -801,17 +768,10 @@ function Create() {
                         </div>
                         {barcode
                             ? <MdCancel onClick={() => setBarcode(null)} className='inline-block  fill-neutral-400 hover:fill-neutral-500  text-lg cursor-pointer' />
-                            : <MdDocumentScanner onClick={() => setScan(true)} className='inline-block  fill-neutral-500  text-xl cursor-pointer' />
+                            : <MdDocumentScanner onClick={() => alert('Feature is not supported yet.')} className='inline-block  fill-neutral-500  text-xl cursor-pointer' />
                         }
 
                     </div>
-
-                    <Modal
-                        showModal={scan}
-                        setShowModal={setScan}
-                        header="Scan the Barcode"
-                        content={<BarcodeScanModal setScan={setScan} setBarcode={setBarcode} />}
-                    />
 
                 </div>
 

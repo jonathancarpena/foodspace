@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // Router
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 // Redux
 import { useSelector } from 'react-redux'
@@ -10,11 +10,6 @@ import { useSelector } from 'react-redux'
 // Urls
 import { API } from '../../lib/urls'
 
-// Utils
-import { toTitleCase, convertToMs } from '../../lib/utils'
-
-// Constants
-import { unitMeasure, emojiDictionary } from '../../lib/constants'
 
 // Icons
 import { BsSearch } from 'react-icons/bs'
@@ -22,7 +17,7 @@ import { MdCancel } from 'react-icons/md'
 import { FaAngleRight, FaRegClock, FaPlusCircle, FaTrashAlt } from 'react-icons/fa'
 
 // Swiper Components
-import { Swiper, SwiperSlide, useSwiperSlide, useSwiper } from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
@@ -85,11 +80,9 @@ function MyFood() {
     useEffect(() => {
         if (user.myProducts) {
             setMyProducts(user.myProducts)
-        } else {
-            setMyProducts(null)
         }
 
-    }, [])
+    }, [user.myProducts])
 
 
     // Shows search Results
@@ -125,7 +118,7 @@ function MyFood() {
         } else {
             setSearchResults(null)
         }
-    }, [search])
+    }, [search, myProducts])
 
 
     async function handleRemoveItem(item) {

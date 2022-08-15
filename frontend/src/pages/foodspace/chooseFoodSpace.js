@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux'
 import Dropdown, { DropdownItem } from '../../components/Dropdown'
 
 // Icons
-import { BiFridge } from 'react-icons/bi'
 import { FaCaretDown, FaCaretUp, FaCrown } from 'react-icons/fa'
 import Button from '../../components/Button'
 import axios from 'axios'
@@ -39,7 +38,7 @@ function ChooseFoodSpace() {
         }
 
 
-    }, [])
+    }, [navigate, user.admin.length, user.foodSpaces.length])
 
     function handleSelectChange(item) {
         setSelected(item)

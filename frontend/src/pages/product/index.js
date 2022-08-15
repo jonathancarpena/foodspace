@@ -11,9 +11,11 @@ import { API } from '../../lib/urls'
 import { BsSearch } from 'react-icons/bs'
 import { MdCancel } from 'react-icons/md'
 import { FaAngleRight, FaRegClock, FaPlusCircle, FaPlusSquare } from 'react-icons/fa'
-import Tooltip from '../../components/Tooltip'
 
 // Components
+import Loading from '../../components/Layout/Loading'
+import Error from '../../components/Layout/Error'
+
 export const ProductDisplay = ({ data }) => {
     return (
         <ul className='flex flex-col space-y-2'>
@@ -41,28 +43,7 @@ export const ProductDisplay = ({ data }) => {
     )
 }
 
-const LoadingContainer = () => {
-    return (
-        <div className=" drop-shadow-md rounded-md p-4 mx-7 bg-white ">
-            <div className="animate-pulse flex space-x-4">
-                {/* Circle */}
-                <div className="rounded-full bg-neutral-200 h-10 w-10"></div>
 
-                {/* Lines */}
-                <div className="flex-1 space-y-3 py-1">
-                    <div className="h-2 bg-neutral-300 rounded"></div>
-                    <div className="space-y-3">
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                            <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                        </div>
-                        <div className="h-2 bg-neutral-300 rounded"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
 function Products() {
     const [isLoading, setIsLoading] = useState(true)
     const [products, setProducts] = useState([])
@@ -121,7 +102,7 @@ function Products() {
         } else {
             setSearchResults(null)
         }
-    }, [search])
+    }, [search, products])
 
 
     function handleSortChange(e) {
@@ -164,17 +145,12 @@ function Products() {
 
     }
 
-    if (errors) {
-        <div>
-            <h1>Oops there was an error</h1>
-        </div>
-    }
+    if (errors) return <Error />
 
     return (
         <div className='min-h-screen pb-20'>
-
             {/* Search */}
-            <div className='p-7 flex flex-col space-y-1 '>
+            <div className='pt-7 px-5 pb-5 flex flex-col space-y-1 '>
                 <label htmlFor="search" className="text-2xl font-semibold">Search</label>
                 <div className='relative w-max'>
                     <BsSearch htmlFor="search" className='absolute fill-secondary top-[50%] -translate-y-[50%] left-2' />
@@ -194,9 +170,9 @@ function Products() {
                         to={`/product/create`}
                         state={{ name: search, prevPath: location.pathname }}
                     >
-                        <Tooltip message={"Create an Item"}>
-                            <FaPlusSquare className='inline-block ml-1 text-lg text-primary-500 cursor-pointer' />
-                        </Tooltip>
+
+                        <FaPlusSquare className='inline-block ml-1 text-lg text-primary-500 cursor-pointer' />
+
 
                     </Link>
                 </div>
@@ -214,19 +190,7 @@ function Products() {
             </div>
 
             {/* Loading Animation */}
-            {isLoading &&
-                <>
-                    <div className='flex flex-col space-y-2'>
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                    </div>
-
-                </>
-            }
+            {isLoading && <Loading />}
 
 
             {/* Products Display */}

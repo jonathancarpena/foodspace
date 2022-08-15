@@ -12,26 +12,22 @@ import { useDispatch, useSelector } from 'react-redux'
 import { API } from '../../../lib/urls'
 
 // Icons
-import { MdCancel, MdError } from 'react-icons/md'
 import { BiArrowBack, BiFridge } from 'react-icons/bi'
 import { RiErrorWarningFill } from 'react-icons/ri'
-import { FaPlusCircle, FaTimes, FaCheckCircle, FaSpinner } from 'react-icons/fa'
-import { FiPlusCircle, FiDelete, FiAlertCircle } from 'react-icons/fi'
+import { FaCheckCircle, FaSpinner } from 'react-icons/fa'
+import { FiPlusCircle, FiDelete } from 'react-icons/fi'
 
 // Components 
 import Button from '../../../components/Button'
-import Tooltip from '../../../components/Tooltip'
-
 
 function AddUser() {
   const navigate = useNavigate()
   const { name } = useParams()
   const location = useLocation()
   const dispatch = useDispatch()
-  const { user, token } = useSelector(state => state.auth)
+  const { token } = useSelector(state => state.auth)
   const [areas, setAreas] = useState([{ value: '', edit: true, status: null, error: null }])
   const [isLoading, setIsLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [error, setError] = useState()
 
 
@@ -45,7 +41,7 @@ function AddUser() {
       })
     }
 
-  }, [])
+  }, [location.pathname, location.state, navigate])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -76,7 +72,7 @@ function AddUser() {
         }
       } catch (error) {
         const { message } = error.response.data
-        setError(error)
+        setError(message)
         setIsLoading(false)
 
       }
@@ -116,7 +112,6 @@ function AddUser() {
 
     if (!isLoading && !error) {
       dispatch(refreshMe())
-      setSuccess(true)
       navigate(`/`)
       console.log('SUCCESS')
     }
@@ -254,8 +249,6 @@ function AddUser() {
           </h2>
         </div>
 
-
-
         <ul className='flex flex-col space-y-5 items-center'>
           {areas.map((item, idx) => (
             <div className='relative' key={`user-field-${idx}`}>
@@ -278,20 +271,20 @@ function AddUser() {
 
               {/* Error */}
               {(areas[idx].status === "error") &&
-                <Tooltip message="User Doesn't Exist">
-                  <span>
-                    <RiErrorWarningFill className="absolute -top-3.5 -right-3.5 inline-block text-red-600" />
-                  </span>
-                </Tooltip>
+
+                <span>
+                  <RiErrorWarningFill className="absolute -top-3.5 -right-3.5 inline-block text-red-600" />
+                </span>
+
               }
 
               {/* Success */}
               {(areas[idx].status === "success") &&
-                <Tooltip message="User Exist">
-                  <span>
-                    <FaCheckCircle className=" absolute -top-3.5 -right-3.5 inline-block text-green-600" />
-                  </span>
-                </Tooltip>
+
+                <span>
+                  <FaCheckCircle className=" absolute -top-3.5 -right-3.5 inline-block text-green-600" />
+                </span>
+
               }
 
               {/* Add Area Button */}

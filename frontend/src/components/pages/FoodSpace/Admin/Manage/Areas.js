@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 
 // Router
-import { Link, useLocation, useParams, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 
 // Redux
 import { refreshMe } from '../../../../../redux/features/auth/authSlice'
@@ -13,26 +13,26 @@ import { API } from '../../../../../lib/urls'
 
 // Icons
 import { FiTrash, FiPlusCircle } from 'react-icons/fi'
-import { BiArrowBack, BiFridge, BiCategory } from 'react-icons/bi'
+import { BiCategory } from 'react-icons/bi'
 
 // Components
 import Avatar from '../../../../../components/pages/Account/Avatar'
-
+import Loading from '../../../../../components/Layout/Loading'
 
 function Areas({ foodSpace }) {
     const { name } = useParams()
     const location = useLocation()
-    const navigate = useNavigate()
     const dispatch = useDispatch()
     const { token } = useSelector(state => state.auth)
     const [areas, setAreas] = useState([...foodSpace.areas])
     const [isLoading, setIsLoading] = useState(false)
-    const [errors, setErrors] = useState(null)
+
 
 
     async function handleRemove(area) {
         const userConfirm = window.confirm(`Are you sure you want to remove ${area} from the FoodSpace?`)
         if (userConfirm) {
+            setIsLoading(true)
             const res = await axios({
                 method: "DELETE",
                 url: `${API.ADMIN.removeUser}`,
@@ -47,6 +47,7 @@ function Areas({ foodSpace }) {
 
             if (res.status === 200) {
                 const updatedUsers = areas.filter((item) => item._id !== area._id)
+                setIsLoading(false)
                 dispatch(refreshMe())
                 setAreas([...updatedUsers])
             }
@@ -58,11 +59,7 @@ function Areas({ foodSpace }) {
 
 
     if (isLoading || !foodSpace) {
-        return (
-            <div>
-                <h1>Loading...</h1>
-            </div>
-        )
+        return <Loading />
     }
     return (
         <div className="">

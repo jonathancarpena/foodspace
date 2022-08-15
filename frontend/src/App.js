@@ -11,6 +11,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Landing from './pages/landing';
 import Login from './pages/login'
+import Contact from './pages/contact'
 import SignUp from './pages/signup';
 import OnBoarding from './pages/onboarding';
 import Products from './pages/product'
@@ -28,7 +29,7 @@ import CreateFoodSpace from './pages/foodspace/create'
 import FoodSpace from './pages/foodspace'
 import AddItem from './pages/foodspace/addItem'
 import AddItemDetails from './pages/foodspace/addItem/[id]'
-import Notifcations from './pages/account/notifications'
+import Tasks from './pages/account/tasks'
 import FoodSpaceItem from './pages/foodspace/item'
 
 // Admin Pages
@@ -52,13 +53,16 @@ function App() {
       dispatch(clearAuth())
       navigate('/')
     }
-  }, [auth])
+  }, [auth, dispatch, location.pathname, navigate])
   return (
     <Layout>
       <Routes>
 
         {/* Landing Page */}
         <Route exact path='/' element={<Landing />} />
+
+        {/* Contact */}
+        <Route exact path='/contact' element={<Contact />} />
 
         {/* Account Page */}
         <Route exact path='/account/' element={<Account />} />
@@ -69,8 +73,8 @@ function App() {
         {/* Delete Account */}
         <Route exact path='/account/manage/delete' element={<DeleteAccount />} />
 
-        {/* Notifications Page */}
-        <Route exact path='/account/notifications' element={<Notifcations />} />
+        {/* Tasks Page */}
+        <Route exact path='/account/tasks' element={<Tasks />} />
 
         {/* Dashboard Page */}
         <Route exact path='/account/dashboard' element={<Dashboard />} />

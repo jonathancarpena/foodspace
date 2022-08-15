@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-
 // Router
 import { Link, useLocation } from "react-router-dom";
 
 // Components
-import { Transition } from "@tailwindui/react";
 import TransitionOpacity from '../Transition/TransitionOpacity'
 
 // Icons
@@ -24,10 +21,10 @@ function AddModal({ showModal, setShowModal }) {
                 <>
                     <div className={`fixed inset-0 overflow-x-hidden overflow-y-auto z-[100] `}>
 
-                        <div className="fixed bottom-5 px-5 pb-3 pt-3 flex justify-evenly items-center  left-[50%] -translate-x-[50%]">
+                        <div className="fixed bottom-[1.15rem] px-5 pb-3.5 pt-3 flex justify-evenly items-center  left-[50%] -translate-x-[50%]">
 
                             {/* Close Modal */}
-                            <span className="bg-primary-500 rounded-full -mt-2.5 ">
+                            <span className="bg-primary-500 rounded-full -mt-2.5 w-[50px] h-[50px] flex items-center justify-center">
                                 <FaTimes onClick={() => setShowModal(false)} className='  inline-block text-[2.5rem] p-2 fill-white cursor-pointer' />
                             </span>
 

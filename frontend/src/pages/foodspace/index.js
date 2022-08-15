@@ -6,31 +6,31 @@ import moment from 'moment'
 import { useSelector } from 'react-redux'
 
 // Router
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 // Urls
 import { API } from '../../lib/urls'
 
 // Components
 import UsersModal from '../../components/pages/FoodSpace/UsersModal'
-import Tooltip from '../../components/Tooltip'
 import Button from '../../components/Button'
 import Avatar from '../../components/pages/Account/Avatar'
 import Dropdown, { DropdownItem } from '../../components/Dropdown'
+import Loading from '../../components/Layout/Loading'
+import Error from '../../components/Layout/Error'
 
 
 // Import Swiper React components
-import { Swiper, SwiperSlide, useSwiperSlide, useSwiper } from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
 
 // Icons
-import { FaTrashAlt, FaEdit, FaCheck, FaCrown, FaCog, FaRing } from 'react-icons/fa'
+import { FaTrashAlt, FaCog, FaRing } from 'react-icons/fa'
 import { BiFridge } from 'react-icons/bi'
-import { ImCross, ImSpoonKnife } from 'react-icons/im'
-import { AiOutlineMinusCircle, AiOutlinePlusCircle } from 'react-icons/ai'
-import { MdPeopleAlt, MdPersonPin, MdPerson } from 'react-icons/md'
+import { ImSpoonKnife } from 'react-icons/im'
+import { MdPeopleAlt, MdPerson } from 'react-icons/md'
 import { FiList, FiGrid } from 'react-icons/fi'
 
 // Utils
@@ -45,7 +45,7 @@ function FoodSpace() {
     const [my_swiper, set_my_swiper] = useState({});
     const { user, token } = useSelector(state => state.auth)
     const [error, setError] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const [area, setArea] = useState("all")
     const [showModal, setShowModal] = useState(false)
     const [adminView, setAdminView] = useState(false)
@@ -53,33 +53,36 @@ function FoodSpace() {
 
 
     useEffect(() => {
-        setError(false)
-        setIsLoading(true)
-        axios({
-            method: "GET",
-            url: `${API.ADMIN.base}/${location.state.foodSpace._id}`,
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then((res) => {
-            if (res.status === 200) {
-                setFoodSpace(res.data.foodSpace)
-                setStock([...res.data.foodSpace.stock, ...res.data.foodSpace.expiredStock])
-                if (res.data.foodSpace.admin._id === user._id) {
-                    setAdminView(true)
+
+        if (location.state) {
+            setError(false)
+            setIsLoading(true)
+            axios({
+                method: "GET",
+                url: `${API.ADMIN.base}/${location.state.foodSpace_id || location.state.foodSpace._id}`,
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            }
-            setIsLoading(false)
-        }).catch((err) => {
-            console.log(err)
-            const { message } = err.response.data
-            setError(message)
-            setIsLoading(false)
-        })
-    }, [])
+            }).then((res) => {
+                if (res.status === 200) {
+                    setFoodSpace(res.data.foodSpace)
+                    setStock([...res.data.foodSpace.stock, ...res.data.foodSpace.expiredStock])
+                    if (res.data.foodSpace.admin._id === user._id) {
+                        setAdminView(true)
+                    }
+                }
+                setIsLoading(false)
+            }).catch((err) => {
+                console.log(err)
+                const { message } = err.response.data
+                setError(message)
+                setIsLoading(false)
+            })
+        } else {
+            setError(true)
+        }
 
-    console.log(stock)
-
+    }, [location.state, token, user._id])
 
     async function handleRemoveItem(item) {
         const userConfirm = window.confirm(`Would you like to remove ${toTitleCase(item.product.brand)} ${toTitleCase(item.product.name)}?`)
@@ -98,8 +101,11 @@ function FoodSpace() {
                         Authorization: `Bearer ${token}`
                     }
                 })
-                const filteredStock = stock.filter((stock) => stock !== item)
-                setStock([...filteredStock])
+                if (res.status === 200) {
+                    const filteredStock = stock.filter((stock) => stock !== item)
+                    setStock([...filteredStock])
+                }
+
             } catch (error) {
                 const { message } = error.response.data
                 setError(message)
@@ -140,6 +146,7 @@ function FoodSpace() {
 
             } catch (error) {
                 const { message } = error.response.data
+                setError(message)
             }
         }
     }
@@ -163,15 +170,15 @@ function FoodSpace() {
 
 
     if (isLoading) {
-        return <div>Loading...</div>
+        return <Loading />
     }
 
     if (!foodSpace || error) {
-        return <div> {error} </div>
+        return <Error />
 
     }
     return (
-        <div className='min-h-screen mb-[5rem]'>
+        <div className='min-h-screen mb-[6rem]'>
 
             <UsersModal showModal={showModal} setShowModal={setShowModal} foodSpace={foodSpace} />
 
@@ -189,12 +196,6 @@ function FoodSpace() {
                     {/* Admin Settings */}
                     {adminView &&
                         <Dropdown sx={'z-[50]'} button={<FaCog className='text-secondary text-2xl hover:text-neutral-600 cursor-pointer' />}>
-                            <DropdownItem onClick={() => navigate(`/ foodSpace / admin / ${foodSpace.name} /add-user`, { state: { prevPath: location.pathname, foodSpace } })} >
-                                Add User
-                            </DropdownItem >
-                            <DropdownItem onClick={() => navigate(`/foodSpace/admin/${foodSpace.name}/add-area`, { state: { prevPath: location.pathname, foodSpace } })} >
-                                Add Area
-                            </DropdownItem>
                             <DropdownItem onClick={() => navigate(`/foodSpace/admin/${foodSpace.name}/manage`, { state: { prevPath: location.pathname, foodSpace } })} >
                                 Manage FoodSpace
                             </DropdownItem>
@@ -213,9 +214,8 @@ function FoodSpace() {
                         Add Item
                     </Button>
 
-                    <div>
-                        <p>{foodSpace.expiredStock.length} items</p>
-                    </div>
+                    {foodSpace.expiredStock.length > 0 && <p className='text-sm'>{foodSpace.expiredStock.length} expired item(s)</p>}
+
                 </div >
 
             </div >
@@ -228,9 +228,7 @@ function FoodSpace() {
                 }
                 }
                 spaceBetween={5}
-                className="w-[100vw] "
                 slidesPerView={3}
-                // centeredSlides={true}
                 onSlideChange={(swiper) => setArea(foodSpace.areas[swiper.activeIndex])
                 }
             >
@@ -241,7 +239,7 @@ function FoodSpace() {
                             my_swiper.slideTo(0);
                             setArea("all")
                         }}
-                        className={`${"all" === area ? 'text-main border-b-2 border-b-primary-500 ' : 'text-secondary'}   font-semibold capitalize cursor-pointer `}>
+                        className={`${"all" === area ? 'text-main border-b-2 border-b-primary-500 ' : 'text-secondary'}   select-none font-semibold capitalize cursor-pointer `}>
                         All
                     </span>
                 </SwiperSlide >
@@ -340,11 +338,11 @@ function FoodSpace() {
                                                     </div>
 
                                                     {/* Expired */}
-                                                    <div className='text-center text-sm'>
+                                                    <div className='text-center text-xs'>
                                                         {generateExpirationSoon(item) === null
                                                             ? <>
-                                                                <p>Not Recommended</p>
-                                                                <p>in FoodSpace</p>
+                                                                <p className='text-xs'>Not Recommended</p>
+                                                                <p className='text-xs'>in FoodSpace</p>
                                                             </>
                                                             : <>
                                                                 <p>{item.expired ? 'Expired' : 'Expires'}</p>
@@ -372,7 +370,7 @@ function FoodSpace() {
 
                         {/* Grid View */}
                         {stockView === "grid" && (
-                            <div className='grid grid-cols-3 gap-4 px-1.5'>
+                            <div className='grid grid-cols-2 gap-2 px-1.5'>
                                 {areaSpecific().map((item, idx) => (
                                     <Swiper
                                         key={`grid-${item._id}-${idx}`}
@@ -392,11 +390,11 @@ function FoodSpace() {
 
                                                     <div className='flex items-center space-x-3 '>
                                                         {/* Name */}
-                                                        <div className={`${item.owner ? 'border-r-2 pr-4' : ''} `}>
+                                                        <div >
                                                             <p className='text-secondary text-xs capitalize'>{item.product.brand}</p>
                                                             <p className='text-main capitalize '>
-                                                                {item.product.name.length > 12
-                                                                    ? `${item.product.name.substring(0, 9)}...`
+                                                                {item.product.name.length > 14
+                                                                    ? `${item.product.name.substring(0, 14)}...`
                                                                     : `${item.product.name}`
                                                                 }
                                                             </p>
@@ -405,9 +403,7 @@ function FoodSpace() {
                                                         </div>
                                                     </div>
 
-                                                    {item.owner &&
-                                                        <MdPersonPin className='absolute bottom-4 right-4 text-secondary' />
-                                                    }
+
                                                 </div>
                                             </Link>
                                         </SwiperSlide>

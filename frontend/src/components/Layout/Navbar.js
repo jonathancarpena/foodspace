@@ -12,9 +12,9 @@ import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
 
 // Constants
 const navLinks = [
-    { placeholder: 'About', link: '' },
-    { placeholder: 'Products', link: '' },
-    { placeholder: 'Contact', link: '' },
+    { placeholder: 'Home', link: '/' },
+    { placeholder: 'Our Products', link: '/product' },
+    { placeholder: 'Contact', link: '/contact' },
 ]
 
 function Navbar() {
@@ -25,6 +25,7 @@ function Navbar() {
         setScroll(window.scrollY)
     }
 
+
     useEffect(() => {
         window.addEventListener('scroll', handleScroll)
         return () => {
@@ -33,11 +34,11 @@ function Navbar() {
     }, [])
 
     return (
-        <nav className={`bg-white fixed top-0 z-[100] w-screen `}>
+        <nav className={`bg-white fixed min-w-[410px] max-w-[410px] top-0 w-full z-[100]  `}>
 
-            <div className={`flex w-[88%] items-center ${scroll > 50 && 'border-b-[1px]'} mx-5`}  >
+            <div className={`flex  items-center ${scroll > 50 && 'border-b-[1px]'} mx-5`}  >
                 {/* Branding */}
-                <Link to='/'>
+                <Link onClick={() => setOpenMenu(false)} to='/'>
                     <div className=''>
                         {/* Icon */}
                         <BiFridge className='inline-block text-4xl mb-1' />
@@ -53,7 +54,7 @@ function Navbar() {
                 {/* Login & Hamburger */}
                 <div className='ml-auto py-2.5 '>
                     {/* Login */}
-                    <Link to='/signup'>
+                    <Link onClick={() => setOpenMenu(false)} to='/signup'>
                         <Button size='sm'>
                             Try FoodSpace Free
                         </Button>
@@ -73,7 +74,7 @@ function Navbar() {
 
             {/* Mobile Menu */}
             {openMenu && <>
-                <div className='bg-white absolute top-16 w-screen h-screen px-5'>
+                <div className='bg-white absolute  top-16 w-full h-screen  px-5'>
 
                     {/* Links */}
                     <ul className='flex flex-col'>
@@ -83,24 +84,26 @@ function Navbar() {
                                 lastChild = true
                             }
                             return (
-                                <li key={item.placeholder} className={`p-3.5 cursor-pointer ${lastChild ? 'border-y-[1px]' : 'border-t-[1px]'}`}>
-                                    <Link to={`/`}>
+                                <Link onClick={() => setOpenMenu(false)} key={item.placeholder} to={`${item.link}`}>
+                                    <li className={`p-3.5 cursor-pointer ${lastChild ? 'border-y-[1px]' : 'border-t-[1px]'}`}>
+
                                         <span className=' text-base font-semibold'>{item.placeholder}</span>
-                                    </Link>
-                                </li>
+
+                                    </li>
+                                </Link>
                             )
                         })}
                     </ul>
 
                     {/* Login/Join Buttons */}
                     <div className='flex flex-col jusitfy-center items-center mt-5 space-y-4'>
-                        <Link to='/signup' className='w-full'>
+                        <Link onClick={() => setOpenMenu(false)} to='/signup' className='w-full'>
                             <Button size='md' sx='w-full'>
                                 Try FoodSpace free
                             </Button>
                         </Link>
 
-                        <Link to='/login' className='w-full'>
+                        <Link onClick={() => setOpenMenu(false)} to='/login' className='w-full'>
                             <Button size='md' variant='outline' sx='w-full'>
                                 Log in
                             </Button>

@@ -156,8 +156,10 @@ export const me = async (req, res) => {
         for (const item of user.admin) {
             let foodSpace = await FoodSpace.findById(item._id)
             const expiredStock = checkForExpiredStock(foodSpace)
+
             if (expiredStock.length > 0) {
                 console.log('MOVING EXP ITEMS')
+
 
                 // Remove Expired Items from Stock
                 const filteredStock = foodSpace.stock.filter((item) => !expiredStock.includes(item));
@@ -176,6 +178,7 @@ export const me = async (req, res) => {
 
                 // Add Expired Items to Expired Stock
                 foodSpace.expiredStock.push(...expiredStock)
+
                 foodSpace.stock = [...filteredStock]
                 await foodSpace.save()
 

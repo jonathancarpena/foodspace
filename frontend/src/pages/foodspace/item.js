@@ -14,11 +14,13 @@ import { API } from '../../lib/urls'
 import { unitMeasure } from '../../lib/constants'
 
 // Utils
-import { convertToValidDate, toTitleCase } from '../../lib/utils'
+import { toTitleCase } from '../../lib/utils'
 
 // Components
 import Dropdown, { DropdownItem } from '../../components/Dropdown'
 import Avatar from '../../components/pages/Account/Avatar'
+import Loading from '../../components/Layout/Loading'
+import Error from '../../components/Layout/Error'
 
 // Icons
 import { BiArrowBack, BiCheck } from 'react-icons/bi'
@@ -31,73 +33,69 @@ function FoodSpaceItem() {
     const location = useLocation()
     const navigate = useNavigate()
     const [item, setItem] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState(null)
-    const [quantity, setQuantity] = useState(1)
-    const [unit, setUnit] = useState({
-        show: false,
-        value: null
-    })
-    const [area, setArea] = useState({
-        show: false,
-        value: null
-    })
-    const [owner, setOwner] = useState({
-        show: false,
-        value: "everyone"
-    })
+    const [quantity, setQuantity] = useState(0)
+    const [unit, setUnit] = useState(null)
+    const [area, setArea] = useState(null)
+    const [owner, setOwner] = useState(null)
     const [purchasedDate, setPurchasedDate] = useState(null)
 
     useEffect(() => {
         if (!location.state) {
             navigate('/')
         }
-        const foodSpace = location.state.foodSpace
-        let stockItem;
-        // Find Item in Stock
-        if (location.state.product.expired) {
-            for (const item of foodSpace.expiredStock) {
-                if (item._id === location.state.product._id) {
-                    stockItem = item
+
+        if (!item && !quantity && !unit && !area && !owner && !purchasedDate) {
+            const foodSpace = location.state.foodSpace
+            let stockItem;
+            // Find Item in Stock
+            if (location.state.product.expired) {
+                for (const item of foodSpace.expiredStock) {
+                    if (item._id === location.state.product._id) {
+                        stockItem = item
+                    }
+                }
+            } else {
+                for (const item of foodSpace.stock) {
+                    if (item._id === location.state.product._id) {
+                        stockItem = item
+                    }
                 }
             }
-        } else {
-            for (const item of foodSpace.stock) {
-                if (item._id === location.state.product._id) {
-                    stockItem = item
+
+            if (stockItem.owner) {
+                if (foodSpace.admin.email !== user.email) {
+                    if (stockItem.owner.email !== user.email) {
+                        alert(`Only ${stockItem.owner.first_name} ${stockItem.owner.last_name[0]}. can make changes to this item.`)
+                        navigate(`${location.state.prevPath}`, { state: { foodSpace: location.state.foodSpace } })
+                    }
                 }
+
             }
+            setItem(stockItem)
+            setQuantity(stockItem.quantity)
+            setUnit({ ...unit, value: stockItem.unit })
+            setArea({ ...area, value: stockItem.area })
+            setOwner({ ...owner, value: stockItem.owner ? stockItem.owner.first_name : "everyone" })
+            setPurchasedDate(stockItem.purchasedDate)
         }
 
-        if (stockItem.owner) {
-            if (foodSpace.admin.email !== user.email) {
-                if (stockItem.owner.email !== user.email) {
-                    alert(`Only ${stockItem.owner.first_name} ${stockItem.owner.last_name[0]}. can make changes to this item.`)
-                    navigate(`${location.state.prevPath}`, { state: { foodSpace: location.state.foodSpace } })
-                }
-            }
-
-        }
-
-        setItem(stockItem)
-        setQuantity(stockItem.quantity)
-        setUnit({ ...unit, value: stockItem.unit })
-        setArea({ ...area, value: stockItem.area })
-        setOwner({ ...owner, value: stockItem.owner ? stockItem.owner.first_name : "everyone" })
-        setPurchasedDate(stockItem.purchasedDate)
 
 
-    }, [])
-    console.log(item)
+    }, [area, location.state, navigate, owner, unit, user.email, item, purchasedDate, quantity])
+
     async function handleEditSubmit(e) {
         e.preventDefault()
         const foodSpace = location.state.foodSpace
 
+
         let itemOwner = null;
         if (owner.value !== "everyone") {
+
             let sameOwner = false;
             let newOwner;
-            if (item.owner.first_name === owner.value) {
+            if (!item.owner || item.owner.first_name === owner.value) {
                 sameOwner = item.owner
                 itemOwner = item.owner
             }
@@ -111,7 +109,7 @@ function FoodSpaceItem() {
             }
         }
 
-        const convertedDate = moment(purchasedDate, "YYYY-MM-DD").toString()
+
 
         const data = {
             item_id: item._id,
@@ -120,7 +118,7 @@ function FoodSpaceItem() {
                 area: area.value,
                 quantity,
                 unit: unit.value,
-                purchasedDate: convertedDate
+                purchasedDate: moment(purchasedDate).format("YYYY-MM-DD")
             },
             expired: item.expired,
             foodSpace_id: foodSpace._id
@@ -128,6 +126,7 @@ function FoodSpaceItem() {
 
 
         try {
+
             const res = await axios({
                 method: "POST",
                 url: `${API.FOODSPACE.updateItem}`,
@@ -136,12 +135,15 @@ function FoodSpaceItem() {
                     Authorization: `Bearer ${token}`
                 }
             })
-            if (res.status = 200) {
+            setIsLoading(true)
+            if (res.status === 200) {
+                setIsLoading(false)
                 alert(`Updated item #${stockNum}`)
                 navigate(`/foodSpace/${name}`, { state: { foodSpace: location.state.foodSpace } })
             }
 
         } catch (error) {
+            setErrors(true)
             console.log(error)
             const { message } = error.response.data
             alert(message)
@@ -186,13 +188,17 @@ function FoodSpaceItem() {
 
 
 
-    if (!item || !location.state) {
-        return <h1>Loading...</h1>
+    if (!item || !location.state || isLoading) {
+        return <Loading />
+    }
+
+    if (errors) {
+        return <Error />
     }
     return (
         <div className='min-h-screen bg-white overflow-visible mb-[4.2rem]'>
 
-            <div className='bg-white fixed pt-6 pb-3 w-full text-center z-[50]'>
+            <div className='bg-white fixed pt-6 pb-3 w-[390px] text-center z-[50]'>
                 {/* Back Button */}
                 <Link to={`/foodSpace/${location.state.foodSpace.name}`} state={location.state}>
                     <span className=''>
@@ -244,7 +250,7 @@ function FoodSpaceItem() {
 
 
             {/* Form */}
-            <form onSubmit={handleEditSubmit} className="mt-7 flex flex-col space-y-7 w-[80%] mx-auto">
+            <form onSubmit={handleEditSubmit} className="mt-7 flex flex-col space-y-7  mx-5">
                 {/* Quantity */}
                 <div className='flex justify-between'>
                     <label className='text-lg font-semibold'>Quantity</label>

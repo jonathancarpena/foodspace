@@ -1,8 +1,5 @@
 import React from 'react'
 
-// Icons
-import { FaCrown } from 'react-icons/fa'
-
 // Components
 import Modal from '../../Modal'
 import Avatar from '../Account/Avatar'

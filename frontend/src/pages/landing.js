@@ -10,7 +10,7 @@ import CallToAction from '../components/pages/Landing/CallToAction'
 
 function Home() {
     return (
-        <div className="bg-white px-7 ">
+        <div className="bg-white px-7 w-full">
             <Hero />
             <Purpose />
             <Instructions />
@@ -21,3 +21,9 @@ function Home() {
 }
 
 export default Home
+
+
+// Keep Track
+// Never ask what in the fridge
+// Reduce waste
+

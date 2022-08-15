@@ -10,7 +10,6 @@ import { useSelector, useDispatch } from 'react-redux'
 
 // Components
 import Avatar from '../../components/pages/Account/Avatar'
-import Button from '../../components/Button'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -41,7 +40,7 @@ function Dashboard() {
         } else {
             navigate('/')
         }
-    }, [])
+    })
 
     useEffect(() => {
         const allExpStock = []
@@ -121,12 +120,13 @@ function Dashboard() {
     }
 
 
+
     if (!ready) {
         return (<div>Not a User</div>)
     }
 
     return (
-        <div className='flex flex-col space-y-5 min-h-screen pb-20'>
+        <div className='flex flex-col space-y-5 min-h-screen mb-[6rem]'>
 
 
             <div className='flex px-7 pt-5 pb-2.5 items-center justify-between'>
@@ -175,17 +175,17 @@ function Dashboard() {
                     </span>
                 </h1>
 
-                <Swiper spaceBetween={20} watchSlidesProgress={true} >
-                    {expStock &&
+                <Swiper spaceBetween={0} slidesPerView={2.3} className='w-[380px]'>
+                    {expStock.length > 0 &&
                         expStock.map((item, idx) => (
-                            <SwiperSlide key={`${item.info.name}-${idx}`} className='max-w-max '>
+                            <SwiperSlide key={`${item.info.name}-${idx}`} className=''>
                                 <Link
                                     key={item.name}
                                     to={`/foodSpace/${item.foodSpace.name}`}
                                     state={{ foodSpace: { _id: item.foodSpace._id } }}>
                                     <div className={` cursor-pointer bg-primary-50 capitalize rounded-xl  flex flex-col space-y-3 justify-evenly h-[150px] w-[150px] drop-shadow-lg mt-4 mb-2 p-3`}>
                                         <div className='flex text-secondary '>
-                                            <BiFridge className='inline-block mr-1  text-lg' />
+                                            <BiFridge className='inline-block mt-0.5 mr-1  text-lg' />
                                             <div className='flex flex-col'>
                                                 <span className=' text-xs'>
                                                     {item.foodSpace.name}
@@ -272,11 +272,11 @@ function Dashboard() {
 
 
                                         {/* FoodSpace Name */}
-                                        <p className='font-semibold tracking-tighter text-3xl'>{item.name}</p>
+                                        <p className='font-semibold tracking-tighter text-3xl'>{item.name.length > 12 ? item.name.substring(0, 11) + '...' : item.name}</p>
                                     </div>
 
                                     {/* FoodSpace Image */}
-                                    <BiFridge className='text-[12rem]  text-main absolute right-8 bottom-[-3rem]' />
+                                    <BiFridge className='text-[10rem]  text-main absolute right-0 bottom-[-3rem]' />
 
                                 </div>
                             </Link>
@@ -325,11 +325,11 @@ function Dashboard() {
 
 
                                         {/* FoodSpace Name */}
-                                        <p className='font-semibold tracking-tighter text-3xl'>{item.name}</p>
+                                        <p className='font-semibold tracking-tighter text-3xl'>{item.name.length > 12 ? item.name.substring(0, 11) + '...' : item.name}</p>
                                     </div>
 
                                     {/* FoodSpace Image */}
-                                    <BiFridge className='text-[12rem]  text-main absolute right-8 bottom-[-3rem]' />
+                                    <BiFridge className='text-[10rem]  text-main absolute right-0 bottom-[-3rem]' />
 
                                 </div>
                             </Link>

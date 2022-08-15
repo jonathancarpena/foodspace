@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
-import moment from 'moment'
 
 // Router 
-import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 
 // Redux
 import { refreshMe } from '../../redux/features/auth/authSlice'
@@ -15,16 +14,16 @@ import { API } from '../../lib/urls'
 // Icons
 import { MdCancel } from 'react-icons/md'
 import { BiArrowBack, BiFridge } from 'react-icons/bi'
-import { FaPlusCircle, FaTimes, FaSpinner } from 'react-icons/fa'
+import { FaSpinner } from 'react-icons/fa'
 import { FiPlusCircle, FiDelete } from 'react-icons/fi'
-import { BsSun } from 'react-icons/bs'
+
 
 // Components 
 import Button from '../../components/Button'
+import Loading from '../../components/Layout/Loading'
 
 
 function Create() {
-    const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
     const { user, token } = useSelector(state => state.auth)
@@ -122,6 +121,8 @@ function Create() {
         prevPath = '/'
         state = null
     }
+
+    if (isLoading) return <Loading />
 
     return (
         <div className='min-h-screen p-7 flex flex-col justify-center items-center '>

@@ -11,7 +11,7 @@ import Button from '../../../components/Button'
 
 function CallToAction() {
     return (
-        <section className='text-center border-y-2 py-16'>
+        <section className='text-center border-t-2 py-16'>
 
             {/* Brand Icon */}
             <BiFridge className='block mx-auto text-6xl bg-white drop-shadow-lg rounded-xl   ' />
@@ -24,7 +24,7 @@ function CallToAction() {
             {/* Subheading */}
             <div className='text-secondary mb-4'>
                 <p>Get started for free.</p>
-                <p>Add your whole team as your needs grow.</p>
+                <p>Add your whole Family as your groceries grow.</p>
             </div>
 
             {/* Call to Action */}
@@ -36,9 +36,9 @@ function CallToAction() {
 
             {/* Link to Contact */}
             <span className='block text-secondary'>
-                Have lots of tummys?
+                Have any questions?
                 <span className='border-b-[1px] border-secondary ml-1 hover:text-primary-500 hover:border-b-0 cursor-pointer '>
-                    Contact sales
+                    Contact Us
                 </span>
             </span>
 

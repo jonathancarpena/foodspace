@@ -36,49 +36,11 @@ import {
 // Components
 import Dropdown, { DropdownItem } from '../../components/Dropdown'
 import Avatar from '../../components/pages/Account/Avatar'
-import Modal from '../../components/Modal'
-import BarcodeScannerComponent from "react-qr-barcode-scanner"
-const LoadingContainer = () => {
-    return (
-        <div className=" rounded-md p-4 bg-white ">
-            <div className="animate-pulse flex flex-col space-y-4">
 
-                <div className="h-4 w-[150px] bg-neutral-300 rounded"></div>
+import Loading from '../../components/Layout/Loading'
+import Error from '../../components/Layout/Error'
 
-                {/* Lines */}
-                <div className="flex-1 space-y-3 py-1">
-                    <div className="h-2 bg-neutral-300 rounded"></div>
-                    <div className="space-y-3">
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="h-2 bg-neutral-300 rounded col-span-2"></div>
-                            <div className="h-2 bg-neutral-300 rounded col-span-1"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-const BarcodeScanModal = ({ setScan, setBarcode }) => {
-    const barcodeScannerComponentHandleUpdate = (error, result) => {
-        if (result) {
-            setBarcode(result.text);
-            window.navigator.vibrate(100);
-            setScan(false);
-        }
-    };
-    return (
-        <div className='h-[350px] relative '>
-            <div className="w-[80%] h-12 mx-auto mt-7 ">
-                <BarcodeScannerComponent
-                    onUpdate={barcodeScannerComponentHandleUpdate}
-                />
-            </div>
 
-        </div>
-
-    )
-}
 const LifeSpanInput = ({ refrigeratorInput, setRefrigeratorInput, pantryInput, setPantryInput, freezerInput, setFreezerInput }) => {
     return (
         <>
@@ -209,7 +171,6 @@ function ProductDetails() {
     const [name, setName] = useState(null)
     const [brand, setBrand] = useState(null)
     const [barcode, setBarcode] = useState(null)
-    const [scan, setScan] = useState(false)
 
     // Life Span
     const [refrigeratorInput, setRefrigeratorInput] = useState({ value: 0, time: { show: false, value: 'week' } })
@@ -221,7 +182,7 @@ function ProductDetails() {
         setIsLoading(true)
         axios.get(`${API.PRODUCT.base}/${id}`)
             .then((res) => {
-                if (res.status == 200) {
+                if (res.status === 200) {
                     console.log(res.data)
                     console.log(res.data.author._id === user._id)
                     if (res.data.author._id === user._id) {
@@ -239,7 +200,7 @@ function ProductDetails() {
                 setIsLoading(false)
             })
             .catch((err) => setErrors(err))
-    }, [])
+    }, [id, user._id])
 
     function generateDefaultLifeSpan() {
         let lifeSpan = {
@@ -321,134 +282,87 @@ function ProductDetails() {
         }
     }
 
-    if (errors) {
-        return <h1>Error...</h1>
-    }
+    if (errors) return <Error />
 
+    if (isLoading) return <Loading />
 
     return (
-        <div className='min-h-screen bg-white overflow-visible mb-[4.2rem]'>
-
-            {location.state
-                ? <>
-                    {(location.state.prevPath.includes('/product') && location.state.prevPath !== '/product/me') &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                All Products
-                            </span>
-                        </Link>
-                    }
+        <div className='relative min-h-screen bg-white overflow-visible mb-[4.2rem]'>
 
 
-                    {(location.state.prevPath.includes('/account') || location.state.prevPath.includes('/foodSpace')) &&
-                        <Link to={"/"}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                Home
-                            </span>
-                        </Link>
-                    }
+            <Link to={"/product"}>
+                <span className='absolute top-6 left-6'>
+                    <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
+                    All Products
+                </span>
+            </Link>
 
-                    {location.state.prevPath === '/product/me' &&
-                        <Link to={location.state.prevPath}>
-                            <span className='fixed top-6 left-6'>
-                                <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                                My Foods
-                            </span>
-                        </Link>
-                    }
-                </>
-                : <Link to={"/product"}>
-                    <span className='fixed top-6 left-6'>
-                        <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
-                        All Products
-                    </span>
-                </Link>
-            }
 
 
 
             {/* Image, Name, Brand */}
             <div className='flex flex-col items-center justify-center h-[40vh]'>
-                {isLoading
-                    ?
-                    <div className="animate-pulse flex flex-col space-y-2">
-                        {/* Circle */}
-                        <div className="rounded-full bg-neutral-200 w-[135px] h-[135px]"></div>
 
-                        {/* Lines */}
-                        <div className="flex-1 space-y-3 py-1">
-                            <div className="h-5 bg-neutral-300 rounded"></div>
-                            <div className="h-2 bg-neutral-300 rounded "></div>
-                        </div>
-                    </div>
-
-                    : <>
-
-                        {author &&
-                            <div className='fixed top-6 right-6 flex items-center justify-evenly space-x-3 bg-white  px-4 py-2 rounded-xl'>
-                                {editStatus
-                                    ? <>
-                                        <div onClick={() => setEditStatus(false)} className='text-center text-red-600 cursor-pointer'>
-                                            <ImCross className='block mx-auto text-3xl' />
-                                            <span className='text-xs'>Cancel</span>
-                                        </div>
-                                        <div onClick={handleSubmit} className='text-center text-green-700 cursor-pointer'>
-                                            <FaCheck className='block mx-auto text-3xl' />
-                                            <span className='text-xs'>Save</span>
-                                        </div>
-                                    </>
-                                    : <>
-                                        <div onClick={() => setEditStatus(!editStatus)} className='text-center text-neutral-700 cursor-pointer'>
-                                            <FaRegEdit className='block mx-auto text-3xl' />
-                                            <span className='text-xs'>Edit</span>
-                                        </div>
-                                        <div onClick={handleRemoveItem} className='text-center text-red-600 cursor-pointer'>
-                                            <FaRegTrashAlt className='block mx-auto text-3xl' />
-                                            <span className='text-xs'>Delete</span>
-                                        </div>
-                                    </>
-
-                                }
-                            </div>
-                        }
-
-
-                        {/* Product Image */}
-                        <Avatar
-                            emoji={product.image}
-                            bg={'bg-neutral-200'}
-                            ring
-                            size='xl'
-
-                        />
-
-
-                        {(editStatus && author)
+                {author &&
+                    <div className='absolute top-6 right-6 flex items-center justify-evenly space-x-3 bg-white  px-4 py-2 rounded-xl'>
+                        {editStatus
                             ? <>
-                                <input
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className='text-3xl capitalize text-main font-semibold mt-3 text-center active:outline-none focus:outline-none '
-
-                                />
-                                <input
-                                    value={brand}
-                                    onChange={(e) => setBrand(e.target.value)}
-                                    className='text-xl capitalize text-secondary text-center active:outline-none focus:outline-none'
-                                />
+                                <div onClick={() => setEditStatus(false)} className='text-center text-red-600 cursor-pointer'>
+                                    <ImCross className='block mx-auto text-3xl' />
+                                    <span className='text-xs'>Cancel</span>
+                                </div>
+                                <div onClick={handleSubmit} className='text-center text-green-700 cursor-pointer'>
+                                    <FaCheck className='block mx-auto text-3xl' />
+                                    <span className='text-xs'>Save</span>
+                                </div>
                             </>
                             : <>
-                                <h1 className='text-3xl capitalize text-main font-semibold mt-3 '>
-                                    {product.name}
-                                </h1>
-                                <h2 className='text-xl capitalize text-secondary'>
-                                    {product.brand}
-                                </h2>
-
+                                <div onClick={() => setEditStatus(!editStatus)} className='text-center text-neutral-700 cursor-pointer'>
+                                    <FaRegEdit className='block mx-auto text-3xl' />
+                                    <span className='text-xs'>Edit</span>
+                                </div>
+                                <div onClick={handleRemoveItem} className='text-center text-red-600 cursor-pointer'>
+                                    <FaRegTrashAlt className='block mx-auto text-3xl' />
+                                    <span className='text-xs'>Delete</span>
+                                </div>
                             </>
+
                         }
+                    </div>
+                }
+
+
+                {/* Product Image */}
+                <Avatar
+                    emoji={product.image}
+                    bg={'bg-neutral-200'}
+                    ring
+                    size='xl'
+
+                />
+
+
+                {(editStatus && author)
+                    ? <>
+                        <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className='text-3xl capitalize text-main font-semibold mt-3 text-center active:outline-none focus:outline-none '
+
+                        />
+                        <input
+                            value={brand}
+                            onChange={(e) => setBrand(e.target.value)}
+                            className='text-xl capitalize text-secondary text-center active:outline-none focus:outline-none'
+                        />
+                    </>
+                    : <>
+                        <h1 className='text-3xl capitalize text-main font-semibold mt-3 '>
+                            {product.name}
+                        </h1>
+                        <h2 className='text-xl capitalize text-secondary'>
+                            {product.brand}
+                        </h2>
 
                     </>
                 }
@@ -458,171 +372,152 @@ function ProductDetails() {
             {/* Author, ID, Type, Date Added */}
             <div className='flex flex-col space-y-3 px-7 '>
 
-                {isLoading
-                    ? <>
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                        <LoadingContainer />
-                    </>
-                    : <>
-                        {/* Author */}
-                        <div className='border-y-2 flex flex-col text-xl'>
-                            <p className='text-xl pt-3'>
-                                <FaPencilAlt className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>Author: </span>
+
+                {/* Author */}
+                <div className='border-y-2 flex flex-col text-xl'>
+                    <p className='text-xl pt-3'>
+                        <FaPencilAlt className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold'>Author: </span>
+                    </p>
+
+                    <div className='flex space-x-2 items-center ml-5 py-3'>
+                        <Avatar
+                            bg={product.author.avatar.favoriteColor}
+                            emoji={product.author.avatar.emoji}
+                        />
+                        <div>
+                            <p className='capitalize text-sm'>
+                                <MdPermIdentity className='inline-block mr-1.5' />
+                                {product.author.first_name} {product.author.last_name[0]}.
                             </p>
 
-                            <div className='flex space-x-2 items-center ml-5 py-3'>
-                                <Avatar
-                                    bg={product.author.avatar.favoriteColor}
-                                    emoji={product.author.avatar.emoji}
-                                />
-                                <div>
-                                    <p className='capitalize'>
-                                        <MdPermIdentity className='inline-block mr-1.5' />
-                                        {product.author.first_name} {product.author.last_name[0]}.
-                                    </p>
-
-                                    <p>
-                                        <MdMailOutline className='inline-block mr-1.5' />
-                                        {product.author.email}
-                                    </p>
-                                </div>
-                            </div>
+                            <p className='text-sm'>
+                                <MdMailOutline className='inline-block mr-1.5' />
+                                {product.author.email}
+                            </p>
                         </div>
+                    </div>
+                </div>
 
 
 
-                        {/* Category */}
-                        <div className='border-b-2 flex flex-col text-xl'>
-                            <div>
-                                <FaFilter className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>Type: </span>
-                            </div>
+                {/* Category */}
+                <div className='border-b-2 flex flex-col text-xl'>
+                    <div>
+                        <FaFilter className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold'>Type: </span>
+                    </div>
 
-                            <p className='py-3 ml-7 capitalize'>
-                                {product.type}
+                    <p className='py-3 ml-7 capitalize'>
+                        {product.type}
+                    </p>
+
+
+
+                </div>
+
+
+                {/* Unit */}
+                <div className='border-b-2 flex flex-col text-xl'>
+                    <div>
+                        <FaRulerVertical className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold'>Unit of Measure: </span>
+                    </div>
+
+                    <p className='py-3 ml-7 capitalize'>
+                        {unitMeasure[product.type].map((item, idx) => <span key={item}>{item}{`${idx === unitMeasure[product.type].length - 1 ? '' : ', '}`}</span>)}
+                    </p>
+
+                </div>
+
+                {/* LifeSpan */}
+                <div className='border-b-2 flex flex-col text-xl'>
+                    <div>
+                        <FaCalendarTimes className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold'>LifeSpan: </span>
+                    </div>
+                    {(editStatus && author)
+                        ? <div className='py-3 ml-7 capitalize'>
+                            <LifeSpanInput
+                                refrigeratorInput={refrigeratorInput}
+                                setRefrigeratorInput={setRefrigeratorInput}
+                                pantryInput={pantryInput}
+                                setPantryInput={setPantryInput}
+                                freezerInput={freezerInput}
+                                setFreezerInput={setFreezerInput}
+                            />
+                        </div>
+                        : <div className='py-3 ml-7  text-base'>
+                            <p>Freezer:
+                                <span className='ml-1 mr-1'>{product.lifeSpan.freezer.value
+                                    ? `${product.lifeSpan.freezer.value} ${product.lifeSpan.freezer.time ? product.lifeSpan.freezer.time : ''}${product.lifeSpan.freezer.value > 1 ? 's' : ''}`
+                                    : "Not Recommended"}
+                                </span>
+                            </p>
+                            <p>Refrigerator:
+                                <span className='ml-1 mr-1'>{product.lifeSpan.refrigerator.value
+                                    ? `${product.lifeSpan.refrigerator.value} ${product.lifeSpan.refrigerator.time ? product.lifeSpan.refrigerator.time : ''}${product.lifeSpan.refrigerator.value > 1 ? 's' : ''}`
+                                    : "Not Recommended"}
+                                </span>
+                            </p>
+                            <p>Pantry:
+                                <span className='ml-1 mr-1'>{product.lifeSpan.pantry.value
+                                    ? `${product.lifeSpan.pantry.value} ${product.lifeSpan.pantry.time ? product.lifeSpan.pantry.time : ''}${product.lifeSpan.pantry.value > 1 ? 's' : ''}`
+                                    : "Not Recommended"}
+                                </span>
                             </p>
 
-
-
                         </div>
+                    }
+                </div>
+
+                {/* Barcode */}
+                <div className='border-b-2 flex flex-col text-xl'>
+                    <div>
+                        <IoMdBarcode className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold'>Barcode: </span>
+                    </div>
+                    {(editStatus && author)
+                        ? <div className='py-3 ml-7  flex items-center   bg-white '>
 
 
-                        {/* Unit */}
-                        <div className='border-b-2 flex flex-col text-xl'>
-                            <div>
-                                <FaRulerVertical className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>Unit of Measure: </span>
-                            </div>
-
-                            <p className='py-3 ml-7 capitalize'>
-                                {unitMeasure[product.type].map((item, idx) => <span key={item}>{item}{`${idx === unitMeasure[product.type].length - 1 ? '' : ', '}`}</span>)}
-                            </p>
-
-                        </div>
-
-                        {/* LifeSpan */}
-                        <div className='border-b-2 flex flex-col text-xl'>
-                            <div>
-                                <FaCalendarTimes className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>LifeSpan: </span>
-                            </div>
-                            {(editStatus && author)
-                                ? <div className='py-3 ml-7 capitalize'>
-                                    <LifeSpanInput
-                                        refrigeratorInput={refrigeratorInput}
-                                        setRefrigeratorInput={setRefrigeratorInput}
-                                        pantryInput={pantryInput}
-                                        setPantryInput={setPantryInput}
-                                        freezerInput={freezerInput}
-                                        setFreezerInput={setFreezerInput}
-                                    />
-                                </div>
-                                : <div className='py-3 ml-7 capitalize'>
-                                    <p>Freezer:
-                                        <span className='ml-3 mr-2'>{product.lifeSpan.freezer.value ? product.lifeSpan.freezer.value : "Not Recommended"}</span>
-                                        {product.lifeSpan.freezer.time ? product.lifeSpan.freezer.time : ''}{product.lifeSpan.freezer.value > 1 ? 's' : ''}
-                                    </p>
-                                    <p>Refrigerator:
-                                        <span className='ml-3 mr-2'>{product.lifeSpan.refrigerator.value ? product.lifeSpan.refrigerator.value : "Not Recommended"}</span>
-                                        {product.lifeSpan.refrigerator.time ? product.lifeSpan.refrigerator.time : ''}{product.lifeSpan.freezer.value > 1 ? 's' : ''}
-                                    </p>
-                                    <p>Pantry:
-                                        <span className='ml-3 mr-2'>{product.lifeSpan.pantry.value ? product.lifeSpan.pantry.value : "Not Recommended"}</span>
-                                        {product.lifeSpan.pantry.time ? product.lifeSpan.pantry.time : ''}{product.lifeSpan.freezer.value > 1 ? 's' : ''}
-                                    </p>
-                                </div>
-                            }
-                        </div>
-
-                        {/* Barcode */}
-                        <div className='border-b-2 flex flex-col text-xl'>
-                            <div>
-                                <IoMdBarcode className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>Barcode: </span>
-                            </div>
-                            {(editStatus && author)
-                                ? <div className='py-3 ml-7  flex items-center   bg-white '>
-
-
-                                    <span className='text-secondary mr-7'>{barcode ? barcode : '00000000'}</span>
-                                    {barcode
-                                        ? <MdCancel onClick={() => setBarcode(null)} className='inline-block  fill-neutral-400 hover:fill-neutral-500  text-lg cursor-pointer ' />
-                                        : <MdDocumentScanner onClick={() => setScan(true)} className='inline-block  fill-neutral-500  text-xl cursor-pointer ' />
-                                    }
-
-
-                                    <Modal
-                                        showModal={scan}
-                                        setShowModal={setScan}
-                                        header="Scan the Barcode"
-                                        content={<BarcodeScanModal setScan={setScan} setBarcode={setBarcode} />}
-                                    />
-
-                                </div>
-                                : <p className='py-3 ml-7 capitalize'>
-                                    {product.barcode ? product.barcode : "None"}
-                                </p>
+                            <span className='text-secondary mr-7'>{barcode ? barcode : '00000000'}</span>
+                            {barcode
+                                ? <MdCancel onClick={() => setBarcode(null)} className='inline-block  fill-neutral-400 hover:fill-neutral-500  text-lg cursor-pointer ' />
+                                : <MdDocumentScanner onClick={() => alert('Feature not supported yet.')} className='inline-block  fill-neutral-500  text-xl cursor-pointer ' />
                             }
 
+
                         </div>
+                        : <p className='py-3 ml-7 capitalize'>
+                            {product.barcode ? product.barcode : "None"}
+                        </p>
+                    }
 
-                        {/* ID */}
-                        <div className='border-b-2 flex flex-col text-xl'>
-                            <div>
-                                <FaHashtag className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold '>Product ID: </span>
-                            </div>
+                </div>
 
-                            <p className='py-3 ml-7'>
-                                {product._id}
-                            </p>
-                        </div>
+                {/* ID */}
+                <div className='border-b-2 flex flex-col text-xl'>
+                    <div>
+                        <FaHashtag className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold '>Product ID: </span>
+                    </div>
 
-                        {/* Date Added */}
-                        <div className='border-b-2 flex flex-col text-xl'>
-                            <div>
-                                <FaClock className='inline-block mr-2 mb-0.5' />
-                                <span className='font-semibold'>Date Added: </span>
-                            </div>
-                            <p className='py-3 ml-7 capitalize'>
-                                {product.createdAt}
-                            </p>
-                        </div>
+                    <p className='py-3 ml-7'>
+                        {product._id}
+                    </p>
+                </div>
 
-
-                    </>
-                }
-
-
-
-
-
-
+                {/* Date Added */}
+                <div className='border-b-2 flex flex-col text-xl'>
+                    <div>
+                        <FaClock className='inline-block mr-2 mb-0.5' />
+                        <span className='font-semibold'>Date Added: </span>
+                    </div>
+                    <p className='py-3 ml-7 capitalize'>
+                        {product.createdAt}
+                    </p>
+                </div>
 
             </div>
 

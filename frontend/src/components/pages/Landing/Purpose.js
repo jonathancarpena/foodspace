@@ -1,37 +1,31 @@
 import React from 'react'
 
 // Images
-import image1 from '../../../images/landing/purpose.jpg'
+import image1 from '../../../images/landing/purpose.PNG'
 import image2 from '../../../images/landing/purpose-2.PNG'
 import image3 from '../../../images/landing/purpose-3.PNG'
 
 // Icons
-import { CgClipboard, CgComment, CgTrash, CgInsights } from 'react-icons/cg'
+import { CgClipboard, CgComment, CgTrash } from 'react-icons/cg'
 
 // Constants
 const contentSections = [
     {
-        icon: <CgClipboard />,
-        heading: 'Keep track without the chaos',
-        message: 'Connect your teams, projects, and docs in Notion — so you can bust silos and move as one.',
+        icon: <CgComment />,
+        heading: 'Never ask “What’s in the fridge?” again',
+        message: 'Simply open your created FoodSpace and check if the items there.',
         image: image1
     },
     {
-        icon: <CgComment />,
-        heading: 'Never ask “What’s in the fridge?” again',
-        message: 'Connect your teams, projects, and docs in Notion — so you can bust silos and move as one.',
+        icon: <CgClipboard />,
+        heading: 'Keep track without the chaos',
+        message: 'Log all your groceries with a quick scan or search through our food database curated by our trusted users.',
         image: image2
     },
     {
-        icon: <CgInsights />,
-        heading: 'Optimize meals with the right timing.',
-        message: 'Connect your teams, projects, and docs in Notion — so you can bust silos and move as one.',
-        image: image1
-    },
-    {
         icon: <CgTrash />,
-        heading: 'Reduce the amount food waste.',
-        message: 'Connect your teams, projects, and docs in Notion — so you can bust silos and move as one.',
+        heading: 'Reduce the amount of food waste.',
+        message: "Don't remember what food went bad? Get reminders of when your food goes bad.",
         image: image3
     },
 ]
@@ -39,7 +33,7 @@ const contentSections = [
 const Section = ({ content }) => {
     const { icon, heading, message, image } = content
     return (
-        <section className='flex flex-col md:flex-row space-y-6 tracking-tight'>
+        <section className='flex flex-col  space-y-6 tracking-tight'>
 
             <div>
                 {/* Icon */}
@@ -57,7 +51,10 @@ const Section = ({ content }) => {
             </div>
 
             {/* Image */}
-            <img src={image} className='rounded-lg drop-shadow-lg' />
+            <div className='border-2 w-full h-[500px] overflow-hidden rounded-xl drop-shadow-lg'>
+                <img alt={image} src={image} className='scale-105 relative top-2 ' />
+            </div>
+
         </section>
     )
 }

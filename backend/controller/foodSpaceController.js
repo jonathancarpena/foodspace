@@ -610,6 +610,7 @@ export const updateItemFromFoodSpace = async (req, res) => {
     const { _id } = req.user
     const { item_id: id, foodSpace_id, expired, info } = req.body
     const check = await checkIfInFoodSpace(foodSpace_id, _id)
+
     if (!check) {
         return res.status(400).json({
             message: "Access Denied"
@@ -618,7 +619,7 @@ export const updateItemFromFoodSpace = async (req, res) => {
 
 
     // Change Owner, Area and Quantity
-    const { owner, area, quantity } = info
+    const { owner, area, quantity, purchaseDate } = info
 
     try {
         const foodSpace = await FoodSpace.findById(foodSpace_id)
@@ -652,6 +653,10 @@ export const updateItemFromFoodSpace = async (req, res) => {
 
             if (quantity) {
                 itemToUpdate['quantity'] = quantity
+            }
+
+            if (purchaseDate) {
+                itemToUpdate['purchaseDate'] = purchaseDate
             }
 
             // Update FoodSpace

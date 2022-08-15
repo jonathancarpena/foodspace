@@ -1,26 +1,19 @@
-import React, { useState, useEffect } from 'react'
-
 // Router
 import { Link, useNavigate } from 'react-router-dom'
 
 // Redux
-import { refreshMe, clearAuth } from '../../redux/features/auth/authSlice'
+import { clearAuth } from '../../redux/features/auth/authSlice'
 import { useSelector, useDispatch } from 'react-redux'
 
 // Components
-import Avatar, { AvatarModal } from '../../components/pages/Account/Avatar'
-import Button from '../../components/Button'
-
-// Import Swiper React components
-import { Swiper, SwiperSlide } from "swiper/react";
-
+import Avatar from '../../components/pages/Account/Avatar'
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 
 // Icons 
-import { FaCarrot, FaCog, FaEdit } from 'react-icons/fa'
+import { FaCarrot, FaCog } from 'react-icons/fa'
 import { MdSpaceDashboard, MdLogout } from 'react-icons/md'
 
 
@@ -47,22 +40,18 @@ const links = [
     },
 ]
 function Account() {
-    const [showModal, setShowModal] = useState(false)
-    const [newAvatar, setNewAvatar] = useState(null)
     const { user } = useSelector(state => state.auth)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    async function handleUpdateAvatar() {
-        const userConfirm = window.confirm('Does everything look correct?')
-    }
+
     function handleLogout() {
         dispatch(clearAuth())
         navigate('/')
     }
     return (
         <div className=' min-h-screen flex flex-col items-center pb-20'>
-            <AvatarModal showModal={showModal} setShowModal={setShowModal} handleComplete={handleUpdateAvatar} />
+
 
             <div className='h-[35vh] bg-white p-7 w-screen flex flex-col justify-center items-center border-b-2'>
                 <div className='relative'>
@@ -72,9 +61,7 @@ function Account() {
                         ring={true}
                         size='xl'
                     />
-                    <span onClick={() => setShowModal(true)} className='cursor-pointer absolute top-0 -right-9 inline-block border-2 border-primary-400 p-1.5 rounded-full'>
-                        <FaEdit className='fill-primary-500 text-center' />
-                    </span>
+
 
                 </div>
 
@@ -89,7 +76,7 @@ function Account() {
                 {links.map((item) => {
                     if (item.link.includes('logout')) {
                         return (
-                            <div onClick={handleLogout} className='w-full bg-white border-2 border-white text-center mx-auto p-5 rounded-2xl drop-shadow-lg active:bg-primary-200 cursor-pointer active:drop-shadow-2xl active:border-primary-500'>
+                            <div key={item.link} onClick={handleLogout} className='w-full bg-white border-2 border-white text-center mx-auto p-5 rounded-2xl drop-shadow-lg active:bg-primary-200 cursor-pointer active:drop-shadow-2xl active:border-primary-500'>
                                 {item.icon}
                                 <h1 className='text-xl font-semibold capitalize mt-5 text-main'>{item.header}</h1>
                             </div>

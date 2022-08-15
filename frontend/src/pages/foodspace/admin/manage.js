@@ -5,26 +5,26 @@ import axios from 'axios'
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom'
 
 // Redux
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 // Urls
 import { API } from '../../../lib/urls'
 
 // Icons
 import { FaUser } from 'react-icons/fa'
-import { FiTrash, FiPlusCircle } from 'react-icons/fi'
-import { BiArrowBack, BiFridge, BiCategory, BiUser } from 'react-icons/bi'
+import { BiArrowBack, BiFridge, BiCategory } from 'react-icons/bi'
 
 // Components
 import Users from '../../../components/pages/FoodSpace/Admin/Manage/Users'
 import Areas from '../../../components/pages/FoodSpace/Admin/Manage/Areas'
 import Tabs, { TabHeader, TabContent } from '../../../components/Tabs'
+import Error from '../../../components/Layout/Error'
+import Loading from '../../../components/Layout/Loading'
 
 function ManageFoodSpace() {
     const { name } = useParams()
     const location = useLocation()
     const navigate = useNavigate()
-    const dispatch = useDispatch()
     const { token } = useSelector(state => state.auth)
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState(null)
@@ -32,46 +32,44 @@ function ManageFoodSpace() {
 
 
     useEffect(() => {
-        setIsLoading(true)
-        if (!location.state.foodSpace) {
-            if (!location.state.foodSpace_id) {
-                navigate("/foodSpace/choose", { state: { prevPath: location.pathname } })
-                setIsLoading(false)
-            } else {
-                axios.get(`${API.ADMIN.base}/${location.state.foodSpace_id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-                    .then((res) => {
-                        if (res.status === 200) {
-                            setFoodSpace(res.data.foodSpace)
+        if (!foodSpace) {
+            setIsLoading(true)
+            if (!location.state.foodSpace) {
+                if (!location.state.foodSpace_id) {
+                    navigate("/foodSpace/choose", { state: { prevPath: location.pathname } })
+                    setIsLoading(false)
+                } else {
+                    axios.get(`${API.ADMIN.base}/${location.state.foodSpace_id}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
                         }
-                        setIsLoading(false)
                     })
-                    .catch((err) => setErrors(err))
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setFoodSpace(res.data.foodSpace)
+                            }
+                            setIsLoading(false)
+                        })
+                        .catch((err) => setErrors(err))
+                }
+            } else {
+                setFoodSpace(location.state.foodSpace)
+                setIsLoading(false)
             }
-        } else {
-            setFoodSpace(location.state.foodSpace)
-            setIsLoading(false)
         }
-    }, [])
-    let prevPath;
+
+    }, [foodSpace, location.pathname, location.state.foodSpace, location.state.foodSpace_id, navigate, token])
     let state;
     try {
-        prevPath = location.state.prevPath
         state = location.state
     } catch (error) {
-        prevPath = '/'
         state = null
     }
 
-
+    if (errors) return <Error />
     if (isLoading || !foodSpace) {
         return (
-            <div>
-                <h1>Loading...</h1>
-            </div>
+            <Loading />
         )
     }
     return (

@@ -8,10 +8,10 @@ export default function Modal({ showModal, setShowModal, content, footer, header
         <>
             <TransitionOpacity show={showModal} >
                 <>
-                    <div className={`justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0  mx-10 z-[100] ${sx}`}>
+                    <div className={` justify-center items-center flex overflow-hidden overflow-y-auto fixed inset-0  mx-5 z-[100] ${sx}`}>
 
                         {/* Card */}
-                        <div className="rounded-md shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                        <div className="max-w-[385px] rounded-md shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
 
                             {/* Close */}
                             <span onClick={() => setShowModal(false)} className="cursor-pointer absolute right-5 top-3 text-xl">

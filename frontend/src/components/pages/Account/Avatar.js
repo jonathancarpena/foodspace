@@ -48,7 +48,7 @@ export function AvatarModal({ showModal, setShowModal, handleComplete }) {
             </div>
 
 
-            <div className='min-h-[300px] w-[250px] mx-auto'>
+            <div className='min-h-[300px] w-[250px] mx-auto overflow-x-hidden'>
                 {/* Emoji Selections */}
                 <TransitionTransform show={!lastStep} direction="ltr" >
                     <ul className=' absolute mx-auto py-2 h-[300px] w-[250px] overflow-y-scroll flex flex-wrap justify-evenly  items-center'>
@@ -113,28 +113,28 @@ export function AvatarModal({ showModal, setShowModal, handleComplete }) {
 function Avatar({ bg = "bg-neutral-300", emoji = "🥧", size = "sm", ring = false, sx, onClick, key = '', ringColor = "ring-white" }) {
     const sizeOptions = {
         xs: {
-            bg: "h-[50px]",
+            bg: "h-[50px] w-[50px]",
             emoji: "text-[25px]"
         },
         sm: {
-            bg: "h-[65px]",
+            bg: "h-[65px] w-[65px]",
             emoji: "text-[35px]"
         },
         md: {
-            bg: "h-[80px]",
+            bg: "h-[80px] w-[80px]",
             emoji: "text-[45px]"
         },
         lg: {
-            bg: "h-[95px]",
+            bg: "h-[95px] w-[95px]",
             emoji: "text-[55px] "
         },
         xl: {
-            bg: "h-[105px]",
+            bg: "h-[105px] w-[105px]",
             emoji: "text-[65px] "
         },
     }
     return (
-        <div key={key} onClick={onClick} className={`w-max ${sizeOptions[size].bg} rounded-[100%] ${bg} ${ring ? `ring-4 ${ringColor} drop-shadow-lg` : ''} flex justify-center items-center cursor-default rounded-full  text-center ${sx}`}>
+        <div key={key} onClick={onClick} className={` ${sizeOptions[size].bg} rounded-[100%] ${bg} ${ring ? `ring-4 ${ringColor} drop-shadow-lg` : ''} cursor-pointer flex justify-center items-center  rounded-full  text-center ${sx}`}>
             <span className={`${sizeOptions[size].emoji} p-2`}>
                 {emoji}
             </span>

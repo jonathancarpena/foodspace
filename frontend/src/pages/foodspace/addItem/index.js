@@ -6,7 +6,7 @@ import moment from 'moment'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 // Redux
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 // Urls
 import { API } from '../../../lib/urls'
@@ -19,8 +19,12 @@ import { unitMeasure } from '../../../lib/constants'
 import { BsSearch } from 'react-icons/bs'
 import { BiArrowBack } from 'react-icons/bi'
 import { MdCancel } from 'react-icons/md'
-import { FaTimes, FaPlusCircle, FaAngleRight } from 'react-icons/fa'
+import { FaTimes, FaPlusCircle } from 'react-icons/fa'
 import { toTitleCase } from '../../../lib/utils'
+
+// Components
+import Loading from '../../../components/Layout/Loading'
+import Error from '../../../components/Layout/Error'
 
 
 export async function addToFoodSpace(token, foodSpace, itemToAdd, input) {
@@ -119,18 +123,27 @@ function AddItem() {
         } else {
             setFoodSpace(location.state.foodSpace)
         }
-    }, [])
+    }, [location.state.foodSpace, navigate])
 
     // Gets ALl Products from Database
     useEffect(() => {
         async function fetchProductData() {
             const productDb = await axios.get(API.PRODUCT.base)
+
             if (productDb) {
                 setProducts(productDb.data)
+                setIsLoading(false)
+            } else {
+                setErrors(true)
             }
         }
-        fetchProductData()
-    }, [])
+
+        if (!products) {
+            setIsLoading(true)
+            fetchProductData()
+        }
+
+    }, [products])
 
 
     // Shows search Results
@@ -163,14 +176,13 @@ function AddItem() {
                 }
             })
 
-            console.log(uniqueResults)
 
             setSearchResults(uniqueResults)
 
         } else {
             setSearchResults(null)
         }
-    }, [search])
+    }, [search, products])
 
 
 
@@ -201,34 +213,22 @@ function AddItem() {
         setItems(updatedItems)
     }
 
-    let prevPath;
     let state;
     try {
-        prevPath = location.state.prevPath
         state = location.state
     } catch (error) {
-        prevPath = '/'
         state = null
     }
 
-    if (errors) {
-        return (
-            <h1>{errors}</h1>
-        )
-    }
+    if (errors) return <Error />
+    if (!foodSpace || !products || isLoading) return <Loading />
 
-
-    if (!foodSpace || !products) {
-        return (
-            <h1>Loading...</h1>
-        )
-    }
     return (
-        <div className='min-h-screen p-7 '>
+        <div className='relative min-h-screen p-7 '>
 
             {/* Back Button */}
             <Link to={`/foodSpace/${foodSpace.name}`} state={state}>
-                <span className='fixed top-6 left-6'>
+                <span className='absolute top-6 left-6'>
                     <BiArrowBack className='inline-block text-[1rem] text-main mr-1 mb-1' />
                 </span>
             </Link>

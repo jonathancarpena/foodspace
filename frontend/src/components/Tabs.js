@@ -1,29 +1,11 @@
-import React, { useState } from "react";
+import { cloneElement, useState, Children } from "react";
 
-
-
-{/* 
-
-<Tabs>
-        <TabHeader>{header}</TabHeader>
-        <TabContent>{content}</TabContent>
-</Tabs> 
-
-*/}
-
-// export const Tab = ({ children }) => {
-//     return (
-//         <>
-//             {children}
-//         </>
-//     )
-// }
 
 export const TabHeader = ({ children, openTab, setOpenTab, idx, bg = "bg-neutral-500", text = "text-neutral-500" }) => {
 
     return (
         <a
-            className={"text-lg font-bold uppercase px-5 py-3 shadow-lg rounded block leading-normal " +
+            className={"text-lg font-bold uppercase px-5 py-3 shadow-lg rounded leading-normal " +
                 (openTab === idx
                     ? `${bg} text-white`
                     : `${text} bg-white`)
@@ -42,7 +24,7 @@ export const TabHeader = ({ children, openTab, setOpenTab, idx, bg = "bg-neutral
     )
 }
 
-export const TabContent = ({ children, idx, openTab }) => {
+export const TabContent = ({ children }) => {
 
     return (
         <>
@@ -52,12 +34,12 @@ export const TabContent = ({ children, idx, openTab }) => {
 }
 
 
-export default function Tabs({ color, children }) {
+export default function Tabs({ children }) {
     const [openTab, setOpenTab] = useState(0);
 
     const tabContent = []
     const tabHeader = []
-    React.Children.map(children, (child, idx) => {
+    Children.map(children, (child, idx) => {
         if (child.type.name === "TabHeader") {
             tabHeader.push(child)
         }
@@ -79,7 +61,7 @@ export default function Tabs({ color, children }) {
                         {tabHeader.map((child, idx) => {
                             return (
                                 <li key={`tabHeader-${idx}`} className="-mb-px mr-2 last:mr-0 flex-auto text-center">
-                                    {React.cloneElement(child, { idx, openTab, setOpenTab })}
+                                    {cloneElement(child, { idx, openTab, setOpenTab })}
                                 </li>
                             )
 
@@ -92,7 +74,7 @@ export default function Tabs({ color, children }) {
                         {tabContent.map((child, idx) => {
                             return (
                                 <div key={`tabContent-${idx}`} className={`${idx === openTab ? "block" : "hidden"}`} id={`link${idx}`}>
-                                    {React.cloneElement(child, { idx, openTab })}
+                                    {cloneElement(child, { idx, openTab })}
                                 </div>
                             )
                         })}

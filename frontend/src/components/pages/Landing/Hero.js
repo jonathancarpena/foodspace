@@ -21,7 +21,7 @@ function Hero() {
         <section className='text-center flex flex-col justify-center items-center space-y-5 py-3 px-5'>
 
             {/* Image */}
-            <img src={hero} className='grayscale contrast-200 w-[250px] ' />
+            <img alt='hero' src={hero} className='grayscale contrast-200 w-[250px] ' />
 
             {/* Heading */}
             <h1 className='text-4xl tracking-tight font-extrabold  text-main'>
@@ -31,9 +31,7 @@ function Hero() {
 
             {/* Subheading */}
             <h2 className=' text-secondary text-lg tracking-tight'>
-                We’re more than a doc.
-                Or a table. Customize Notion
-                to work the way you do.
+                Don't remember what's in the fridge? Keep track of your food in the best way.
             </h2>
 
             {/* Call To Action */}
