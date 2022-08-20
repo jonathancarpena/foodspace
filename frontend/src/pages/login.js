@@ -58,7 +58,7 @@ function Login() {
                 data: { email }
             })
 
-            console.log(data)
+
 
             if (!data.ok) {
                 setNewUser({

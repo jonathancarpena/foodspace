@@ -1,31 +1,23 @@
 {
-	"name": "pantry",
+	"name": "foodspace",
 	"version": "1.0.0",
-	"type": "module",
 	"description": "",
-	"main": "server.js",
+	"main": "index.js",
 	"scripts": {
-		"start": "node backend/server.js",
-		"server": "nodemon backend/server.js",
-		"client": "npm start --prefix frontend",
-		"dev": "concurrently \"npm run server\" \"npm run client\"",
-		"data:import": "node backend/seederScript.js"
+		"dev": "concurrently \"npm run server --prefix backend\" \"npm run start --prefix frontend\"",
+		"server": "npm run start --prefix server"
 	},
-	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jonathancarpena/pantry.git"
+	},
 	"author": "",
 	"license": "ISC",
-	"dependencies": {
-		"bcrypt": "^5.0.1",
-		"cookie-parser": "^1.4.6",
-		"cors": "^2.8.5",
-		"dotenv": "^16.0.0",
-		"express": "^4.17.3",
-		"jsonwebtoken": "^8.5.1",
-		"moment": "^2.29.2",
-		"mongoose": "^6.2.4"
+	"bugs": {
+		"url": "https://github.com/jonathancarpena/pantry/issues"
 	},
-	"devDependencies": {
-		"concurrently": "^7.0.0",
-		"nodemon": "^2.0.15"
+	"homepage": "https://github.com/jonathancarpena/pantry#readme",
+	"dependencies": {
+		"concurrently": "^7.3.0"
 	}
 }
