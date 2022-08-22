@@ -13,8 +13,6 @@ import { FaTimes, FaRegLemon, FaBarcode } from 'react-icons/fa'
 function AddModal({ showModal, setShowModal }) {
     const location = useLocation()
 
-
-
     return (
         <>
             <TransitionOpacity show={showModal} >
