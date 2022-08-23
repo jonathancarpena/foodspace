@@ -306,9 +306,9 @@ function FoodSpace() {
                                                     product: item,
                                                     foodSpace
                                                 }}>
-                                                <span className='text-xs absolute top-4 left-4 text-secondary'>#{stockNumber(item) + 1}</span>
+                                                <span className='text-xs absolute top-2 left-4 text-secondary'>#{stockNumber(item) + 1}</span>
 
-                                                <div className={`${item.expired ? 'border-4 border-red-500 bg-white' : 'bg-white'}  p-5 rounded-xl flex w-full justify-between items-center`}>
+                                                <div className={`${item.expired ? 'border-4 border-red-500 bg-white' : 'bg-white'}  py-5 px-3 rounded-xl flex w-full justify-between items-center`}>
                                                     <div className='flex items-center space-x-3'>
 
                                                         {/* Image */}
@@ -328,7 +328,7 @@ function FoodSpace() {
                                                         {/* Owner */}
                                                         {item.owner &&
                                                             <div className='text-center ml-4 border-l-2 pl-4'>
-                                                                <span className='text-xs text-secondary mb-1 block'><MdPerson className='inline-block mb-0.5 mr-0.5' />Owner</span>
+                                                                <span className='text-xs text-secondary mb-1 block'><MdPerson className='inline-block mb-0.5 mr-0.5' /></span>
                                                                 {/* First and Last Initial */}
                                                                 <span className='text-xs text-secondary mb-1 block'>
                                                                     {toTitleCase(item.owner.first_name)} {toTitleCase(item.owner.last_name[0])}.
