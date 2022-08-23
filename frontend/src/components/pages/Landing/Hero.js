@@ -18,7 +18,7 @@ const trustedTeams = [
 
 function Hero() {
     return (
-        <section className='text-center flex flex-col justify-center items-center space-y-5 py-3 px-5'>
+        <section className='h-screen text-center flex flex-col justify-center items-center space-y-5 py-3 px-5'>
 
             {/* Image */}
             <img alt='hero' src={hero} className='grayscale contrast-200 w-[250px] ' />

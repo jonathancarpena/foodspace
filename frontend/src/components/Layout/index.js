@@ -52,7 +52,7 @@ function Layout({ children }) {
 
                 {/* Navigator Buttons */}
                 {auth.ready &&
-                    <section className={`shadow-lg fixed bottom-0 w-full min-w-[410px] max-w-[410px]  pb-3 pt-3 flex justify-evenly items-center bg-white ${showAddModal ? 'z-[50]' : 'z-[90]'}`} >
+                    <section className={`drop-shadow-xl fixed bottom-0 w-full  max-w-[410px]  px-1 pb-3 pt-3 flex justify-evenly items-center bg-neutral-50 ${showAddModal ? 'z-[50]' : 'z-[90]'}`} >
 
 
                         <Link to='/account/dashboard' className={`${highlightMobileFooter(homePages) ? 'text-primary-500' : 'text-secondary'} w-[78px] flex justify-center  flex-col  items-center select-none`}>
@@ -76,7 +76,7 @@ function Layout({ children }) {
 
 
                         <button className='w-[78px]'>
-                            <span onClick={() => setShowAddModal(true)} className='ring-[15px] left-[50%] -translate-x-[50%] ring-white absolute w-[50px] h-[50px] rounded-full  bottom-8 bg-primary-500 flex items-center justify-center'>
+                            <span onClick={() => setShowAddModal(true)} className='ring-[15px] left-[50%] -translate-x-[50%] ring-neutral-50 absolute w-[50px] h-[50px] rounded-full  bottom-8 bg-primary-500 flex items-center justify-center'>
                                 <FaPlus className='text-2xl   text-white' />
                             </span>
                         </button>
