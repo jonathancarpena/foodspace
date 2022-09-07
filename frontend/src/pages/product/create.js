@@ -267,7 +267,7 @@ function Create() {
         }
         const defaultLifeSpan = shelfLife[type.value][category.value][subCategory.value]
         for (const key in lifeSpan) {
-            if (lifeSpan[key].value.isNan() || lifeSpan[key].value === 0) {
+            if (lifeSpan[key].value === 0) {
                 lifeSpan[key] = defaultLifeSpan[key]
             }
         }
@@ -325,6 +325,7 @@ function Create() {
                         Authorization: `Bearer ${token}`
                     }
                 })
+                console.log(res)
 
                 if (res.status === 200) {
                     setLoading(false)

@@ -111,7 +111,7 @@ function AddUser() {
     }
 
     if (!isLoading && !error) {
-      dispatch(refreshMe())
+      dispatch(refreshMe({ forceRefresh: true }))
       navigate(`/`)
       console.log('SUCCESS')
     }

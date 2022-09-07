@@ -47,7 +47,7 @@ function Users({ foodSpace }) {
             if (res.status === 200) {
                 const updatedUsers = users.filter((item) => item._id !== user._id)
                 setIsLoading(false)
-                dispatch(refreshMe())
+                dispatch(refreshMe({ forceRefresh: true }))
                 setUsers({ ...foodSpace, users: [...updatedUsers] })
             }
         }

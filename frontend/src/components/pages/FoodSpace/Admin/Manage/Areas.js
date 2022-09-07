@@ -48,7 +48,7 @@ function Areas({ foodSpace }) {
             if (res.status === 200) {
                 const updatedUsers = areas.filter((item) => item._id !== area._id)
                 setIsLoading(false)
-                dispatch(refreshMe())
+                dispatch(refreshMe({ forceRefresh: true }))
                 setAreas([...updatedUsers])
             }
         }

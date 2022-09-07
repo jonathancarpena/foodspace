@@ -88,7 +88,7 @@ function Create() {
 
                 if (res.data) {
                     setFoodSpace(res.data.foodSpace)
-                    dispatch(refreshMe())
+                    dispatch(refreshMe({ forceRefresh: true }))
                 }
                 setIsLoading(false)
             } catch (error) {

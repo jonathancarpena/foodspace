@@ -72,7 +72,8 @@ function Login() {
                     register_code: registerCode,
                     email: email
                 }
-                sendRegisterCode(params)
+                // sendRegisterCode(params)
+                console.log(registerCode)
             } else {
                 setNewUser({
                     ...newUser,

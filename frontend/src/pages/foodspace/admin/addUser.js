@@ -108,7 +108,7 @@ function AddUser() {
                     setLoading(false)
 
                     if (res.status === 200) {
-                        dispatch(refreshMe())
+                        dispatch(refreshMe({ forceRefresh: true }))
                         navigate('/')
                     }
                 } catch (error) {

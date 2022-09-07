@@ -272,7 +272,7 @@ function ProductDetails() {
                     }
                 })
                 if (res.status === 200) {
-                    dispatch(refreshMe())
+                    dispatch(refreshMe({ forceRefresh: true }))
                     navigate(location.state ? location.state.prevPath : '/product')
                 }
             } catch (error) {

@@ -29,18 +29,25 @@ function Dashboard() {
     const [expStock, setExpStock] = useState([])
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { ready, user } = useSelector(state => state.auth)
+    const { user, refresh } = useSelector(state => state.auth)
+
 
     useEffect(() => {
-        if (!user && ready) {
+        const sinceLastSession = moment(Date.now()).diff(moment(refresh), 'minutes')
+
+        // Not a Valid User OR Session Timeout 
+        if (!user || sinceLastSession > 10) {
             dispatch(clearAuth())
-        }
-        if (ready && user) {
-            dispatch(refreshMe())
-        } else {
             navigate('/')
         }
-    })
+
+        console.log(`${sinceLastSession} mins since last refresh`)
+        if (user && sinceLastSession > 1) {
+            console.log('REFRESH ME CLIENT')
+            dispatch(refreshMe())
+        }
+
+    }, [refresh, user, dispatch, navigate])
 
     useEffect(() => {
         const allExpStock = []
@@ -121,13 +128,9 @@ function Dashboard() {
 
 
 
-    if (!ready) {
-        return (<div>Not a User</div>)
-    }
 
     return (
         <div className='flex flex-col space-y-5 min-h-screen mb-[6rem]'>
-
 
             <div className='flex px-7 pt-5 pb-2.5 items-center justify-between'>
                 <div>

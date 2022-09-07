@@ -46,8 +46,11 @@ function App() {
   const auth = useSelector(state => state.auth)
 
   useEffect(() => {
+
     if (auth.user && location.pathname === '/') {
       navigate('/account/dashboard')
+    } else {
+
     }
     if (!auth.user && auth.ready) {
       dispatch(clearAuth())

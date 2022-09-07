@@ -4,13 +4,15 @@ import axios from 'axios'
 
 // Urls
 import { API } from "../../../lib/urls";
+import moment from "moment";
 
 const initialState = {
     ready: false,
     loading: true,
     token: '',
     user: null,
-    error: false
+    error: false,
+    refresh: null
 }
 
 
@@ -56,24 +58,39 @@ export const refreshMe = createAsyncThunk(
     'auth/refreshMe',
     async (arg, thunkAPI) => {
         let response;
-        try {
-            const { data } = await axios({
-                method: "GET",
-                url: `${API.USER.me}`,
-                headers: {
-                    Authorization: `Bearer ${thunkAPI.getState().auth.token}`
+        const sinceLastSession = moment(Date.now()).diff(moment(thunkAPI.getState().auth.refresh), 'minutes')
+        if (sinceLastSession > 1 || arg.hasOwnProperty('forceRefresh')) {
+            try {
+                const { data } = await axios({
+                    method: "GET",
+                    url: `${API.USER.me}`,
+                    headers: {
+                        Authorization: `Bearer ${thunkAPI.getState().auth.token}`
+                    }
+                })
+                response = {
+                    user: data.user,
+                    token: thunkAPI.getState().auth.token
                 }
-            })
-            response = {
-                user: data.user,
-                token: thunkAPI.getState().auth.token
-            }
 
-        } catch (error) {
-            response = error.message
+            } catch (error) {
+                response = error.message
+            }
+            return response
+        } else {
+            return thunkAPI.rejectWithValue({
+                user: thunkAPI.getState().auth.user,
+                token: thunkAPI.getState().auth.token,
+                ready: true,
+                error: false
+            })
         }
 
-        return response
+
+
+
+
+
     }
 )
 export const authSlice = createSlice({
@@ -106,6 +123,7 @@ export const authSlice = createSlice({
             state.token = action.payload.token
             state.user = action.payload.user
             state.ready = true
+            state.refresh = Date.now()
 
         },
         [setupAuth.rejected]: (state, action) => {
@@ -118,21 +136,23 @@ export const authSlice = createSlice({
         },
         [refreshMe.fulfilled]: (state, action) => {
             console.log('Refresh Fufilled')
+
             state.loading = false
             state.error = null
             state.token = action.payload.token
             state.user = action.payload.user
             state.ready = true
+            state.refresh = Date.now()
 
         },
         [refreshMe.rejected]: (state, action) => {
             console.log('Refresh Rejected')
             state.loading = false
-            console.log(action.error)
-            state.error = JSON.parse(action.error.message)
-            state.user = null
-            state.token = null
-            state.ready = false
+            state.error = action.payload.error ? JSON.parse(action.error.message) : ''
+            state.user = action.payload.user || null
+            state.token = action.payload.token || null
+            state.ready = action.payload.ready || false
+            state.refresh = Date.now()
         },
 
     }

@@ -29,7 +29,7 @@ function Login() {
     const auth = useSelector(state => state.auth)
     const [email, setEmail] = useState('')
     const [emailError, setEmailError] = useState('')
-    const registerCode = generateHashCode()
+    let registerCode = 'registerCode'
 
     const [newUser, setNewUser] = useState({
         status: false,
@@ -73,7 +73,9 @@ function Login() {
                     register_code: registerCode,
                     email: email
                 }
-                sendRegisterCode(params)
+
+
+                // sendRegisterCode(params)
             } else {
                 setNewUser({
                     ...newUser,
@@ -116,6 +118,7 @@ function Login() {
 
     function handleRegisterCodeSubmit(e) {
         e.preventDefault()
+        console.log(newUser.codeInput, registerCode)
         if (newUser.codeInput === registerCode) {
             setNewUser({ ...newUser, error: '' })
             dispatch(userEmail({ email }))
