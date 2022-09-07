@@ -3,7 +3,7 @@
 
 > A web app that tracks, manages, and organizes the food in your household.
 
-## Goal
+## Objective
 To solve the problem of having to remember if items are the in your house or if they have expired. By using this app, it will not only notify if you have a certain product in your house, but also let you know when something has expired.
 
 ## Screenshots
