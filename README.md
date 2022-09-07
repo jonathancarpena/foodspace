@@ -1,11 +1,12 @@
 
 # FoodSpace
 
-> A web app that tracks, manages, and organizes the food in your household the goal of the project was to solve the problem of having to remember if items are the in your house or if they have expired. 
+> A web app that tracks, manages, and organizes the food in your household.
 
-> By using this app, it will not only notify if you have a certain product in your house, but also let you know when something has expired.
+## Goal
+To solve the problem of having to remember if items are the in your house or if they have expired. By using this app, it will not only notify if you have a certain product in your house, but also let you know when something has expired.
+
 ## Screenshots
-
 <ul style="display:flex flex-direction:column">
 <img src="./screenshots/landing.PNG" width="172" height="375" alt="landing"> 
 <img src="./screenshots/foodspace.PNG" width="172" height="375" alt="loading">
