@@ -4,11 +4,11 @@
 > A MERN Stack CRUD application that allows users to have a personal food management system for their homes.
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+<ul style="display:flex flex-direction:column">
+<img src="./screenshots/landing.PNG" width="172" height="375" alt="landing"> 
+<img src="./screenshots/foodspace.PNG" width="172" height="375" alt="loading">
+<img src="./screenshots/user-dashboard.PNG" width="172" height="375" alt="difficulty">    
+</ul>
 
 
 ## Demo
